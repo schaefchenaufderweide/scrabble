@@ -3,3 +3,4 @@
 0.16 Steine rasten auf Feldern ein
 0.2 Button: Zug beenden
 0.3 Computer
+haha
