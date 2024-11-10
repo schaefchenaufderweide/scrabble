@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://7dbwea2in5nt"]
+
+[ext_resource type="Texture2D" uid="uid://claqc60tarde8" path="res://graphics/spielfeld.png" id="1_1qnwi"]
+[ext_resource type="Script" path="res://scenes/spielfeld.gd" id="1_w745b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_akk6s"]
+size = Vector2(56, 54)
+
+[node name="Spielfeld" type="Area2D"]
+scale = Vector2(0.1, 0.1)
+script = ExtResource("1_w745b")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_1qnwi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2.68221e-07, -2.38419e-07)
+scale = Vector2(1, 1)
+shape = SubResource("RectangleShape2D_akk6s")

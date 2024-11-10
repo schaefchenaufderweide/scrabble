@@ -1,0 +1,5 @@
+0.1 Hand erstellt, Steine werden erstellt, können per Touch bewegt werden (10.11)
+0.15 Spielfeld vollkommen erstellt
+0.16 Steine rasten auf Feldern ein
+0.2 Button: Zug beenden
+0.3 Computer

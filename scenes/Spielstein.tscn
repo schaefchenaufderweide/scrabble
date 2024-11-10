@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://b3ggbr8w7b2pj"]
+
+[ext_resource type="Texture2D" uid="uid://ddch01n4cb73l" path="res://graphics/spielstein.png" id="1_i87gv"]
+[ext_resource type="Script" path="res://scripts/spielstein.gd" id="1_n7k4w"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gp8hn"]
+size = Vector2(600, 600)
+
+[sub_resource type="LabelSettings" id="LabelSettings_kvkx7"]
+font_size = 100
+
+[node name="Spielstein" type="Area2D"]
+scale = Vector2(0.1, 0.1)
+script = ExtResource("1_n7k4w")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_i87gv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_gp8hn")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -300.0
+offset_top = -297.0
+offset_right = 300.0
+offset_bottom = 297.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+text = "Test"
+label_settings = SubResource("LabelSettings_kvkx7")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
