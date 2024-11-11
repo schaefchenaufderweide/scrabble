@@ -39,18 +39,18 @@ func ziehe_steine():
 			#
 	
 
-
-func _on_hand_area_mouse_entered() -> void:
-	if not GlobalConcepts.camera.screen_dragging:
-		#print("entered")
-		mouse_coll = true
-		GlobalConcepts.camera.screen_dragging_is_allowed = false
-		
-
-
-func _on_hand_area_mouse_exited() -> void:
-	if not GlobalConcepts.camera.screen_dragging:
-		#print("exited")
-		mouse_coll = false
-		GlobalConcepts.camera.screen_dragging_is_allowed = true
-		pass # Replace with function body.
+#
+#func _on_hand_area_mouse_entered() -> void:
+	#if not GlobalConcepts.camera.screen_dragging:
+		##print("entered")
+		#mouse_coll = true
+		#GlobalConcepts.camera.screen_dragging_is_allowed = false
+		#
+#
+#
+#func _on_hand_area_mouse_exited() -> void:
+	#if not GlobalConcepts.camera.screen_dragging:
+		##print("exited")
+		#mouse_coll = false
+		#GlobalConcepts.camera.screen_dragging_is_allowed = true
+		#pass # Replace with function body.
