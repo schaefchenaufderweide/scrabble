@@ -1,10 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://7dbwea2in5nt"]
+[gd_scene load_steps=7 format=3 uid="uid://7dbwea2in5nt"]
 
 [ext_resource type="Texture2D" uid="uid://claqc60tarde8" path="res://graphics/spielfeld.png" id="1_1qnwi"]
 [ext_resource type="Script" path="res://scenes/spielfeld.gd" id="1_w745b"]
+[ext_resource type="Texture2D" uid="uid://bh1xydtdky2yw" path="res://graphics/spielfeld_mitte.png" id="3_c1hra"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_akk6s"]
 size = Vector2(56, 54)
+
+[sub_resource type="SystemFont" id="SystemFont_yn36g"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_tl5w1"]
+font = SubResource("SystemFont_yn36g")
+font_size = 9
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
 
 [node name="Spielfeld" type="Area2D"]
 script = ExtResource("1_w745b")
@@ -15,3 +24,123 @@ texture = ExtResource("1_1qnwi")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-2.68221e-07, -2.38419e-07)
 shape = SubResource("RectangleShape2D_akk6s")
+
+[node name="Mitte" type="Sprite2D" parent="."]
+visible = false
+texture = ExtResource("3_c1hra")
+
+[node name="DreifacherWortwert" type="ColorRect" parent="."]
+visible = false
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+color = Color(1, 0, 0, 1)
+
+[node name="Label" type="Label" parent="DreifacherWortwert"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Dreifacher 
+Wort-
+wert"
+label_settings = SubResource("LabelSettings_tl5w1")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="DoppelterWortwert" type="ColorRect" parent="."]
+visible = false
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+color = Color(0.878431, 0.635294, 0.576471, 1)
+
+[node name="Label" type="Label" parent="DoppelterWortwert"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Doppelter 
+Wort-
+wert"
+label_settings = SubResource("LabelSettings_tl5w1")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="DreifacherBuchstabenwert" type="ColorRect" parent="."]
+visible = false
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+color = Color(0.105882, 0.572549, 0.839216, 1)
+
+[node name="Label" type="Label" parent="DreifacherBuchstabenwert"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Dreifacher 
+Buchstaben-
+wert"
+label_settings = SubResource("LabelSettings_tl5w1")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
+
+[node name="DoppelterBuchstabenwert" type="ColorRect" parent="."]
+visible = false
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+color = Color(0.682353, 0.760784, 0.823529, 1)
+
+[node name="Label" type="Label" parent="DoppelterBuchstabenwert"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = -27.0
+offset_right = 28.0
+offset_bottom = 27.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Doppelter 
+Buchstaben-
+wert"
+label_settings = SubResource("LabelSettings_tl5w1")
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 1
