@@ -7,7 +7,6 @@
 size = Vector2(56, 54)
 
 [node name="Spielfeld" type="Area2D"]
-scale = Vector2(0.1, 0.1)
 script = ExtResource("1_w745b")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

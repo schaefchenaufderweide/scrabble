@@ -1,16 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=10 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
+[ext_resource type="Script" path="res://scenes/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
 [ext_resource type="Texture2D" uid="uid://jkhvdsxcvslq" path="res://graphics/hand.png" id="3_ut4hp"]
 [ext_resource type="Script" path="res://scripts/hand_player.gd" id="5_gy7g6"]
+[ext_resource type="Script" path="res://scenes/spielbrett.gd" id="5_hoy6u"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7tyfo"]
+size = Vector2(461, 68)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7tyfo"]
-size = Vector2(1550, 223.333)
 
 [node name="Main" type="Node"]
 script = ExtResource("1_6iaw0")
@@ -18,8 +20,23 @@ script = ExtResource("1_6iaw0")
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("6_r55eh")
 
+[node name="HandPlayer" type="CanvasLayer" parent="."]
+script = ExtResource("5_gy7g6")
+
+[node name="HandArea" type="Area2D" parent="HandPlayer"]
+position = Vector2(250, 750)
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HandPlayer/HandArea"]
+position = Vector2(-2.5, 1)
+shape = SubResource("RectangleShape2D_7tyfo")
+
+[node name="Sprite2D" type="Sprite2D" parent="HandPlayer/HandArea"]
+texture = ExtResource("3_ut4hp")
+
 [node name="Spielbrett" type="Area2D" parent="."]
 position = Vector2(600, 617)
+script = ExtResource("5_hoy6u")
 metadata/_edit_group_ = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Spielbrett"]
@@ -28,20 +45,8 @@ texture = ExtResource("3_7hawp")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Spielbrett"]
 shape = SubResource("RectangleShape2D_o7rvn")
 
-[node name="HandPlayer" type="CanvasLayer" parent="."]
-script = ExtResource("5_gy7g6")
-
-[node name="HandArea" type="Area2D" parent="HandPlayer"]
-position = Vector2(250, 750)
-scale = Vector2(0.3, 0.3)
-metadata/_edit_group_ = true
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HandPlayer/HandArea"]
-position = Vector2(-15, -1.66675)
-shape = SubResource("RectangleShape2D_7tyfo")
-
-[node name="Sprite2D" type="Sprite2D" parent="HandPlayer/HandArea"]
-texture = ExtResource("3_ut4hp")
+[node name="GlobalConcepts" type="Node" parent="."]
+script = ExtResource("2_vusr7")
 
 [connection signal="mouse_entered" from="HandPlayer/HandArea" to="HandPlayer" method="_on_hand_area_mouse_entered"]
 [connection signal="mouse_exited" from="HandPlayer/HandArea" to="HandPlayer" method="_on_hand_area_mouse_exited"]

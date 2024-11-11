@@ -2,18 +2,23 @@ extends CanvasLayer
 
 @onready var stein_scene = preload("res://scenes/Spielstein.tscn")
 
-#@onready var width = $HandArea/Sprite2D.texture.get_width()
+
 @onready var hand_area = $HandArea
-@onready var camera = $"../Camera2D"
+#@onready var camera = $"../Camera2D"
+
 
 var mouse_coll = false
 var steine = {}
 
 	
-func ziehe_steine(buchstaben_im_sackerl: Array):
+func ziehe_steine():
+	
 	var anzahl_steine = GlobalGameSettings.anzahl_steine_pro_hand
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
+	
+	
 	for nr_stein in range(anzahl_steine):
+		
 		if not steine.get(nr_stein):
 			
 			var new_stein = stein_scene.instantiate()
@@ -25,27 +30,27 @@ func ziehe_steine(buchstaben_im_sackerl: Array):
 			new_stein.position.x = new_pos_x
 			new_stein.position.y = hand_area.position.y
 			
-			var random_buchstabe_nr = randi_range(0, len(buchstaben_im_sackerl) - 1)
-			var new_buchstabe = buchstaben_im_sackerl.pop_at(random_buchstabe_nr)
+			var random_buchstabe_nr = randi_range(0, len(GlobalConcepts.buchstaben_im_sackerl) - 1)
+			var new_buchstabe = GlobalConcepts.buchstaben_im_sackerl.pop_at(random_buchstabe_nr)
 			
 			
 			new_stein.label.text = new_buchstabe
 			steine[nr_stein] = new_buchstabe
+			#
 	
 
 
-
 func _on_hand_area_mouse_entered() -> void:
-	if not camera.screen_dragging:
-		print("entered")
+	if not GlobalConcepts.camera.screen_dragging:
+		#print("entered")
 		mouse_coll = true
-		camera.screen_dragging_is_allowed = false
+		GlobalConcepts.camera.screen_dragging_is_allowed = false
 		
 
 
 func _on_hand_area_mouse_exited() -> void:
-	if not camera.screen_dragging:
-		print("exited")
+	if not GlobalConcepts.camera.screen_dragging:
+		#print("exited")
 		mouse_coll = false
-		camera.screen_dragging_is_allowed = true
+		GlobalConcepts.camera.screen_dragging_is_allowed = true
 		pass # Replace with function body.

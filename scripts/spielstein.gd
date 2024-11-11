@@ -2,21 +2,29 @@ extends Area2D
 
 @onready var label = $Label
 @onready var size = $Sprite2D.texture.get_width() * scale
-@onready var camera = get_parent().camera
-var mouse_coll = false
+#var camera = $".".camera
+#var spielbrett = $".".spielbrettxxx
 
+var mouse_coll = false
+var abgelegt = false
+var dragging = false
 
 func _unhandled_input(event: InputEvent) -> void:	
 	if event is InputEventScreenDrag and mouse_coll:
 		position = event.position
-		print("dragging")
-		camera.screen_dragging_is_allowed = false
-	elif event is InputEventScreenTouch and not event.pressed:
-		print("aus")
-		camera.screen_dragging_is_allowed = true
-
+		print(label.text + "dragging")
+		dragging = true
+		GlobalConcepts.camera.screen_dragging_is_allowed = false
+	elif event is InputEventScreenTouch and dragging:
+		if not event.pressed: # wird losgelassen
+			print(label.text + "dragging aus")
+			GlobalConcepts.camera.screen_dragging_is_allowed = true
+			dragging = false
+		#get_parent().remove_child(self)
+		#Main.spielbrett.add_child(self)
+		
 func _on_mouse_entered() -> void:
-	var allowed = camera.screen_dragging == false
+	var allowed = GlobalConcepts.camera.screen_dragging == false
 	if allowed:
 		mouse_coll = true
 		pass
@@ -27,7 +35,7 @@ func _on_mouse_entered() -> void:
 
 
 func _on_mouse_exited() -> void:
-	var allowed = camera.screen_dragging == false
+	var allowed = GlobalConcepts.camera.screen_dragging == false
 	if allowed:
 		mouse_coll = false
 		pass

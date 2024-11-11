@@ -15,5 +15,4 @@ func _unhandled_input(event: InputEvent) -> void:
 			screen_dragging = true
 	
 	elif event is InputEventScreenTouch and not event.pressed:
-		print("aus")
 		screen_dragging = false
