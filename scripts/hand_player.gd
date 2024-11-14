@@ -9,7 +9,7 @@ extends CanvasLayer
 
 var mouse_coll = false
 var steine = {}
-
+var stein_positions = {}
 	
 func ziehe_steine():
 	
@@ -22,7 +22,8 @@ func ziehe_steine():
 		if not steine.get(nr_stein):
 			
 			var new_stein = stein_scene.instantiate()
-			add_child(new_stein)
+			new_stein.name = "Stein " + str(nr_stein)
+			add_child(new_stein)  
 			var erste_x = hand_area.position.x - anzahl_steine/2 * (new_stein.size.x + abstand)
 			var new_pos_x = erste_x + nr_stein * (new_stein.size.x + abstand)
 			
@@ -36,7 +37,8 @@ func ziehe_steine():
 			
 			new_stein.label.text = new_buchstabe
 			steine[nr_stein] = new_buchstabe
-			#
+			
+			stein_positions[new_stein] = new_stein.position
 	
 
 #

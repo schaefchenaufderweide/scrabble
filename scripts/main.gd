@@ -7,3 +7,4 @@ func _ready() -> void:
 	GlobalConcepts.player_hand.ziehe_steine() 
 	
 	
+	

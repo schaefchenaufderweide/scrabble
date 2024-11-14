@@ -4,66 +4,47 @@ extends Area2D
 @onready var size = $Sprite2D.texture.get_width() * scale
 
 
+var offset_hand = Vector2(-GlobalConcepts.screen_size.x/2, -GlobalConcepts.screen_size.y/2)
 var is_touched = false
 var abgelegt = false
-var is_dragged = false
-var snap_to_position = null
+var is_pressed = false
 
-func _unhandled_input(event: InputEvent) -> void:	
-	
-	if event is InputEventScreenTouch:
-		if not is_touched and event.pressed and not GlobalConcepts.spielstein_is_dragged:  # sofern nicht bereits einer gewählt ist
-			is_touched = check_is_touched(event.position)  
-			if is_touched:  # stein wird angeclickt
-				print("touched")
-				GlobalConcepts.spielstein_is_dragged = true				
-				#GlobalConcepts.camera.screen_dragging_is_allowed = false
-		
-		if not event.pressed and is_touched: 
-			print(label.text + " dragging aus")
-			#GlobalConcepts.camera.screen_dragging_is_allowed = true
-			GlobalConcepts.spielstein_is_dragged = false
-			is_dragged = false				
-			is_touched = false
+func _input(event: InputEvent) -> void:	
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed and is_touched:
+				# spielstein wird hand entnommen
+				
+				is_pressed = true
+				GlobalConcepts.spielstein_is_dragged = true
+				get_parent().remove_child(self)
+				GlobalConcepts.spielbereich_abgelegte_steine.add_child(self)
+				
+				position = event.position + offset_hand + GlobalConcepts.camera.position
+				
+			elif not event.pressed and is_touched:
+				# spielstein wird losgelassen
+				is_pressed = false
+				GlobalConcepts.spielstein_is_dragged = false
+				print("snap field: ", GlobalConcepts.snap_field)
+				if GlobalConcepts.snap_field:
+					position = GlobalConcepts.snap_field.position
+				else:
+					get_parent().remove_child(self)
+					GlobalConcepts.player_hand.add_child(self)
+					position = GlobalConcepts.player_hand.stein_positions[self]
+				
+	if event is InputEventMouseMotion:
+		if is_pressed:
 			
-	elif is_touched:
+			position = event.position + offset_hand + GlobalConcepts.camera.position
+			
+func _on_mouse_entered() -> void:
+	if not GlobalConcepts.spielstein_is_dragged:
+		# berührt spielstein
+		is_touched = true
 	
+func _on_mouse_exited() -> void:
+	if not is_pressed:
+		is_touched = false
 		
-		position = event.position
-		print(label.text + " is dragged")
-		is_dragged = true	
-		#get_parent().remove_child(self)
-		#Main.spielbrett.add_child(self)
-
-func check_is_touched(touch_pos):
-	
-	var dist = touch_pos.distance_to(position)
-	if dist < size.x/2:
-		return true
-	else:
-		return false
-	
-		#
-#func _on_mouse_entered() -> void:
-	#var allowed = GlobalConcepts.camera.screen_dragging == false
-	#if allowed:
-		#mouse_coll = true
-		#pass
-		#print("Entered " + label.text)
-	#
-	#
-#
-#
-#
-#func _on_mouse_exited() -> void:
-	#var allowed = GlobalConcepts.camera.screen_dragging == false
-	#if allowed:
-		#mouse_coll = false
-		#pass
-		#print("Exited " + label.text)
-	#
-#
-#
-#func _on_area_entered(area: Area2D) -> void:
-	#print(area, "entered")
-	#pass # Replace with function body.

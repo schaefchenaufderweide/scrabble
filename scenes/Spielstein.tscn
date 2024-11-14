@@ -12,6 +12,38 @@ font_size = 20
 [node name="Spielstein" type="Area2D"]
 script = ExtResource("1_n7k4w")
 
+[node name="AllowedRect" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -35.0
+offset_right = 35.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+color = Color(0, 1, 0, 1)
+
+[node name="ForbiddenRect" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -35.0
+offset_top = -35.0
+offset_right = 35.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+color = Color(1, 0, 0, 1)
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_i87gv")
 
@@ -28,3 +60,6 @@ text = "Test"
 label_settings = SubResource("LabelSettings_kvkx7")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

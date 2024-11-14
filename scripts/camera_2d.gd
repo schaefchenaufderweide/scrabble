@@ -1,16 +1,17 @@
 extends Camera2D
 
-#@onready var hand_player = $"../HandPlayer"
-#var screen_dragging = false
-#var screen_dragging_is_allowed = true
 
-	
+var is_pressed = false
 
 func _unhandled_input(event: InputEvent) -> void:
 
-	if event is InputEventScreenDrag:
-		#if event.pressed:
-		if not GlobalConcepts.spielstein_is_dragged:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_pressed = true
+			else:
+				is_pressed = false
+	if event is InputEventMouseMotion:
+		if is_pressed and not GlobalConcepts.spielstein_is_dragged:
 			position -= event.relative
-				#screen_dragging = true
-		
+			#print("camera poisiont", position)

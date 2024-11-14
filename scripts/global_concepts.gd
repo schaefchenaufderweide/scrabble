@@ -2,11 +2,15 @@ extends Node
 
 
 
-@onready var spielbrett = $"../Main/Spielbrett"
-
-@onready var player_hand = $"../Main/HandPlayer"
+@onready var spielbrett = $"/root/Main/Spielbrett"
+@onready var spielbereich_spielfelder = $"/root/Main/Spielbereich/Spielfelder"
+@onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbereich/AbgelegteSteine"
+@onready var player_hand = $"/root/Main/Hand"
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
-@onready var camera = $"../Main/Camera2D"
+@onready var camera = $"/root/Main/Camera2D"
+@onready var main = $"/root/Main"
+
+@onready var screen_size = get_viewport().size
 
 var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,7], [0, 14], [7,14], [14,14]],
 "doppelter Wortwert": [[1,1],[2,2], [3,3], [4,4], [10, 4], [11, 3], [12,2], [13,1],[1, 13], [2,12], [3,11], [4,10], [10,10], [11,11], [12,12], [13,13]],
@@ -15,6 +19,8 @@ var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,
 "Mitte": [[7,7]]}
 
 var spielstein_is_dragged = false
+var snap_field = null
+
 
 func create_buchstaben_im_sackerl():
 	
@@ -22,7 +28,7 @@ func create_buchstaben_im_sackerl():
 
 
 func init_spielfeld():
-	var spielbrett_size = spielbrett.size
+	#var spielbrett_size = spielbrett.size
 	
 	var spielfeld_scene = preload("res://scenes/Spielfeld.tscn")
 	var spielfeld_size = preload("res://graphics/spielfeld.png").get_size()
@@ -30,13 +36,14 @@ func init_spielfeld():
 	var anzahl_felder = GlobalGameSettings.anzahl_felder
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
 	
-	var erste_x = spielbrett.position.x - spielbrett_size.x/2 - anzahl_felder/2 * (spielfeld_size.x + abstand)
-	var erste_y = spielbrett.position.y - spielbrett_size.y/2 - anzahl_felder/2 * (spielfeld_size.y + abstand)
+	var erste_x = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
+	var erste_y = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
 	for y in range(anzahl_felder):
 		for x in range(anzahl_felder):
 			
 			var new_spielfeld = spielfeld_scene.instantiate()
-			spielbrett.add_child(new_spielfeld)
+			new_spielfeld.name = "Spielfeld (" + str(x) + "x" + str(y) + ")"
+			spielbereich_spielfelder.add_child(new_spielfeld)
 			var spezial_markierung = null
 			for spezial in spezialfelder:
 				if [x, y] in spezialfelder[spezial]:
