@@ -4,6 +4,8 @@ extends CanvasLayer
 
 
 @onready var hand_area = $HandArea
+@onready var zug_beenden: TextureButton = $ZugBeenden
+
 #@onready var camera = $"../Camera2D"
 
 

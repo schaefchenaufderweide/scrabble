@@ -3,8 +3,8 @@ extends Node
 
 
 @onready var spielbrett = $"/root/Main/Spielbrett"
-@onready var spielbereich_spielfelder = $"/root/Main/Spielbereich/Spielfelder"
-@onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbereich/AbgelegteSteine"
+@onready var spielbereich_spielfelder = $"/root/Main/Spielbrett/Spielfelder"
+@onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbrett/AbgelegteSteine"
 @onready var player_hand = $"/root/Main/Hand"
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
@@ -64,3 +64,12 @@ func init_spielfeld():
 			var new_position_y = erste_y + y * (spielfeld_size.y + abstand)
 			new_spielfeld.position.x = new_position_x
 			new_spielfeld.position.y = new_position_y
+			new_spielfeld.feld = [x, y]
+
+func _on_zug_beenden_button_up() -> void:
+	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
+	for feld in group_alle_felder:
+		if feld.belegt:
+			print(feld.feld, ": ", feld.belegt.label.text)
+	#print(group_alle_felder)
+	pass # Replace with function body.

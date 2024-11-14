@@ -13,13 +13,13 @@ extends Area2D
 var belegt = null
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer
-
+var feld
 
 
 
 func _on_mouse_entered() -> void:
 	
-	if GlobalConcepts.spielstein_is_dragged:
+	if GlobalConcepts.spielstein_is_dragged and not belegt:
 		
 		select_rect.visible = true
 		animation_player.play("select")
