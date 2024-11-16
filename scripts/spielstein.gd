@@ -8,6 +8,7 @@ var offset_hand = Vector2(-GlobalConcepts.screen_size.x/2, -GlobalConcepts.scree
 var is_touched = false
 var abgelegtes_feld = false
 var is_pressed = false
+var wert
 
 func _input(event: InputEvent) -> void:	
 	if event is InputEventMouseButton:

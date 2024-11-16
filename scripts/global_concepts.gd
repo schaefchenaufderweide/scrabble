@@ -23,8 +23,15 @@ var snap_field = null
 
 
 func create_buchstaben_im_sackerl():
-	
-	return ["C", "B", "D", "X", "Y", "O", "P", "R", "S"]
+	var buchstaben_im_sackerl = []
+	for buchstabe in GlobalGameSettings.spielsteine_start:
+		
+		var anzahl = GlobalGameSettings.spielsteine_start[buchstabe]["Anzahl"]
+		
+		for i in range(anzahl):
+			buchstaben_im_sackerl.append(buchstabe)
+	buchstaben_im_sackerl.shuffle()
+	return buchstaben_im_sackerl
 
 
 func init_spielfeld():
@@ -71,5 +78,5 @@ func _on_zug_beenden_button_up() -> void:
 	for feld in group_alle_felder:
 		if feld.belegt:
 			print(feld.feld, ": ", feld.belegt.label.text)
-	#print(group_alle_felder)
-	pass # Replace with function body.
+	
+	

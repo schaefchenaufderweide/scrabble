@@ -1,4 +1,4 @@
-extends CanvasLayer
+extends Node
 
 @onready var stein_scene = preload("res://scenes/Spielstein.tscn")
 
@@ -41,7 +41,7 @@ func ziehe_steine():
 			steine[nr_stein] = new_buchstabe
 			
 			stein_positions[new_stein] = new_stein.position
-	
+			new_stein.wert = GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"]
 
 #
 #func _on_hand_area_mouse_entered() -> void:
