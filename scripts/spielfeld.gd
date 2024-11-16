@@ -11,15 +11,16 @@ extends Area2D
 @onready var mitte = $Mitte
 
 var belegt = null
+var allowed = false
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer
 var feld
-
+var frisch_belegt
 
 
 func _on_mouse_entered() -> void:
 	
-	if GlobalConcepts.spielstein_is_dragged and not belegt:
+	if GlobalConcepts.spielstein_is_dragged and allowed:
 		
 		select_rect.visible = true
 		animation_player.play("select")

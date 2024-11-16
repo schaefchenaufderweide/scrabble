@@ -20,6 +20,8 @@ var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,
 
 var spielstein_is_dragged = false
 var snap_field = null
+var all_spielfelder = {}
+var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
 
 func create_buchstaben_im_sackerl():
@@ -66,80 +68,120 @@ func init_spielfeld():
 				new_spielfeld.doppelter_buchstabenwert.visible = true
 			elif spezial_markierung == "Mitte":
 				new_spielfeld.mitte.visible = true
+				
 			
 			var new_position_x = erste_x + x * (spielfeld_size.x + abstand)
 			var new_position_y = erste_y + y * (spielfeld_size.y + abstand)
 			new_spielfeld.position.x = new_position_x
 			new_spielfeld.position.y = new_position_y
 			new_spielfeld.feld = [x, y]
-
-func read(ausgangsfeld, belegte_felder):
-		var neue_woerter = []
-		
-		for richtung in ["horizontal", "vertikal"]:
+			all_spielfelder[[x,y]] = new_spielfeld
 			
-			var new_wort = ""
-		
-			while ausgangsfeld in belegte_felder:
-				new_wort += belegte_felder[ausgangsfeld]
-				if richtung == "horizontal":
-					ausgangsfeld = [ausgangsfeld[0] + 1, ausgangsfeld[1]]
-				else:
-					ausgangsfeld = [ausgangsfeld[0], ausgangsfeld[1] + 1]
-			
-		
-		
-		return neue_woerter
-	
-func find_wortanfaenge_felder(belegte_felder):
-	var felder_wortanfaenge = []
-	
-	for feld in belegte_felder:
-		for richtung in [[0, -1], [-1, 0]]:
-			var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
-			if checkfeld not in belegte_felder:
-				felder_wortanfaenge.append(feld)
-	print(felder_wortanfaenge)
-	return felder_wortanfaenge
-		
-	# TODO HIER WEITER DENKEN!
-
-func read_gelegte_woerter():
-	
+func get_belegte_felder():
 	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
-	
 	var belegte_felder = {}
 	
 	for feld in group_alle_felder:
 		if feld.belegt:
 			belegte_felder[feld.feld] = feld.belegt.label.text
-	
-	var wortanfaenge_felder = find_wortanfaenge_felder(belegte_felder)
-	
-	var all_woerter = []
-	for x in range(GlobalGameSettings.anzahl_felder):
-		for y in range(GlobalGameSettings.anzahl_felder):
-			var feld = [x, y]
-			if feld in wortanfaenge_felder:
-				all_woerter += read(feld, belegte_felder)
-				#all_woerter.append(read(feld, "vertikal", belegte_felder))
-	print(all_woerter)
-	#
-	## read horizontal
-	#for belegt in belegte_felder:
-		#var x = belegt[0]
-		#var y = belegt[1]
-		#
-		#var new_wort = 
-		
-			
+	return belegte_felder
+
+func get_frisch_belegte_felder():
+	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
+	var frisch_belegte_felder  = []
 	
 	for feld in group_alle_felder:
-		if feld.belegt:
-			print(feld.feld, ": ", feld.belegt.label.text)
-	
+		if feld.frisch_belegt:
+			frisch_belegte_felder.append(feld.feld)
+	return frisch_belegte_felder
 
+
+func read_gelegte_woerter():
+	
+	
+	var belegte_felder = get_belegte_felder()
+	# read horizontal
+	var woerter_horizontal = []
+	for y in range(GlobalGameSettings.anzahl_felder):
+		var x = 0
+		
+		while x < GlobalGameSettings.anzahl_felder:
+			var new_word = ""
+			var feld = [x, y]
+			while feld in belegte_felder:
+				new_word += belegte_felder[feld]
+				x += 1
+				feld = [x, y]
+			if len(new_word) > 1:
+				woerter_horizontal.append(new_word)
+			x += 1
+	print(woerter_horizontal)
+	
+	# read vertikal
+	var woerter_vertikal = []
+	for x in range(GlobalGameSettings.anzahl_felder):
+		var y = 0
+		
+		while y < GlobalGameSettings.anzahl_felder:
+			var new_word = ""
+			var feld = [x, y]
+			while feld in belegte_felder:
+				new_word += belegte_felder[feld]
+				y += 1
+				feld = [x, y]
+			if len(new_word) > 1:
+				woerter_vertikal.append(new_word)
+			y += 1
+	print(woerter_vertikal)
+	
+func get_allowed_spielfelder():
+	# legerichtung eruieren
+	var belegte_felder = get_belegte_felder()
+	var frisch_belegte_felder = get_frisch_belegte_felder()
+	print("frisch belegt", frisch_belegte_felder)
+	print("gesamt gelegt", belegte_felder)
+	var relevante_steine 
+	if len(frisch_belegte_felder) == 0:  # 0 -> alle richtungen erlaubt und alle gelegten steine erlaubt
+		allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+		relevante_steine = belegte_felder
+	elif len(frisch_belegte_felder) == 1: # 1 > alle richtungen erlaubt, nur frisch belegte felder
+		allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+		relevante_steine = frisch_belegte_felder
+	elif frisch_belegte_felder[-2][1] == frisch_belegte_felder[-1][1]:
+		allowed_richtungen = [[-1, 0], [1, 0]] # horizontal
+		relevante_steine = frisch_belegte_felder
+	else:
+		allowed_richtungen = [[0, -1], [0, 1]] # vertikal
+		relevante_steine = frisch_belegte_felder
+	# alle spielfelder anfangs auf nicht allowed setzen
+	
+	XXXX TODO XXXXX falsche erlaubte felder!!!!
+	for feld in all_spielfelder:
+		all_spielfelder[feld].allowed = false
+	
+	
+	
+	if not all_spielfelder[[7,7]].belegt:
+		all_spielfelder[[7,7]].allowed = true
+		# dann ist NUR dieses erlaubt
+		return
+	
+	for feld in relevante_steine:
+		print("allowte richtungen", allowed_richtungen)
+		for richtung in allowed_richtungen:
+			var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+			if not checkfeld in belegte_felder and checkfeld in all_spielfelder:
+				all_spielfelder[checkfeld].allowed = true
+	#
+
+func clear_frisch_belegte_woerter():
+	for feld in GlobalConcepts.all_spielfelder:  # GD SCRIPT VERGISST (?) 
+		GlobalConcepts.all_spielfelder[feld].frisch_belegt = false
+	print("nicht mehr frisch")
+	
+	
 func _on_zug_beenden_button_up() -> void:
+	clear_frisch_belegte_woerter()
 	var gelegte_woerter = read_gelegte_woerter()
 	
 	
