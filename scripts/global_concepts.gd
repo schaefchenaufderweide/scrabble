@@ -135,44 +135,71 @@ func read_gelegte_woerter():
 	print(woerter_vertikal)
 	
 func get_allowed_spielfelder():
+	
 	# legerichtung eruieren
 	var belegte_felder = get_belegte_felder()
 	var frisch_belegte_felder = get_frisch_belegte_felder()
 	print("frisch belegt", frisch_belegte_felder)
 	print("gesamt gelegt", belegte_felder)
-	var relevante_steine 
+	
+	
+	
+	
+	var allowed_x = []
+	var allowed_y = []
 	if len(frisch_belegte_felder) == 0:  # 0 -> alle richtungen erlaubt und alle gelegten steine erlaubt
-		allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
-		relevante_steine = belegte_felder
+		#allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+		allowed_x = range(0, 15)
+		allowed_y = range(0, 15)
 	elif len(frisch_belegte_felder) == 1: # 1 > alle richtungen erlaubt, nur frisch belegte felder
-		allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
-		relevante_steine = frisch_belegte_felder
+		#allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+		allowed_x = [frisch_belegte_felder[0][0]]
+		allowed_y = [frisch_belegte_felder[0][1]]
+		
 	elif frisch_belegte_felder[-2][1] == frisch_belegte_felder[-1][1]:
-		allowed_richtungen = [[-1, 0], [1, 0]] # horizontal
-		relevante_steine = frisch_belegte_felder
+		#allowed_richtungen = [[-1, 0], [1, 0]] # horizontal
+		allowed_y = [frisch_belegte_felder[0][1]]
 	else:
-		allowed_richtungen = [[0, -1], [0, 1]] # vertikal
-		relevante_steine = frisch_belegte_felder
+		#allowed_richtungen = [[0, -1], [0, 1]] # vertikal
+		allowed_x = [frisch_belegte_felder[0][0]]
+	
 	# alle spielfelder anfangs auf nicht allowed setzen
 	
-	XXXX TODO XXXXX falsche erlaubte felder!!!!
+	print("allowed x:", allowed_x)
+	print("allowed y:", allowed_y)
 	for feld in all_spielfelder:
 		all_spielfelder[feld].allowed = false
-	
-	
+		#all_spielfelder[feld].animation_player.stop()
+		
+	# WARUM WWARUM WARUM SPIELEN SIE DIE ANIMATION NICHT ????
 	
 	if not all_spielfelder[[7,7]].belegt:
 		all_spielfelder[[7,7]].allowed = true
+		all_spielfelder[[7,7]].animation_player.play("allowed")
 		# dann ist NUR dieses erlaubt
 		return
 	
-	for feld in relevante_steine:
-		print("allowte richtungen", allowed_richtungen)
-		for richtung in allowed_richtungen:
+	
+	for feld in belegte_felder:
+		#print("allowte richtungen", allowed_richtungen)
+		
+		for richtung in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
 			var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+			
+				
 			if not checkfeld in belegte_felder and checkfeld in all_spielfelder:
-				all_spielfelder[checkfeld].allowed = true
-	#
+				if richtung == [-1, 0] or richtung == [1, 0]:
+					if checkfeld[1] in allowed_y:  # wenn horizontal check muss y stimmen
+						all_spielfelder[checkfeld].allowed = true
+						all_spielfelder[checkfeld].animation_player.play("allowed")
+				elif richtung == [0, -1] or richtung == [0, 1]: # wenn vertikel muss x stimmen
+					if checkfeld[0] in allowed_x:
+						all_spielfelder[checkfeld].allowed = true
+						all_spielfelder[checkfeld].animation_player.play("allowed")
+	
+
+	
+
 
 func clear_frisch_belegte_woerter():
 	for feld in GlobalConcepts.all_spielfelder:  # GD SCRIPT VERGISST (?) 

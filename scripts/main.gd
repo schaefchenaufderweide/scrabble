@@ -7,8 +7,8 @@ func _ready() -> void:
 	GlobalConcepts.player_hand.ziehe_steine() 
 	
 	GlobalConcepts.get_allowed_spielfelder()
-
-func _process(delta: float) -> void:
-	var fresh = GlobalConcepts.get_frisch_belegte_felder()
-	print(len(fresh))
+#
+#func _process(delta: float) -> void:
+	#var fresh = GlobalConcepts.get_frisch_belegte_felder()
+	#print(len(fresh))
 	
