@@ -73,10 +73,73 @@ func init_spielfeld():
 			new_spielfeld.position.y = new_position_y
 			new_spielfeld.feld = [x, y]
 
-func _on_zug_beenden_button_up() -> void:
+func read(ausgangsfeld, belegte_felder):
+		var neue_woerter = []
+		
+		for richtung in ["horizontal", "vertikal"]:
+			
+			var new_wort = ""
+		
+			while ausgangsfeld in belegte_felder:
+				new_wort += belegte_felder[ausgangsfeld]
+				if richtung == "horizontal":
+					ausgangsfeld = [ausgangsfeld[0] + 1, ausgangsfeld[1]]
+				else:
+					ausgangsfeld = [ausgangsfeld[0], ausgangsfeld[1] + 1]
+			
+		
+		
+		return neue_woerter
+	
+func find_wortanfaenge_felder(belegte_felder):
+	var felder_wortanfaenge = []
+	
+	for feld in belegte_felder:
+		for richtung in [[0, -1], [-1, 0]]:
+			var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+			if checkfeld not in belegte_felder:
+				felder_wortanfaenge.append(feld)
+	print(felder_wortanfaenge)
+	return felder_wortanfaenge
+		
+	# TODO HIER WEITER DENKEN!
+
+func read_gelegte_woerter():
+	
 	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
+	
+	var belegte_felder = {}
+	
+	for feld in group_alle_felder:
+		if feld.belegt:
+			belegte_felder[feld.feld] = feld.belegt.label.text
+	
+	var wortanfaenge_felder = find_wortanfaenge_felder(belegte_felder)
+	
+	var all_woerter = []
+	for x in range(GlobalGameSettings.anzahl_felder):
+		for y in range(GlobalGameSettings.anzahl_felder):
+			var feld = [x, y]
+			if feld in wortanfaenge_felder:
+				all_woerter += read(feld, belegte_felder)
+				#all_woerter.append(read(feld, "vertikal", belegte_felder))
+	print(all_woerter)
+	#
+	## read horizontal
+	#for belegt in belegte_felder:
+		#var x = belegt[0]
+		#var y = belegt[1]
+		#
+		#var new_wort = 
+		
+			
+	
 	for feld in group_alle_felder:
 		if feld.belegt:
 			print(feld.feld, ": ", feld.belegt.label.text)
+	
+
+func _on_zug_beenden_button_up() -> void:
+	var gelegte_woerter = read_gelegte_woerter()
 	
 	

@@ -33,3 +33,6 @@ var spielsteine_start = {"E": {"Anzahl": 15, "Wert": 1},
 						"Q": {"Anzahl": 1, "Wert": 10},
 						"Y": {"Anzahl": 1, "Wert": 10},
 						"?": {"Anzahl": 2, "Wert": 0}}
+
+var file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
+var wortliste = file.get_as_text()
