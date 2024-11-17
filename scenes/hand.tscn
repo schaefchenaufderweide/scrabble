@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://c5wqgnu8r3eye"]
+
+[ext_resource type="Script" path="res://scripts/hand.gd" id="1_bjxnp"]
+[ext_resource type="Texture2D" uid="uid://jkhvdsxcvslq" path="res://graphics/hand.png" id="2_5j0w0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7tyfo"]
+size = Vector2(479, 70)
+
+[node name="HandCanvasLayer" type="CanvasLayer"]
+script = ExtResource("1_bjxnp")
+
+[node name="HandArea" type="Area2D" parent="."]
+position = Vector2(250, 750)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HandArea"]
+shape = SubResource("RectangleShape2D_7tyfo")
+
+[node name="Sprite2D" type="Sprite2D" parent="HandArea"]
+texture = ExtResource("2_5j0w0")

@@ -21,9 +21,9 @@ func _input(event: InputEvent) -> void:
 				
 				is_pressed = true
 				GlobalConcepts.spielstein_is_dragged = true
-				if get_parent() == GlobalConcepts.player_hand:  # aus hand entnommen
+				if get_parent() == GlobalConcepts.player:  # aus hand entnommen
 					#print("aus hand entnommen")
-					GlobalConcepts.player_hand.remove_child(self)
+					GlobalConcepts.player.remove_child(self)
 					GlobalConcepts.spielbereich_abgelegte_steine.add_child(self)
 				else:
 					#print("aus spielfeld entnommen")

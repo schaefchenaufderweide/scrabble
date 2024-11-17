@@ -4,15 +4,13 @@ extends Node
 
 
 @onready var hand_area = $HandArea
-@onready var zug_beenden: TextureButton = $ZugBeenden
 
-#@onready var camera = $"../Camera2D"
-
-
-var mouse_coll = false
 var steine = {}
 var stein_positions = {}
-	
+
+func _ready() -> void:
+	ziehe_steine()
+
 func ziehe_steine():
 	
 	var anzahl_steine = GlobalGameSettings.anzahl_steine_pro_hand
@@ -45,21 +43,7 @@ func ziehe_steine():
 			new_stein.label.text = new_buchstabe
 			steine[nr_stein] = new_buchstabe
 			
-			stein_positions[new_stein] = new_stein.position
+			stein_positions[new_stein] = Vector2(new_pos_x, new_pos_y)
 			new_stein.wert = GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"]
-
-#
-#func _on_hand_area_mouse_entered() -> void:
-	#if not GlobalConcepts.camera.screen_dragging:
-		##print("entered")
-		#mouse_coll = true
-		#GlobalConcepts.camera.screen_dragging_is_allowed = false
-		#
-#
-#
-#func _on_hand_area_mouse_exited() -> void:
-	#if not GlobalConcepts.camera.screen_dragging:
-		##print("exited")
-		#mouse_coll = false
-		#GlobalConcepts.camera.screen_dragging_is_allowed = true
-		#pass # Replace with function body.
+			if self == GlobalConcepts.computer:
+				new_stein.visible = false

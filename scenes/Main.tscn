@@ -1,19 +1,59 @@
-[gd_scene load_steps=11 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=15 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
-[ext_resource type="Texture2D" uid="uid://jkhvdsxcvslq" path="res://graphics/hand.png" id="3_ut4hp"]
-[ext_resource type="Script" path="res://scripts/hand_player.gd" id="5_gy7g6"]
+[ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/hand.tscn" id="5_0h5wa"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
+[ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
+[ext_resource type="FontFile" uid="uid://can2ojupcbppw" path="res://fonts/comici.ttf" id="9_b2lyv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7tyfo"]
-size = Vector2(479, 70)
+[sub_resource type="Animation" id="Animation_xjd0v"]
+resource_name = "computer_denkt"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UICanvasLayer/ComputerzugSprite/ComputerzugLabel:label_settings:font_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0, 0, 0, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_hfkhn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UICanvasLayer/ComputerzugSprite/ComputerzugLabel:label_settings:font_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ob7eb"]
+_data = {
+"RESET": SubResource("Animation_hfkhn"),
+"computer_denkt": SubResource("Animation_xjd0v")
+}
+
+[sub_resource type="LabelSettings" id="LabelSettings_sxrdc"]
+font = ExtResource("9_b2lyv")
+font_size = 34
 
 [node name="Main" type="Node"]
 script = ExtResource("1_6iaw0")
@@ -37,19 +77,18 @@ shape = SubResource("RectangleShape2D_o7rvn")
 [node name="GlobalConcepts" type="Node" parent="."]
 script = ExtResource("2_vusr7")
 
-[node name="Hand" type="CanvasLayer" parent="."]
-script = ExtResource("5_gy7g6")
+[node name="Player" parent="." instance=ExtResource("5_0h5wa")]
 
-[node name="HandArea" type="Area2D" parent="Hand"]
-position = Vector2(250, 750)
+[node name="Computer" parent="." instance=ExtResource("5_0h5wa")]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hand/HandArea"]
-shape = SubResource("RectangleShape2D_7tyfo")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_ob7eb")
+}
 
-[node name="Sprite2D" type="Sprite2D" parent="Hand/HandArea"]
-texture = ExtResource("3_ut4hp")
+[node name="UICanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="ZugBeenden" type="TextureButton" parent="Hand"]
+[node name="ZugBeenden" type="TextureButton" parent="UICanvasLayer"]
 anchors_preset = -1
 anchor_left = 0.2
 anchor_top = 0.0125
@@ -62,4 +101,38 @@ texture_normal = ExtResource("7_p3hy0")
 texture_pressed = ExtResource("8_i0s4k")
 metadata/_edit_use_anchors_ = true
 
-[connection signal="button_up" from="Hand/ZugBeenden" to="GlobalConcepts" method="_on_zug_beenden_button_up"]
+[node name="ComputerzugSprite" type="ColorRect" parent="UICanvasLayer"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -225.0
+offset_top = -25.0
+offset_right = 225.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 0, 0, 1)
+
+[node name="ComputerzugLabel" type="Label" parent="UICanvasLayer/ComputerzugSprite"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -72.5
+offset_top = -11.5
+offset_right = 72.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Computer denkt ..."
+label_settings = SubResource("LabelSettings_sxrdc")
+
+[node name="Computerzug" type="Node" parent="."]
+script = ExtResource("9_avwwi")
+
+[connection signal="button_up" from="UICanvasLayer/ZugBeenden" to="GlobalConcepts" method="_on_zug_beenden_button_up"]

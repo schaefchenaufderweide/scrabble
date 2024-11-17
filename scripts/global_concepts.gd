@@ -5,10 +5,17 @@ extends Node
 @onready var spielbrett = $"/root/Main/Spielbrett"
 @onready var spielbereich_spielfelder = $"/root/Main/Spielbrett/Spielfelder"
 @onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbrett/AbgelegteSteine"
-@onready var player_hand = $"/root/Main/Hand"
+@onready var player = $"/root/Main/Player"
+@onready var computer = $"/root/Main/Computer"
+
+
+@onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
+@onready var animation_player = $"/root/Main/AnimationPlayer"
+@onready var computerzug_sprite: ColorRect = $"/root/Main/UICanvasLayer/ComputerzugSprite"
+@onready var computerzug: Node = $"/root/Main/Computerzug"
 
 @onready var screen_size = get_viewport().size
 
@@ -24,7 +31,8 @@ var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 var file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
 var wortliste = file.get_as_text()
-
+var an_der_reihe = player
+#player_hand.is_player = true
 
 func create_buchstaben_im_sackerl():
 	var buchstaben_im_sackerl = []
@@ -224,7 +232,7 @@ func update_spielbrett(zug_erlaubt):
 			if zug_erlaubt:  # steine werden am feld fixiert
 				spielstein_auf_feld.frisch_gelegt_sprite.visible = false
 				spielstein_auf_feld.fixiert_sprite.visible = true
-				player_hand.steine[spielstein_auf_feld.pos_in_hand] = null
+				player.steine[spielstein_auf_feld.pos_in_hand] = null
 			else:  # steine wandern zurück zur hand
 				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - GlobalConcepts.camera.position
 				
@@ -256,4 +264,9 @@ func _on_zug_beenden_button_up() -> void:
 	if zug_erlaubt:
 		
 		
-		player_hand.ziehe_steine()
+		player.ziehe_steine()
+		print("umschaltn")
+		GlobalConcepts.an_der_reihe = computer
+		computerzug_sprite.visible = true
+		animation_player.play("computer_denkt")
+		
