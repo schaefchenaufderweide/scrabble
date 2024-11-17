@@ -18,12 +18,14 @@ var feld
 var frisch_belegt
 
 
+
+
 func _on_mouse_entered() -> void:
 	
 	if GlobalConcepts.spielstein_is_dragged and allowed:
 		
 		select_rect.visible = true
-		animation_player.play("select")
+		#animation_player.play("select")
 		GlobalConcepts.snap_field = self
 		
 

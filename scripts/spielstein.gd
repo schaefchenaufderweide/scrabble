@@ -27,10 +27,11 @@ func _input(event: InputEvent) -> void:
 				else:
 					print("aus spielfeld entnommen")
 					abgelegtes_feld.belegt = null
-					abgelegtes_feld.animation_player.play("select")
+					#abgelegtes_feld.animation_player.play("select")
 					abgelegtes_feld.frisch_belegt = false
+					abgelegtes_feld.select_rect.visible = false
 				#print("check allowed spielfelder")
-				GlobalConcepts.get_allowed_spielfelder()
+				GlobalConcepts.set_allowed_spielfelder()
 					
 				position = event.position + offset_hand + GlobalConcepts.camera.position
 				
@@ -43,16 +44,16 @@ func _input(event: InputEvent) -> void:
 					position = GlobalConcepts.snap_field.position
 					GlobalConcepts.snap_field.belegt = self
 					abgelegtes_feld = GlobalConcepts.snap_field
-					abgelegtes_feld.animation_player.stop()
+					abgelegtes_feld.select_rect.visible = false
 					
 					abgelegtes_feld.frisch_belegt = true
 					
-					GlobalConcepts.get_allowed_spielfelder()
+					GlobalConcepts.set_allowed_spielfelder()
 				else: # stein geht zurück zur hand
 					get_parent().remove_child(self)
 					GlobalConcepts.player_hand.add_child(self)
 					position = GlobalConcepts.player_hand.stein_positions[self]
-				
+					
 	if event is InputEventMouseMotion:
 		if is_pressed:
 			

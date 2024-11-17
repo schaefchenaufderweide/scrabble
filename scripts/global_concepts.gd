@@ -21,7 +21,7 @@ var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,
 var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
-var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+#var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
 
 func create_buchstaben_im_sackerl():
@@ -134,17 +134,14 @@ func read_gelegte_woerter():
 			y += 1
 	print(woerter_vertikal)
 	
-func get_allowed_spielfelder():
-	
+func set_allowed_spielfelder():
+	var allowed_felder = []
 	# legerichtung eruieren
 	var belegte_felder = get_belegte_felder()
 	var frisch_belegte_felder = get_frisch_belegte_felder()
-	print("frisch belegt", frisch_belegte_felder)
-	print("gesamt gelegt", belegte_felder)
-	
-	
-	
-	
+	#print("frisch belegt", frisch_belegte_felder)
+	#print("gesamt gelegt", belegte_felder)
+		
 	var allowed_x = []
 	var allowed_y = []
 	if len(frisch_belegte_felder) == 0:  # 0 -> alle richtungen erlaubt und alle gelegten steine erlaubt
@@ -165,40 +162,48 @@ func get_allowed_spielfelder():
 	
 	# alle spielfelder anfangs auf nicht allowed setzen
 	
-	print("allowed x:", allowed_x)
-	print("allowed y:", allowed_y)
+	#print("allowed x:", allowed_x)
+	#print("allowed y:", allowed_y)
 	for feld in all_spielfelder:
 		all_spielfelder[feld].allowed = false
-		#all_spielfelder[feld].animation_player.stop()
+		all_spielfelder[feld].animation_player.stop()
 		
-	# WARUM WWARUM WARUM SPIELEN SIE DIE ANIMATION NICHT ????
-	
 	if not all_spielfelder[[7,7]].belegt:
-		all_spielfelder[[7,7]].allowed = true
-		all_spielfelder[[7,7]].animation_player.play("allowed")
+		allowed_felder = [[7,7]]
+		#all_spielfelder[[7,7]].allowed = true
+		#all_spielfelder[[7,7]].animation_player.play("allowed")
 		# dann ist NUR dieses erlaubt
-		return
-	
-	
-	for feld in belegte_felder:
-		#print("allowte richtungen", allowed_richtungen)
-		
-		for richtung in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
-			var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+	else:
 			
+		
+		
+		for feld in belegte_felder:
+			#print("allowte richtungen", allowed_richtungen)
+			
+			for richtung in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
+				var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
 				
-			if not checkfeld in belegte_felder and checkfeld in all_spielfelder:
-				if richtung == [-1, 0] or richtung == [1, 0]:
-					if checkfeld[1] in allowed_y:  # wenn horizontal check muss y stimmen
-						all_spielfelder[checkfeld].allowed = true
-						all_spielfelder[checkfeld].animation_player.play("allowed")
-				elif richtung == [0, -1] or richtung == [0, 1]: # wenn vertikel muss x stimmen
-					if checkfeld[0] in allowed_x:
-						all_spielfelder[checkfeld].allowed = true
-						all_spielfelder[checkfeld].animation_player.play("allowed")
-	
-
-	
+					
+				if not checkfeld in belegte_felder and checkfeld in all_spielfelder:
+					if richtung == [-1, 0] or richtung == [1, 0]:
+						if checkfeld[1] in allowed_y:  # wenn horizontal check muss y stimmen
+							if not checkfeld in allowed_felder:
+								allowed_felder.append(checkfeld)
+							#all_spielfelder[checkfeld].allowed = true
+							
+							#all_spielfelder[checkfeld].animation_player.play("allowed")
+					elif richtung == [0, -1] or richtung == [0, 1]: # wenn vertikel muss x stimmen
+						if checkfeld[0] in allowed_x:
+							#all_spielfelder[checkfeld].allowed = true
+							#all_spielfelder[checkfeld].animation_player.play("allowed")
+							if not checkfeld in allowed_felder:
+								allowed_felder.append(checkfeld)
+	print("erlaubte")
+	for all in allowed_felder:
+		print(all)
+		all_spielfelder[all].allowed = true
+		all_spielfelder[all].animation_player.play("allowed")
+		
 
 
 func clear_frisch_belegte_woerter():
