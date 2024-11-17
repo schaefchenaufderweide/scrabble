@@ -10,7 +10,7 @@ extends Area2D
 @onready var doppelter_buchstabenwert = $DoppelterBuchstabenwert
 @onready var mitte = $Mitte
 
-var belegt = null
+var spielstein_auf_feld = null
 var allowed = false
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer

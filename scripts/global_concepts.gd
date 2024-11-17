@@ -22,6 +22,8 @@ var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
+var file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
+var wortliste = file.get_as_text()
 
 
 func create_buchstaben_im_sackerl():
@@ -82,8 +84,9 @@ func get_belegte_felder():
 	var belegte_felder = {}
 	
 	for feld in group_alle_felder:
-		if feld.belegt:
-			belegte_felder[feld.feld] = feld.belegt.label.text
+		if feld.spielstein_auf_feld:
+			belegte_felder[feld.feld] = feld.spielstein_auf_feld.label.text
+			
 	return belegte_felder
 
 func get_frisch_belegte_felder():
@@ -115,7 +118,7 @@ func read_gelegte_woerter():
 			if len(new_word) > 1:
 				woerter_horizontal.append(new_word)
 			x += 1
-	print(woerter_horizontal)
+	#print(woerter_horizontal)
 	
 	# read vertikal
 	var woerter_vertikal = []
@@ -132,7 +135,8 @@ func read_gelegte_woerter():
 			if len(new_word) > 1:
 				woerter_vertikal.append(new_word)
 			y += 1
-	print(woerter_vertikal)
+	#print(woerter_vertikal)
+	return woerter_horizontal + woerter_vertikal
 	
 func set_allowed_spielfelder():
 	var allowed_felder = []
@@ -168,7 +172,7 @@ func set_allowed_spielfelder():
 		all_spielfelder[feld].allowed = false
 		all_spielfelder[feld].animation_player.stop()
 		
-	if not all_spielfelder[[7,7]].belegt:
+	if not all_spielfelder[[7,7]].spielstein_auf_feld:  # mitte wurde noch nicht platziert
 		allowed_felder = [[7,7]]
 		#all_spielfelder[[7,7]].allowed = true
 		#all_spielfelder[[7,7]].animation_player.play("allowed")
@@ -198,22 +202,58 @@ func set_allowed_spielfelder():
 							#all_spielfelder[checkfeld].animation_player.play("allowed")
 							if not checkfeld in allowed_felder:
 								allowed_felder.append(checkfeld)
-	print("erlaubte")
+	#print("erlaubte")
 	for all in allowed_felder:
-		print(all)
+		#print("erlaubt", all)
 		all_spielfelder[all].allowed = true
 		all_spielfelder[all].animation_player.play("allowed")
 		
 
 
-func clear_frisch_belegte_woerter():
+func update_spielbrett(zug_erlaubt):
 	for feld in GlobalConcepts.all_spielfelder:  # GD SCRIPT VERGISST (?) 
-		GlobalConcepts.all_spielfelder[feld].frisch_belegt = false
-	print("nicht mehr frisch")
+		var spielfeld = GlobalConcepts.all_spielfelder[feld]
+		
+		spielfeld.animation_player.stop()  # animation wird gestoppt
+		
+		if spielfeld.frisch_belegt:  # wurde in diesem zug mit spielstein belegt
+			spielfeld.frisch_belegt = false  # wird gelöscht
+			
+			
+			var spielstein_auf_feld = spielfeld.spielstein_auf_feld
+			if zug_erlaubt:  # steine werden am feld fixiert
+				spielstein_auf_feld.frisch_gelegt_sprite.visible = false
+				spielstein_auf_feld.fixiert_sprite.visible = true
+				player_hand.steine[spielstein_auf_feld.pos_in_hand] = null
+			else:  # steine wandern zurück zur hand
+				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - GlobalConcepts.camera.position
+				
+				spielstein_auf_feld.return_to_hand(old_pos)
+				spielfeld.spielstein_auf_feld = null
+				
+				
+		#GlobalConcepts.all_spielfelder[feld].frisch_belegt = false
+		
+	#print("nicht mehr frisch")
 	
 	
 func _on_zug_beenden_button_up() -> void:
-	clear_frisch_belegte_woerter()
+	
+	
 	var gelegte_woerter = read_gelegte_woerter()
+	var zug_erlaubt = true
+	for wort in gelegte_woerter:
+		print(wort)
+		if wort not in wortliste:
+			print(wort, " nicht in liste")
+			zug_erlaubt = false
+			break
 	
 	
+		
+	
+	update_spielbrett(zug_erlaubt)
+	if zug_erlaubt:
+		
+		
+		player_hand.ziehe_steine()
