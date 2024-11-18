@@ -1,6 +1,7 @@
 extends Node
 
 @onready var stein_scene = preload("res://scenes/Spielstein.tscn")
+@onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
 
 
 @onready var hand_area = $HandArea
@@ -28,16 +29,16 @@ func ziehe_steine():
 			var new_pos_x = erste_x + nr_stein * (new_stein.size.x + abstand)
 			var new_pos_y = hand_area.position.y
 			#print(new_stein.size)
-			new_stein.position.x = randi_range(0, GlobalConcepts.screen_size.x)
-			new_stein.position.y = GlobalConcepts.screen_size.y + 100
+			new_stein.position.x = randi_range(0, global_concepts.screen_size.x)
+			new_stein.position.y = global_concepts.screen_size.y + 100
 			var tween = create_tween()
 			
 			tween.tween_property(new_stein, "position", Vector2(new_pos_x, new_pos_y), 0.5)
 			#new_stein.position.x = new_pos_x
 			#new_stein.position.y = hand_area.position.y
 			new_stein.pos_in_hand = nr_stein
-			var random_buchstabe_nr = randi_range(0, len(GlobalConcepts.buchstaben_im_sackerl) - 1)
-			var new_buchstabe = GlobalConcepts.buchstaben_im_sackerl.pop_at(random_buchstabe_nr)
+			var random_buchstabe_nr = randi_range(0, len(global_concepts.buchstaben_im_sackerl) - 1)
+			var new_buchstabe = global_concepts.buchstaben_im_sackerl.pop_at(random_buchstabe_nr)
 			
 			
 			new_stein.label.text = new_buchstabe
@@ -45,5 +46,5 @@ func ziehe_steine():
 			
 			stein_positions[new_stein] = Vector2(new_pos_x, new_pos_y)
 			new_stein.wert = GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"]
-			if self == GlobalConcepts.computer:
+			if self == global_concepts.computer:
 				new_stein.visible = false

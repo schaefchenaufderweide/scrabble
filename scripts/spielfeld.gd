@@ -9,6 +9,7 @@ extends Area2D
 @onready var dreifacher_buchstabenwert = $DreifacherBuchstabenwert
 @onready var doppelter_buchstabenwert = $DoppelterBuchstabenwert
 @onready var mitte = $Mitte
+@onready var global_concepts: Node =  $"/root/Main/GlobalConcepts"
 
 var spielstein_auf_feld = null
 var allowed = false
@@ -22,11 +23,11 @@ var frisch_belegt
 
 func _on_mouse_entered() -> void:
 	
-	if GlobalConcepts.spielstein_is_dragged and allowed:
+	if global_concepts.spielstein_is_dragged and allowed:
 		
 		select_rect.visible = true
 		#animation_player.play("select")
-		GlobalConcepts.snap_field = self
+		global_concepts.snap_field = self
 		
 
 	
@@ -34,6 +35,6 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	select_rect.visible = false
-	if GlobalConcepts.snap_field == self:
-		GlobalConcepts.snap_field = null
+	if global_concepts.snap_field == self:
+		global_concepts.snap_field = null
 		

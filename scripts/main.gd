@@ -1,17 +1,18 @@
 extends Node
 
+@onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
 
 func _ready() -> void:
 	
-	GlobalConcepts.init_spielfeld()
+	global_concepts.init_spielfeld()
 	#GlobalConcepts.player.ziehe_steine() 
 	
-	GlobalConcepts.set_allowed_spielfelder()
+	global_concepts.set_allowed_spielfelder()
 
 
 func _process(delta: float) -> void:
-	#
+	print(global_concepts.an_der_reihe)
 	#print(GlobalConcepts.an_der_reihe)
-	if GlobalConcepts.an_der_reihe == GlobalConcepts.computer:
-		GlobalConcepts.computerzug.aktiv = true
+	if global_concepts.an_der_reihe == global_concepts.computer:
+		global_concepts.computerzug.aktiv = true
 	

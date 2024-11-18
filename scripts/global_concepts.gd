@@ -10,11 +10,14 @@ extends Node
 
 
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
+@onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
+@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
+
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
 @onready var animation_player = $"/root/Main/AnimationPlayer"
-@onready var computerzug_sprite: ColorRect = $"/root/Main/UICanvasLayer/ComputerzugSprite"
+#@onready var computerzug_sprite = $"/root/Main/UICanvasLayer/ComputerzugSprite"
 @onready var computerzug: Node = $"/root/Main/Computerzug"
 
 @onready var screen_size = get_viewport().size
@@ -31,9 +34,12 @@ var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 var file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
 var wortliste = file.get_as_text()
-var an_der_reihe = player
-#player_hand.is_player = true
+var an_der_reihe 
 
+func _ready() -> void:
+	print("start global concepts")
+	an_der_reihe = player
+	print(an_der_reihe)
 func create_buchstaben_im_sackerl():
 	var buchstaben_im_sackerl = []
 	for buchstabe in GlobalGameSettings.spielsteine_start:
@@ -219,8 +225,8 @@ func set_allowed_spielfelder():
 
 
 func update_spielbrett(zug_erlaubt):
-	for feld in GlobalConcepts.all_spielfelder:  # GD SCRIPT VERGISST (?) 
-		var spielfeld = GlobalConcepts.all_spielfelder[feld]
+	for feld in all_spielfelder:  # GD SCRIPT VERGISST (?) 
+		var spielfeld = all_spielfelder[feld]
 		
 		spielfeld.animation_player.stop()  # animation wird gestoppt
 		
@@ -234,7 +240,7 @@ func update_spielbrett(zug_erlaubt):
 				spielstein_auf_feld.fixiert_sprite.visible = true
 				player.steine[spielstein_auf_feld.pos_in_hand] = null
 			else:  # steine wandern zurück zur hand
-				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - GlobalConcepts.camera.position
+				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - camera.position
 				
 				spielstein_auf_feld.return_to_hand(old_pos)
 				spielfeld.spielstein_auf_feld = null
@@ -245,11 +251,15 @@ func update_spielbrett(zug_erlaubt):
 	#print("nicht mehr frisch")
 	
 	
-func _on_zug_beenden_button_up() -> void:
+func zug_beenden():
 	
 	
 	var gelegte_woerter = read_gelegte_woerter()
+	
 	var zug_erlaubt = true
+	if not gelegte_woerter:
+		zug_erlaubt = false
+		
 	for wort in gelegte_woerter:
 		print(wort)
 		if wort not in wortliste:
@@ -262,11 +272,25 @@ func _on_zug_beenden_button_up() -> void:
 	
 	update_spielbrett(zug_erlaubt)
 	if zug_erlaubt:
+		change_an_der_reihe()
 		
 		
+		
+func change_an_der_reihe():
+	if an_der_reihe == player:  # player WAR an der reihe, wechsel zu computer
 		player.ziehe_steine()
-		print("umschaltn")
-		GlobalConcepts.an_der_reihe = computer
-		computerzug_sprite.visible = true
+		
+		an_der_reihe = computer
+		zug_beenden_button.disabled = true
+		zug_beenden_button_label.text = "Computer denkt ..."
+		computerdenkt_fortschrittanzeige.visible = true
 		animation_player.play("computer_denkt")
+	else: # computer WAR an der reihe, wechsel zu player
+		computer.ziehe_steine()
+		
+		an_der_reihe = player
+		zug_beenden_button.disabled = false
+		zug_beenden_button_label.text = "Zug beenden"
+		computerdenkt_fortschrittanzeige.visible = false
+		animation_player.stop()
 		

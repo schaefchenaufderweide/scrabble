@@ -18,7 +18,6 @@ config/icon="res://graphics/icon.png"
 [autoload]
 
 GlobalGameSettings="*res://scripts/global_game_settings.gd"
-GlobalConcepts="*res://scripts/global_concepts.gd"
 
 [display]
 
