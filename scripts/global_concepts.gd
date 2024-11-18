@@ -42,15 +42,15 @@ func _ready() -> void:
 	an_der_reihe = player
 	print(an_der_reihe)
 func create_buchstaben_im_sackerl():
-	var buchstaben_im_sackerl = []
+	var sackerl = []
 	for buchstabe in GlobalGameSettings.spielsteine_start:
 		
 		var anzahl = GlobalGameSettings.spielsteine_start[buchstabe]["Anzahl"]
 		
 		for i in range(anzahl):
-			buchstaben_im_sackerl.append(buchstabe)
-	buchstaben_im_sackerl.shuffle()
-	return buchstaben_im_sackerl
+			sackerl.append(buchstabe)
+	sackerl.shuffle()
+	return sackerl
 
 
 func init_spielfeld():
@@ -114,7 +114,8 @@ func get_frisch_belegte_felder():
 	return frisch_belegte_felder
 
 
-func read_gelegte_woerter():
+func read_gelegte_woerter(is_computerzug):
+	
 	
 	
 	var belegte_felder = get_belegte_felder()
@@ -125,12 +126,16 @@ func read_gelegte_woerter():
 		
 		while x < GlobalGameSettings.anzahl_felder:
 			var new_word = ""
+			var beginn_feld = [x,y]
 			var feld = [x, y]
 			while feld in belegte_felder:
 				new_word += belegte_felder[feld]
 				x += 1
 				feld = [x, y]
-			if len(new_word) > 1:
+			if is_computerzug:
+				woerter_horizontal.append([new_word, beginn_feld, "horizontal"])
+				
+			elif len(new_word) > 1:
 				woerter_horizontal.append(new_word)
 			x += 1
 	#print(woerter_horizontal)
@@ -142,15 +147,19 @@ func read_gelegte_woerter():
 		
 		while y < GlobalGameSettings.anzahl_felder:
 			var new_word = ""
+			var beginn_feld = [x,y]
 			var feld = [x, y]
 			while feld in belegte_felder:
 				new_word += belegte_felder[feld]
 				y += 1
 				feld = [x, y]
-			if len(new_word) > 1:
+			if is_computerzug:
+				woerter_vertikal.append([new_word, beginn_feld, "vertikal"])
+				
+			elif len(new_word) > 1:
 				woerter_vertikal.append(new_word)
 			y += 1
-	#print(woerter_vertikal)
+	
 	return woerter_horizontal + woerter_vertikal
 	
 func get_allowed_spielfelder():
@@ -249,7 +258,7 @@ func update_spielbrett(zug_erlaubt):
 func zug_beenden():
 	
 	
-	var gelegte_woerter = read_gelegte_woerter()
+	var gelegte_woerter = read_gelegte_woerter(false)
 	
 	var zug_erlaubt = true
 	if not gelegte_woerter:

@@ -7,6 +7,7 @@
 0.182 fälschlich "doppelte" global_concepts korrigiert, übergang zwischen player und computerzug (18.11)
 0.2 Button: Zug beenden, prüfung: wort in liste? animation, buchstaben werden neu gezogen (DURCHEINANDER!!!)
 0.3 Computerzug: beginn etablieren (18.11)
+0.31 computerzug: mögliche wörter anhand von gelegten eruieren... (its a long way) (18.11)
 0.5 punkte
 0.6 einstellungen/menü
 haha
