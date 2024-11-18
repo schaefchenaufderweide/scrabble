@@ -33,7 +33,8 @@ func _input(event: InputEvent) -> void:
 					abgelegtes_feld.frisch_belegt = false
 					abgelegtes_feld.select_rect.visible = false
 				#print("check allowed spielfelder")
-				global_concepts.set_allowed_spielfelder()
+				var allowed_felder = global_concepts.get_allowed_spielfelder()
+				global_concepts.set_allowed_spielfelder(allowed_felder)
 					
 				position = event.position + offset_hand + global_concepts.camera.position
 				
@@ -50,7 +51,8 @@ func _input(event: InputEvent) -> void:
 					
 					abgelegtes_feld.frisch_belegt = true
 					
-					global_concepts.set_allowed_spielfelder()
+					var allowed_felder = global_concepts.get_allowed_spielfelder()
+					global_concepts.set_allowed_spielfelder(allowed_felder)
 				else: # stein geht zurück zur hand
 					return_to_hand(event.position)
 					

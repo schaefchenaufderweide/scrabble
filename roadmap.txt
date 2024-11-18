@@ -5,8 +5,8 @@
 0.18 erlaubte felder fertig, versuch der animation der erlaubten felder (16.11)
 0.181 animation der erlaubten felder korrekt (17.11)
 0.182 fälschlich "doppelte" global_concepts korrigiert, übergang zwischen player und computerzug (18.11)
-0.2 Button: Zug beenden, prüfung: wort in liste? animation, buchstaben werden neu gezogen
-0.3 Computerzug
+0.2 Button: Zug beenden, prüfung: wort in liste? animation, buchstaben werden neu gezogen (DURCHEINANDER!!!)
+0.3 Computerzug: beginn etablieren (18.11)
 0.5 punkte
 0.6 einstellungen/menü
 haha

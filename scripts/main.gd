@@ -7,12 +7,12 @@ func _ready() -> void:
 	global_concepts.init_spielfeld()
 	#GlobalConcepts.player.ziehe_steine() 
 	
-	global_concepts.set_allowed_spielfelder()
+	var allowed_felder = global_concepts.get_allowed_spielfelder()
+	global_concepts.set_allowed_spielfelder(allowed_felder)
 
 
-func _process(delta: float) -> void:
-	print(global_concepts.an_der_reihe)
-	#print(GlobalConcepts.an_der_reihe)
-	if global_concepts.an_der_reihe == global_concepts.computer:
-		global_concepts.computerzug.aktiv = true
+#func _process(delta: float) -> void:
+	#print(global_concepts.an_der_reihe)
+	
+	
 	

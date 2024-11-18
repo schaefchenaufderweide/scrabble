@@ -13,6 +13,7 @@ extends Node
 @onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
 @onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
 
+
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
@@ -152,44 +153,33 @@ func read_gelegte_woerter():
 	#print(woerter_vertikal)
 	return woerter_horizontal + woerter_vertikal
 	
-func set_allowed_spielfelder():
+func get_allowed_spielfelder():
 	var allowed_felder = []
-	# legerichtung eruieren
+	
 	var belegte_felder = get_belegte_felder()
 	var frisch_belegte_felder = get_frisch_belegte_felder()
-	#print("frisch belegt", frisch_belegte_felder)
-	#print("gesamt gelegt", belegte_felder)
 		
 	var allowed_x = []
 	var allowed_y = []
-	if len(frisch_belegte_felder) == 0:  # 0 -> alle richtungen erlaubt und alle gelegten steine erlaubt
-		#allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+	if len(frisch_belegte_felder) == 0:  
 		allowed_x = range(0, 15)
 		allowed_y = range(0, 15)
-	elif len(frisch_belegte_felder) == 1: # 1 > alle richtungen erlaubt, nur frisch belegte felder
-		#allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]  # alle richtungen
+	elif len(frisch_belegte_felder) == 1: 
+		
 		allowed_x = [frisch_belegte_felder[0][0]]
 		allowed_y = [frisch_belegte_felder[0][1]]
 		
 	elif frisch_belegte_felder[-2][1] == frisch_belegte_felder[-1][1]:
-		#allowed_richtungen = [[-1, 0], [1, 0]] # horizontal
+		
 		allowed_y = [frisch_belegte_felder[0][1]]
 	else:
-		#allowed_richtungen = [[0, -1], [0, 1]] # vertikal
+		
 		allowed_x = [frisch_belegte_felder[0][0]]
 	
-	# alle spielfelder anfangs auf nicht allowed setzen
 	
-	#print("allowed x:", allowed_x)
-	#print("allowed y:", allowed_y)
-	for feld in all_spielfelder:
-		all_spielfelder[feld].allowed = false
-		all_spielfelder[feld].animation_player.stop()
 		
 	if not all_spielfelder[[7,7]].spielstein_auf_feld:  # mitte wurde noch nicht platziert
 		allowed_felder = [[7,7]]
-		#all_spielfelder[[7,7]].allowed = true
-		#all_spielfelder[[7,7]].animation_player.play("allowed")
 		# dann ist NUR dieses erlaubt
 	else:
 			
@@ -207,20 +197,25 @@ func set_allowed_spielfelder():
 						if checkfeld[1] in allowed_y:  # wenn horizontal check muss y stimmen
 							if not checkfeld in allowed_felder:
 								allowed_felder.append(checkfeld)
-							#all_spielfelder[checkfeld].allowed = true
 							
-							#all_spielfelder[checkfeld].animation_player.play("allowed")
 					elif richtung == [0, -1] or richtung == [0, 1]: # wenn vertikel muss x stimmen
 						if checkfeld[0] in allowed_x:
-							#all_spielfelder[checkfeld].allowed = true
-							#all_spielfelder[checkfeld].animation_player.play("allowed")
+							
 							if not checkfeld in allowed_felder:
 								allowed_felder.append(checkfeld)
-	#print("erlaubte")
-	for all in allowed_felder:
-		#print("erlaubt", all)
-		all_spielfelder[all].allowed = true
-		all_spielfelder[all].animation_player.play("allowed")
+	return allowed_felder
+	
+	
+func set_allowed_spielfelder(allowed_felder):
+	# setzen der spielfelder
+	for feld in all_spielfelder:
+		if feld in allowed_felder:
+			all_spielfelder[feld].allowed = true
+			all_spielfelder[feld].animation_player.play("allowed")
+		else:
+			all_spielfelder[feld].animation_player.stop()
+			all_spielfelder[feld].allowed = false
+		
 		
 
 
@@ -284,13 +279,20 @@ func change_an_der_reihe():
 		zug_beenden_button.disabled = true
 		zug_beenden_button_label.text = "Computer denkt ..."
 		computerdenkt_fortschrittanzeige.visible = true
+		computerzug.aktiv = true
+		computerzug.durchgang = 0
 		animation_player.play("computer_denkt")
+		#computerzug.init_word_array()
+		
 	else: # computer WAR an der reihe, wechsel zu player
 		computer.ziehe_steine()
 		
 		an_der_reihe = player
 		zug_beenden_button.disabled = false
+		animation_player.play("RESET")
 		zug_beenden_button_label.text = "Zug beenden"
+		
 		computerdenkt_fortschrittanzeige.visible = false
-		animation_player.stop()
+		
+		computerzug.aktiv = false
 		
