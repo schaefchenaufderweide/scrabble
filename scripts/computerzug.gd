@@ -53,7 +53,7 @@ func think():
 	
 	
 	var gelegte_woerter_mit_zelle_und_richtung = global_concepts.read_gelegte_woerter(true)
-	
+	var belegte_felder = global_concepts.get_belegte_felder(false)
 	var zu_pruefen
 	
 	var moegliche_woerter = []
@@ -87,28 +87,77 @@ func think():
 		else:
 			richtung = [0, 1]
 		
-		moegliche_woerter += find_moegliche_woerter(wort, 0, computer_buchstaben, zelle_beginn, richtung, gelegte_woerter_mit_zelle_und_richtung)
+		moegliche_woerter += find_moegliche_woerter(wort, 0, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
 		
 	print("Anzahl möglicher Wörter: ", len(moegliche_woerter))
 	
 	var erlaubte_woerter = []
 	for wort in moegliche_woerter:
-		var ergebnis_test = test_moegliches_wort(wort)
-		var allowed = ergebnis_test[0]
-		var punkte = ergebnis_test[1]
+		var ergebnis_test = test_moegliches_wort(wort, belegte_felder)
+		var allowed = ergebnis_test
+		# TODO HIER DIE PUNKTE, ICH BRAUCHE BEGINN DES WORTES UND SPIELFELD
+		
 		if allowed:
 			erlaubte_woerter.append([wort, punkte])
 
-func test_moegliches_wort(wort):
+func test_moegliches_wort(wort_dict, belegte_felder):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	ist seitlich bzw. ober-unterhalb des probeweise gelegten buchstabens ein bereits gelegter buchstabe? 
 	dann schauen, ob gültiges wort
 	die legerichtung ist bereits überprüft! es geht nur um "querschläger"
 	"""
-	pass
-
+	#var moegliche_punkte = 0  
+	var wort = wort_dict[0]
+	var zu_legende_buchstaben_dict = wort_dict[1]
+	var richtung = wort_dict[2]
 	
+	for feld in zu_legende_buchstaben_dict:
+		var buchstabe = zu_legende_buchstaben_dict[feld]
+		
+		var querrichtung = [richtung[1], richtung[0]]
+		var querwort_okay = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
+		
+		if not querwort_okay:
+			return false
+		#else:
+			#var new_punkte = global_concepts.all_spielfelder[feld].xxx = new_spielfeld
+	
+	
+	
+	return true
+
+func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
+	
+	var new_wort = buchstabe
+	
+	for vor_zurueck in [[querrichtung[0] * -1, querrichtung[1] * -1], [querrichtung[0], querrichtung[1]]]:
+		
+		
+		var checkfeld = [feld[0] + vor_zurueck[0], feld[1] + vor_zurueck[1]]
+		
+		
+		
+		var new_buchstabe = belegte_felder.get(checkfeld)
+		while new_buchstabe:
+		
+			if vor_zurueck[0] == -1 or vor_zurueck[1] == - 1:  # es geht rückwärts
+				new_wort = new_buchstabe + new_wort
+			else:
+				new_wort += new_buchstabe
+	if not new_wort or new_wort in global_concepts.wortliste_txt:
+		# wort kann geschrieben werden
+		return true
+	else:
+		# wort kann nicht geschrieben werden
+		return false
+			
+		
+		
+
+		 
+
+
 
 func is_a_letter(letter):
 	
@@ -177,7 +226,7 @@ func find_moegliche_woerter(wort, suche_start_x, debug_computer_buchstaben, wort
 				
 				var allow_wort = hat_alle_buchstaben(fehlende_buchstaben, debug_computer_buchstaben)
 				if allow_wort:
-					moegliche_woerter.append([gesuchtes_wort, lege_dict])
+					moegliche_woerter.append([gesuchtes_wort, lege_dict, wortrichtung])
 					#print("mögliches wort ", gesuchtes_wort)
 				#else:
 					#print("nicht erlaubt", gesuchtes_wort)

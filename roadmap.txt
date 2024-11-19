@@ -10,6 +10,7 @@
 0.31 computerzug: mögliche wörter anhand von gelegten eruieren... (its a long way) (18.11)
 0.32 IN PROGRESS ... Fixe Liste, welche Wörter mit welchen anderen Wörtern gelegt werden können (19.11)
 0.33 IN PROGRESS: fixe liste zu zeitaufwendig. prüfen welche worte können gelegt werden (19.11)
-0.5 punkte
+0.34 IN PROGRESS: prüfen auf querwörter, punkte müssen noch erstellt werden (19.11)
+0.5 legen der buchstaben durch computer, berechnen der punkte
 0.6 einstellungen/menü
 haha
