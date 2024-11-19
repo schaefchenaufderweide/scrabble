@@ -33,8 +33,11 @@ var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
-var file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
-var wortliste = file.get_as_text()
+
+var wortliste_txt = load_wortliste()
+#var moegliche_woerter_dict = load_moegliche_woerter_dict()
+
+
 var an_der_reihe 
 
 func _ready() -> void:
@@ -52,6 +55,28 @@ func create_buchstaben_im_sackerl():
 	sackerl.shuffle()
 	return sackerl
 
+func load_wortliste():
+	var wortliste_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
+	return wortliste_file.get_as_text()
+#
+#func load_moegliche_woerter_dict():
+	#moegliche_woerter_dict = {}
+	#for buchstabe in GlobalGameSettings.allowed_letters:
+		#var json = JSON.new()
+		#var filename = "res://moegliche_woerter" + buchstabe + ".txt"
+		#var moegliche_woerter_file = FileAccess.open(filename, FileAccess.READ)
+		#var new_buchstaben_dict = JSON.parse_string(moegliche_woerter_file.get_as_text())
+		#moegliche_woerter_dict[buchstabe] = new_buchstaben_dict
+		##print(moegliche_woerter_dict)
+	#
+	#return moegliche_woerter_dict
+	#
+
+func save_wortliste():
+	pass
+#
+#func save_moegliche_woerter_dict():
+	#pass
 
 func init_spielfeld():
 	#var spielbrett_size = spielbrett.size
@@ -94,31 +119,43 @@ func init_spielfeld():
 			new_spielfeld.feld = [x, y]
 			all_spielfelder[[x,y]] = new_spielfeld
 			
-func get_belegte_felder():
+func get_belegte_felder(check_is_frisch_belegt):
 	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
 	var belegte_felder = {}
-	
-	for feld in group_alle_felder:
-		if feld.spielstein_auf_feld:
-			belegte_felder[feld.feld] = feld.spielstein_auf_feld.label.text
+	var frisch_belegte_felder = []
+	for feld_instance in group_alle_felder:
+		
+		if not check_is_frisch_belegt:
 			
-	return belegte_felder
+			if feld_instance.spielstein_auf_feld:
+				belegte_felder[feld_instance.feld] = feld_instance.spielstein_auf_feld.label.text
+		else:
+			if feld_instance.frisch_belegt:
+				frisch_belegte_felder.append(feld_instance.feld)
+	if not check_is_frisch_belegt:				
+				
+		return belegte_felder
+	else:
+		return frisch_belegte_felder
+#
+#func get_frisch_belegte_felder():
+	#var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
+	#var frisch_belegte_felder  = []
+	#
+	#for feld in group_alle_felder:
+		#if feld.frisch_belegt:
+			#frisch_belegte_felder.append(feld.feld)
+	#return frisch_belegte_felder
 
-func get_frisch_belegte_felder():
-	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
-	var frisch_belegte_felder  = []
+func get_buchstaben_auf_feld(belegte_felder, feld):
 	
-	for feld in group_alle_felder:
-		if feld.frisch_belegt:
-			frisch_belegte_felder.append(feld.feld)
-	return frisch_belegte_felder
-
+	return belegte_felder[feld].label.text
 
 func read_gelegte_woerter(is_computerzug):
 	
 	
 	
-	var belegte_felder = get_belegte_felder()
+	var belegte_felder = get_belegte_felder(false)
 	# read horizontal
 	var woerter_horizontal = []
 	for y in range(GlobalGameSettings.anzahl_felder):
@@ -165,8 +202,8 @@ func read_gelegte_woerter(is_computerzug):
 func get_allowed_spielfelder():
 	var allowed_felder = []
 	
-	var belegte_felder = get_belegte_felder()
-	var frisch_belegte_felder = get_frisch_belegte_felder()
+	var belegte_felder = get_belegte_felder(false)
+	var frisch_belegte_felder = get_belegte_felder(true)
 		
 	var allowed_x = []
 	var allowed_y = []
@@ -266,7 +303,7 @@ func zug_beenden():
 		
 	for wort in gelegte_woerter:
 		print(wort)
-		if wort not in wortliste:
+		if wort not in wortliste_txt:
 			print(wort, " nicht in liste")
 			zug_erlaubt = false
 			break

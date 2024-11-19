@@ -33,7 +33,7 @@ func think():
 	
 	var vorhandene_buchstaben = get_buchstaben()
 	#print(vorhandene_buchstaben)
-	print(global_concepts.wortliste)	
+	print(global_concepts.wortliste_txt)	
 	for wort_lst in gelegte_woerter_mit_zelle_und_richtung:
 		var wort = wort_lst[0]
 		var zelle = wort_lst[1]

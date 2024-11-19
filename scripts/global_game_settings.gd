@@ -35,3 +35,4 @@ var spielsteine_start = {"E": {"Anzahl": 15, "Wert": 1},
 						"?": {"Anzahl": 2, "Wert": 0}}
 
 var computer_denktiefe = 100
+var allowed_letters = spielsteine_start.keys()
