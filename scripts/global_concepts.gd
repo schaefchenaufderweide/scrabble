@@ -134,6 +134,7 @@ func get_belegte_felder(check_is_frisch_belegt):
 				frisch_belegte_felder.append(feld_instance.feld)
 	if not check_is_frisch_belegt:				
 				
+		print(belegte_felder)
 		return belegte_felder
 	else:
 		return frisch_belegte_felder
@@ -169,11 +170,13 @@ func read_gelegte_woerter(is_computerzug):
 				new_word += belegte_felder[feld]
 				x += 1
 				feld = [x, y]
-			if is_computerzug:
-				woerter_horizontal.append([new_word, beginn_feld, "horizontal"])
 				
-			elif len(new_word) > 1:
-				woerter_horizontal.append(new_word)
+			if len(new_word) > 1:
+				if is_computerzug:
+					woerter_horizontal.append([new_word, beginn_feld, "horizontal"])
+			
+				else:
+					woerter_horizontal.append(new_word)
 			x += 1
 	#print(woerter_horizontal)
 	
@@ -190,11 +193,13 @@ func read_gelegte_woerter(is_computerzug):
 				new_word += belegte_felder[feld]
 				y += 1
 				feld = [x, y]
-			if is_computerzug:
-				woerter_vertikal.append([new_word, beginn_feld, "vertikal"])
+			
+			if len(new_word) > 1:
+				if is_computerzug:
+					woerter_vertikal.append([new_word, beginn_feld, "vertikal"])
 				
-			elif len(new_word) > 1:
-				woerter_vertikal.append(new_word)
+				else:
+					woerter_vertikal.append(new_word)
 			y += 1
 	
 	return woerter_horizontal + woerter_vertikal
@@ -296,7 +301,7 @@ func zug_beenden():
 	
 	
 	var gelegte_woerter = read_gelegte_woerter(false)
-	
+	#print(gelegte_woerter)
 	var zug_erlaubt = true
 	if not gelegte_woerter:
 		zug_erlaubt = false
