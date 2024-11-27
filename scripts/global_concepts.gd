@@ -23,11 +23,7 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 
 @onready var screen_size = get_viewport().size
 
-var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,7], [0, 14], [7,14], [14,14]],
-"doppelter Wortwert": [[1,1],[2,2], [3,3], [4,4], [10, 4], [11, 3], [12,2], [13,1],[1, 13], [2,12], [3,11], [4,10], [10,10], [11,11], [12,12], [13,13]],
-"dreifacher Buchstabenwert": [[5,1], [9,1], [1,5], [5,5], [9,5], [13,5], [1, 9], [5,9], [9,9],[13,9], [5,13], [9,13]],
-"doppelter Buchstabenwert": [[3,0], [11,0], [0,3],[6,2],[8,2],[7,3],[2,6],[6,6],[8,6],[12,6],[3,7],[11,7],[2,8],[6,8],[8,8],[12,8],[0,11],[7,11],[14,11],[6,12],[8,12],[3,14],[11,14]],
-"Mitte": [[7,7]]}
+
 
 var spielstein_is_dragged = false
 var snap_field = null
@@ -96,8 +92,8 @@ func init_spielfeld():
 			new_spielfeld.name = "Spielfeld (" + str(x) + "x" + str(y) + ")"
 			spielbereich_spielfelder.add_child(new_spielfeld)
 			var spezial_markierung = null
-			for spezial in spezialfelder:
-				if [x, y] in spezialfelder[spezial]:
+			for spezial in GlobalGameSettings.spezialfelder:
+				if [x, y] in GlobalGameSettings.spezialfelder[spezial]:
 					spezial_markierung = spezial
 					break
 			if spezial_markierung == "dreifacher Wortwert":

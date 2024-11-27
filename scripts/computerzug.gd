@@ -7,7 +7,7 @@ var max_durchgaenge = GlobalGameSettings.computer_denktiefe
 @onready var fortschrittanzeige_max_breite = computerdenkt_fortschrittanzeige.size.x
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
 var percent: float = 0.0
-var word_array
+#var word_array
 
 
 func _ready() -> void:
@@ -27,30 +27,11 @@ func get_buchstaben():
 	for stein_nr in global_concepts.computer.steine:
 		buchstaben.append(global_concepts.computer.steine[stein_nr])
 	return buchstaben
-
-
-# TEST!!!!!!!!!!
-	#1. Wörter lesen  mit einzelbuchstaben 
-	#2. Welche erlaubten wörter beinhalten die gelesenen wörter inkl. Einzelbucjstaben
-	#3. Welche buchstaben bräuchte ich
-	#4. Welchen platz beöuchte ich
-	#5. Liste möglicher wörter vor check
-	#6. Check mit word array, wörter einlesen, allesamt korrekte wörter?
-	#7. Punkteliste erstellen
-	#8. Bestes wort wählen
-	
 	
 func think():
 	var computer_buchstaben = get_buchstaben()
 
-	
-	
-	#
-	#var debug_gelegte_woerter_mit_zelle_und_richtung = [["DONAUDAMPF", [7,7], "horizontal"], ["DENNOCH", [7,7], "vertikal"], ["NILPFERDE", [7,9], "horizontal"]]
-	
 	computer_buchstaben.sort()
-	
-	
 	
 	var gelegte_woerter_mit_zelle_und_richtung = global_concepts.read_gelegte_woerter(true)
 	var belegte_felder = global_concepts.get_belegte_felder(false)
@@ -88,17 +69,30 @@ func think():
 			richtung = [0, 1]
 		
 		moegliche_woerter += find_moegliche_woerter(wort, 0, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
-		
-	print("Anzahl möglicher Wörter: ", len(moegliche_woerter))
 	
 	var erlaubte_woerter = []
 	for wort in moegliche_woerter:
+		#print("prüfe ", wort)
 		var ergebnis_test = test_moegliches_wort(wort, belegte_felder)
-		var allowed = ergebnis_test
-		# TODO HIER DIE PUNKTE, ICH BRAUCHE BEGINN DES WORTES UND SPIELFELD
+		var allowed = ergebnis_test[0]
 		
+		var punkte = ergebnis_test[1] 
 		if allowed:
 			erlaubte_woerter.append([wort, punkte])
+			#print("erlaubt: ", [wort, punkte])
+		#else:
+			#print("nicht erlaubt: ", [wort, punkte])
+	
+	var sort_erlaubte_woerter = sort_by_punkte(erlaubte_woerter)
+	for wort in sort_erlaubte_woerter:
+		print(wort)
+	
+	# TODO: computer buchstaben legen!
+
+
+func sort_by_punkte(woerter):
+	woerter.sort_custom(func(a, b): return a[1] > b[1])
+	return woerter
 
 func test_moegliches_wort(wort_dict, belegte_felder):
 	"""
@@ -107,25 +101,62 @@ func test_moegliches_wort(wort_dict, belegte_felder):
 	dann schauen, ob gültiges wort
 	die legerichtung ist bereits überprüft! es geht nur um "querschläger"
 	"""
-	#var moegliche_punkte = 0  
+	var moegliche_punkte = 0
+	var wort_wert_bonus_faktor = 1 
 	var wort = wort_dict[0]
 	var zu_legende_buchstaben_dict = wort_dict[1]
 	var richtung = wort_dict[2]
 	
+	var abrechnen_bereits_gelegtes_wort = wort
+	
 	for feld in zu_legende_buchstaben_dict:
+		var buchstaben_wert_bonus_faktor = 1
 		var buchstabe = zu_legende_buchstaben_dict[feld]
 		
 		var querrichtung = [richtung[1], richtung[0]]
-		var querwort_okay = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
+		var querwort_pruefung_ergebnis = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
+		var ergebnis_okay = querwort_pruefung_ergebnis[0]
+		var zusatzpunkte = querwort_pruefung_ergebnis[1]
 		
-		if not querwort_okay:
-			return false
-		#else:
-			#var new_punkte = global_concepts.all_spielfelder[feld].xxx = new_spielfeld
+		if not ergebnis_okay:
+			return [false, 0]
+		else:
+			moegliche_punkte += zusatzpunkte
+			#print("zusatzpunkte querwort ", zusatzpunkte)
+		#print("dreifacher Wortwert: ", feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"])
+		#print("doppelter Wortwert: ", feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"])
+		#print("dreifacher Buchstabenwert: ", feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"])
+		#print("doppelter Wortwert: ", feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"])
+		
+		if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
+			wort_wert_bonus_faktor = 3
+		elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
+			wort_wert_bonus_faktor = 2
+		if feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"]:
+			buchstaben_wert_bonus_faktor = 3
+		elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
+			buchstaben_wert_bonus_faktor = 2
+		
+		
+		moegliche_punkte += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
+		#print("punkte für ", buchstabe, " :", GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor)
+		abrechnen_bereits_gelegtes_wort = replace_first_occurance(abrechnen_bereits_gelegtes_wort, buchstabe)	
+	
+	for abr_buchstabe in abrechnen_bereits_gelegtes_wort:
+		moegliche_punkte += GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"]
+		#print("punkte für bereits gelegten buchstaben ", abr_buchstabe, " :", GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"])
+	moegliche_punkte *= wort_wert_bonus_faktor
+		
 	
 	
-	
-	return true
+	return [true, moegliche_punkte]
+
+func replace_first_occurance(wort, buchstabe):
+	var index = wort.find(buchstabe)
+	if index != -1:
+		return wort.substr(0, index) + "" + wort.substr(index + 1)
+	return wort
+
 
 func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 	
@@ -147,17 +178,16 @@ func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 				new_wort += new_buchstabe
 	if not new_wort or new_wort in global_concepts.wortliste_txt:
 		# wort kann geschrieben werden
-		return true
+		var zusatzpunkte = 0
+		
+		if len(new_wort) > 1:
+			for abr_buchst in new_wort:
+				zusatzpunkte += GlobalGameSettings.spielsteine_start[abr_buchst]["Wert"]	
+		
+		return [true, zusatzpunkte]
 	else:
 		# wort kann nicht geschrieben werden
-		return false
-			
-		
-		
-
-		 
-
-
+		return [false, 0]
 
 func is_a_letter(letter):
 	
@@ -250,48 +280,6 @@ func hat_alle_buchstaben(fehlende_buchstaben, debug_computer_buchstaben):
 			return false  # nicht dieselbe anzahl vorhanden
 	return true
 
-	##print(vorhandene_buchstaben)
-	#print(global_concepts.wortliste_txt)	
-	#for wort_lst in gelegte_woerter_mit_zelle_und_richtung:
-		#var wort = wort_lst[0]
-		#var zelle = wort_lst[1]
-		#var richtung = wort_lst[2]
-		#
-		#if wort in global_concepts.wortliste:
-			#print()
-			##if wort xxx
-	##
-	#var erlaubte_felder = global_concepts.get_allowed_spielfelder()
-	#print(erlaubte_felder)
-	# TODO HIER WEITER!!! TESTEN IM MAIN!!!!
-	pass
-	#1. Wörter lesen  mit einzelbuchstaben 
-	#2. Welche erlaubten wörter beinhalten die gelesenen wörter inkl. Einzelbucjstaben
-	#3. Welche buchstaben bräuchte ich
-	#4. Welchen platz beöuchte ich
-	#5. Liste möglicher wörter vor check
-	#6. Check mit word array, wörter einlesen, allesamt korrekte wörter?
-	#7. Punkteliste erstellen
-	#8. Bestes wort wählen
-
-#func init_word_array():
-	#word_array = []
-	#var belegte_felder = global_concepts.get_belegte_felder()
-	#print(belegte_felder)
-	#for y in range(GlobalGameSettings.anzahl_felder):
-		#var word_array_x_line = []
-		#
-		#for x in range(GlobalGameSettings.anzahl_felder):
-		#
-			#
-			#var feld = [x, y]
-			#if feld in belegte_felder:
-				#word_array_x_line.append(belegte_felder[feld])
-			#else:
-				#word_array_x_line.append("")
-		#word_array.append(word_array_x_line)
-	#print(word_array)
-	#
 
 func _process(delta: float) -> void:
 	if aktiv:

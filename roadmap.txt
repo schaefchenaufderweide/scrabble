@@ -12,5 +12,7 @@
 0.33 IN PROGRESS: fixe liste zu zeitaufwendig. prüfen welche worte können gelegt werden (19.11)
 0.34 IN PROGRESS: prüfen auf querwörter, punkte müssen noch erstellt werden (19.11)
 0.5 legen der buchstaben durch computer, berechnen der punkte
-0.6 einstellungen/menü
+0.6 fragezeichen buchstaben - für computer und spieler ...
+0.7 einstellungen/menü
+0.8 wortliste reinigen
 haha
