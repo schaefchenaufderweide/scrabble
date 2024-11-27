@@ -7,6 +7,9 @@ extends Area2D
 @onready var global_concepts: Node =  $"/root/Main/GlobalConcepts"
 
 @onready var offset_hand = Vector2(-global_concepts.screen_size.x/2, -global_concepts.screen_size.y/2)
+
+
+
 var is_touched = false
 var abgelegtes_feld = false
 var is_pressed = false
@@ -69,15 +72,15 @@ func return_to_hand(old_position):
 	position = old_position
 	var tween = create_tween()
 	#tween.position = position
-	tween.tween_property(self, "position", Vector2(global_concepts.player.stein_positions[self]), 0.5)
+	tween.tween_property(self, "position", Vector2(global_concepts.player.stein_hand_positions[self]), 0.5)
 	#position = GlobalConcepts.player_hand.stein_positions[self]
 		
 func _on_mouse_entered() -> void:
 	if not global_concepts.spielstein_is_dragged and not fixiert:
 		# berührt spielstein
 		is_touched = true
+		#print("berührt")
 	
 func _on_mouse_exited() -> void:
 	if not is_pressed:
 		is_touched = false
-		

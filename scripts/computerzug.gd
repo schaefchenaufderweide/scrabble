@@ -22,14 +22,9 @@ func draw_bar():
 	computerdenkt_fortschrittanzeige.color.g = percent
 
 
-func get_buchstaben():
-	var buchstaben = []
-	for stein_nr in global_concepts.computer.steine:
-		buchstaben.append(global_concepts.computer.steine[stein_nr])
-	return buchstaben
 	
 func think():
-	var computer_buchstaben = get_buchstaben()
+	var computer_buchstaben = global_concepts.computer.get_buchstaben()
 
 	computer_buchstaben.sort()
 	
@@ -71,24 +66,27 @@ func think():
 		moegliche_woerter += find_moegliche_woerter(wort, 0, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
 	
 	var erlaubte_woerter = []
-	for wort in moegliche_woerter:
-		#print("prüfe ", wort)
-		var ergebnis_test = test_moegliches_wort(wort, belegte_felder)
+	for pruefwort in moegliche_woerter:
+		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
+		var ergebnis_test = test_moegliches_wort(pruefwort, belegte_felder)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
 		if allowed:
-			erlaubte_woerter.append([wort, punkte])
-			#print("erlaubt: ", [wort, punkte])
+			erlaubte_woerter.append([pruefwort, punkte])
+			#print("erlaubt: ", [pruefwort, punkte])
 		#else:
-			#print("nicht erlaubt: ", [wort, punkte])
+			#print("nicht erlaubt: ", [pruefwort, punkte])
 	
 	var sort_erlaubte_woerter = sort_by_punkte(erlaubte_woerter)
-	for wort in sort_erlaubte_woerter:
-		print(wort)
 	
-	# TODO: computer buchstaben legen!
-
+	print("bestes wort ", sort_erlaubte_woerter[0])
+	
+	print("computer steine vor legen: ", computer_buchstaben)
+	lege_steine(sort_erlaubte_woerter[0])
+	
+	global_concepts.computer.ziehe_steine()
+	aktiv = false
 
 func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
@@ -190,11 +188,12 @@ func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 		return [false, 0]
 
 func is_a_letter(letter):
-	
+	if letter == "Y":
+		pass
 	var allowed = letter in GlobalGameSettings.allowed_letters # (letter.unicode_at(0) >= 65 and letter.unicode_at(0) <= 90) or letter in ["Ä", "Ö", "Ü"]
 	return allowed
 
-func find_moegliche_woerter(wort, suche_start_x, debug_computer_buchstaben, wortbeginn_zelle, wortrichtung, belegte_felder):
+func find_moegliche_woerter(wort, suche_start_x, computer_buchstaben, wortbeginn_zelle, wortrichtung, belegte_felder):
 	"""
 	dies überprüft allein die möglichkeit, die aufgrund der buchstaben und der wortliste gegeben sind.
 	"""
@@ -225,14 +224,23 @@ func find_moegliche_woerter(wort, suche_start_x, debug_computer_buchstaben, wort
 					abbruch = true
 					break
 				if not zelle in belegte_felder:
+					
+					
+					
 					fehlende_buchstaben.append(letter)
 					lege_dict[zelle] = letter
 					
-					if not letter in debug_computer_buchstaben:
+					if not letter in computer_buchstaben:
 						#print(letter, " fehlt")
 						abbruch = true
 						break
-				
+				else:
+					var gelegter_letter = belegte_felder[zelle]
+					if letter != gelegter_letter:
+						#print("würde überlegt werden!")
+						abbruch = true
+						break
+					
 				check_x += suchrichtung
 				letter = global_concepts.wortliste_txt[check_x]
 				#abstand_letter = check_x - find_x 
@@ -252,9 +260,11 @@ func find_moegliche_woerter(wort, suche_start_x, debug_computer_buchstaben, wort
 			var length_of_word = wortende_x - wortbeginn_x
 			var gesuchtes_wort = global_concepts.wortliste_txt.substr(wortbeginn_x, length_of_word)
 			
-			if not wort.strip_edges() == gesuchtes_wort:
-				
-				var allow_wort = hat_alle_buchstaben(fehlende_buchstaben, debug_computer_buchstaben)
+			if not wort.strip_edges() == gesuchtes_wort.strip_edges():
+				#print("wort ", gesuchtes_wort, " gesucht")
+				#print("computer buchstaben ", computer_buchstaben)
+				#print("fehlende buchstaben ", fehlende_buchstaben)
+				var allow_wort = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
 				if allow_wort:
 					moegliche_woerter.append([gesuchtes_wort, lege_dict, wortrichtung])
 					#print("mögliches wort ", gesuchtes_wort)
@@ -271,13 +281,16 @@ func find_moegliche_woerter(wort, suche_start_x, debug_computer_buchstaben, wort
 			
 	return moegliche_woerter
 	
-func hat_alle_buchstaben(fehlende_buchstaben, debug_computer_buchstaben):
+func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 	fehlende_buchstaben.sort()
 	for buchst in fehlende_buchstaben:
-		if buchst not in debug_computer_buchstaben:
+		if buchst not in computer_buchstaben:
+			#print("... kann nicht geschrieben werden, fehlendes ", buchst)
 			return false
-		if fehlende_buchstaben.count(buchst) > debug_computer_buchstaben.count(buchst):
+		if fehlende_buchstaben.count(buchst) > computer_buchstaben.count(buchst):
+			#print("... kann nicht geschrieben werden, nicht genug ", buchst)
 			return false  # nicht dieselbe anzahl vorhanden
+	#print(" ... kann geschrieben werden")
 	return true
 
 
@@ -293,3 +306,44 @@ func _process(delta: float) -> void:
 			print("ende computerzug")
 			global_concepts.change_an_der_reihe()
 		
+
+func lege_steine(wort_arr):
+	# TODO. teilweise löcher im wort, wahrscheinlich wenn mehrere steine mit gleichem buchstaben genommen werden!!!
+	
+	var steine_pos_dict = wort_arr[0][1]
+	#var computer_steine = global_concepts.computer.steine_dict
+	var rel_stein_aus_hand = null
+	
+	for stein_pos in steine_pos_dict:
+		# suchen des richtigen steins in der computerhand	
+		var gesuchter_buchstabe = steine_pos_dict[stein_pos]
+		
+		for stein_nr in range(GlobalGameSettings.anzahl_steine_pro_hand):
+			var test_stein = global_concepts.computer.steine_dict[stein_nr]
+			if not test_stein: # schon ausgespielt
+				continue
+			if test_stein.label.text == gesuchter_buchstabe:
+				global_concepts.computer.steine_dict[stein_nr] = null
+				rel_stein_aus_hand = test_stein
+				break
+		if not rel_stein_aus_hand:
+			print("Buchstabe fehlt!!!!! ", steine_pos_dict[stein_pos])
+			assert(false, "test error")
+		
+		
+		global_concepts.computer.remove_child(rel_stein_aus_hand)
+		global_concepts.spielbereich_abgelegte_steine.add_child(rel_stein_aus_hand)
+		#test_stein.position = event.position + offset_hand + global_concepts.camera.position
+		
+		
+		rel_stein_aus_hand.position.y = -100
+		rel_stein_aus_hand.visible = true
+		
+		var new_pos_x = global_concepts.all_spielfelder[stein_pos].position.x
+		var new_pos_y = global_concepts.all_spielfelder[stein_pos].position.y
+		var tween = create_tween()
+		tween.tween_property(rel_stein_aus_hand, "position", Vector2(new_pos_x, new_pos_y), 0.5)
+		
+		rel_stein_aus_hand.fixiert = true
+		rel_stein_aus_hand.frisch_gelegt_sprite.visible = false
+		rel_stein_aus_hand.fixiert_sprite.visible = true

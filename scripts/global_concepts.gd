@@ -37,9 +37,9 @@ var wortliste_txt = load_wortliste()
 var an_der_reihe 
 
 func _ready() -> void:
-	print("start global concepts")
+	#print("start global concepts")
 	an_der_reihe = player
-	print(an_der_reihe)
+	#print(an_der_reihe)
 func create_buchstaben_im_sackerl():
 	var sackerl = []
 	for buchstabe in GlobalGameSettings.spielsteine_start:
@@ -130,7 +130,7 @@ func get_belegte_felder(check_is_frisch_belegt):
 				frisch_belegte_felder.append(feld_instance.feld)
 	if not check_is_frisch_belegt:				
 				
-		print(belegte_felder)
+		#print(belegte_felder)
 		return belegte_felder
 	else:
 		return frisch_belegte_felder
@@ -267,7 +267,7 @@ func set_allowed_spielfelder(allowed_felder):
 
 
 func update_spielbrett(zug_erlaubt):
-	for feld in all_spielfelder:  # GD SCRIPT VERGISST (?) 
+	for feld in all_spielfelder:  
 		var spielfeld = all_spielfelder[feld]
 		
 		spielfeld.animation_player.stop()  # animation wird gestoppt
@@ -280,7 +280,8 @@ func update_spielbrett(zug_erlaubt):
 			if zug_erlaubt:  # steine werden am feld fixiert
 				spielstein_auf_feld.frisch_gelegt_sprite.visible = false
 				spielstein_auf_feld.fixiert_sprite.visible = true
-				player.steine[spielstein_auf_feld.pos_in_hand] = null
+				spielstein_auf_feld.fixiert = true
+				player.steine_dict[spielstein_auf_feld.pos_in_hand] = null
 			else:  # steine wandern zurück zur hand
 				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - camera.position
 				
@@ -301,9 +302,10 @@ func zug_beenden():
 	var zug_erlaubt = true
 	if not gelegte_woerter:
 		zug_erlaubt = false
-		
+	
+	# TODO NICHT GUT GENUG!!!! (WEIL WORT TEXT ALS RIESENLANGER STRING!)
 	for wort in gelegte_woerter:
-		print(wort)
+		#print(wort)
 		if wort not in wortliste_txt:
 			print(wort, " nicht in liste")
 			zug_erlaubt = false

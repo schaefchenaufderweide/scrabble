@@ -6,8 +6,9 @@ extends Node
 
 @onready var hand_area = $HandArea
 
-var steine = {}
-var stein_positions = {}
+var steine_dict = {}
+var stein_hand_positions = {}
+
 
 func _ready() -> void:
 	ziehe_steine()
@@ -20,7 +21,7 @@ func ziehe_steine():
 	
 	for nr_stein in range(anzahl_steine):
 		
-		if not steine.get(nr_stein):
+		if not steine_dict.get(nr_stein):
 			
 			var new_stein = stein_scene.instantiate()
 			new_stein.name = "Stein " + str(nr_stein)
@@ -42,9 +43,16 @@ func ziehe_steine():
 			
 			
 			new_stein.label.text = new_buchstabe
-			steine[nr_stein] = new_buchstabe
+			steine_dict[nr_stein] = new_stein
 			
-			stein_positions[new_stein] = Vector2(new_pos_x, new_pos_y)
+			stein_hand_positions[new_stein] = Vector2(new_pos_x, new_pos_y)
 			new_stein.wert = GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"]
 			if self == global_concepts.computer:
 				new_stein.visible = false
+	print(self, get_buchstaben())
+
+func get_buchstaben():
+	var buchstaben = []
+	for stein_nr in steine_dict:
+		buchstaben.append(steine_dict[stein_nr].label.text)
+	return buchstaben
