@@ -10,4 +10,4 @@ func _on_button_down() -> void:
 
 func _on_button_up() -> void:
 	$Label.position.y -= 2
-	global_concepts.zug_beenden()
+	global_concepts.player_zug_beenden()

@@ -33,42 +33,47 @@ func think():
 	var zu_pruefen
 	
 	var moegliche_woerter = []
-	
-	for wort_lst in gelegte_woerter_mit_zelle_und_richtung:
-		zu_pruefen = [wort_lst]
+	# TODO DAS IST EIN BLÖDSINN HIER!!!!!!!!!!
+	XXXXXXXX
+	for gelegte_wort_lst in gelegte_woerter_mit_zelle_und_richtung:
+		zu_pruefen = [gelegte_wort_lst]
 		
-		var ausgangszelle = wort_lst[1]
+		var ausgangszelle = gelegte_wort_lst[1]
 		var zellen_add = 0
 		# von einzelbuchstaben ausgehend
-		for buchstab in wort_lst[0]:
+		for buchstab in gelegte_wort_lst[0]:
 			var neu_richtung 
 			var neue_zelle
-			if wort_lst[2] == "horizontal":
+			if gelegte_wort_lst[2] == "horizontal":
 				neu_richtung = "vertikal"
 				neue_zelle = [ausgangszelle[0], ausgangszelle[1] + zellen_add]
 			else:
 				neu_richtung = "horizontal"
 				neue_zelle = [ausgangszelle[0] + zellen_add, ausgangszelle[1]]
 			var neu_pruef = [buchstab, neue_zelle, neu_richtung]
-			zu_pruefen.append(neu_pruef)
+			if not neu_pruef in zu_pruefen:
+				zu_pruefen.append(neu_pruef)
 			zellen_add += 1
 		
-	for wort_lst in zu_pruefen:
+	for zu_pr_wort_lst in zu_pruefen:
 		
-		var wort = wort_lst[0]
-		var zelle_beginn = wort_lst[1]
+		var pruef_wort = zu_pr_wort_lst[0]
+		var zelle_beginn = zu_pr_wort_lst[1]
 		var richtung
-		if wort_lst[2] == "horizontal":
+		if zu_pr_wort_lst[2] == "horizontal":
 			richtung = [1, 0]
 		else:
 			richtung = [0, 1]
 		
-		moegliche_woerter += find_moegliche_woerter(wort, 0, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
-	
+		#moegliche_woerter += find_moegliche_woerter(pruef_wort, 0, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
+		print("zelle beginn: ", zelle_beginn, " für wort ", pruef_wort)
+		moegliche_woerter += find_moegliche_woerter(pruef_wort, computer_buchstaben, zelle_beginn, richtung, belegte_felder)
+		
+		
 	var erlaubte_woerter = []
 	for pruefwort in moegliche_woerter:
 		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		var ergebnis_test = test_moegliches_wort(pruefwort, belegte_felder)
+		var ergebnis_test = test_moegliches_wort_auf_querschlaeger(pruefwort, belegte_felder)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
@@ -85,14 +90,15 @@ func think():
 	print("computer steine vor legen: ", computer_buchstaben)
 	lege_steine(sort_erlaubte_woerter[0])
 	
-	global_concepts.computer.ziehe_steine()
+	#global_concepts.computer.ziehe_steine()
 	aktiv = false
+	global_concepts.change_an_der_reihe()
 
 func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
 
-func test_moegliches_wort(wort_dict, belegte_felder):
+func test_moegliches_wort_auf_querschlaeger(wort_dict, belegte_felder):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	ist seitlich bzw. ober-unterhalb des probeweise gelegten buchstabens ein bereits gelegter buchstabe? 
@@ -162,19 +168,19 @@ func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 	
 	for vor_zurueck in [[querrichtung[0] * -1, querrichtung[1] * -1], [querrichtung[0], querrichtung[1]]]:
 		
-		
-		var checkfeld = [feld[0] + vor_zurueck[0], feld[1] + vor_zurueck[1]]
-		
-		
-		
-		var new_buchstabe = belegte_felder.get(checkfeld)
-		while new_buchstabe:
-		
+		var distance = 1
+		while true:
+			var checkfeld = [feld[0] + vor_zurueck[0] * distance, feld[1] + vor_zurueck[1] * distance]
+			var new_buchstabe = belegte_felder.get(checkfeld)
+			if not new_buchstabe:
+				break
 			if vor_zurueck[0] == -1 or vor_zurueck[1] == - 1:  # es geht rückwärts
 				new_wort = new_buchstabe + new_wort
 			else:
 				new_wort += new_buchstabe
-	if not new_wort or new_wort in global_concepts.wortliste_txt:
+			distance += 1
+			
+	if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_lst:
 		# wort kann geschrieben werden
 		var zusatzpunkte = 0
 		
@@ -187,100 +193,56 @@ func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 		# wort kann nicht geschrieben werden
 		return [false, 0]
 
-func is_a_letter(letter):
-	if letter == "Y":
-		pass
-	var allowed = letter in GlobalGameSettings.allowed_letters # (letter.unicode_at(0) >= 65 and letter.unicode_at(0) <= 90) or letter in ["Ä", "Ö", "Ü"]
-	return allowed
+#func is_a_letter(letter):
+	#if letter == "Y":
+		#pass
+	#var allowed = letter in GlobalGameSettings.allowed_letters # (letter.unicode_at(0) >= 65 and letter.unicode_at(0) <= 90) or letter in ["Ä", "Ö", "Ü"]
+	#return allowed
 
-func find_moegliche_woerter(wort, suche_start_x, computer_buchstaben, wortbeginn_zelle, wortrichtung, belegte_felder):
-	"""
-	dies überprüft allein die möglichkeit, die aufgrund der buchstaben und der wortliste gegeben sind.
-	"""
+
+# todo: funktion findmoeglicheworter neu machen mit wortliste!
+func find_moegliche_woerter(pruef_wortteil, computer_buchstaben, pruefwort_zelle_beginn, richtung, belegte_felder):
 	var moegliche_woerter = []
-	
-	var find_x = global_concepts.wortliste_txt.find(wort, suche_start_x)
-	
-	while find_x != -1:
-		#print("Fortschritt: ", find_x, "/", len(global_concepts.wortliste_txt))
-		var abbruch = false
-		var fehlende_buchstaben = []
-		var check_x = find_x - 1
-		var letter = global_concepts.wortliste_txt[check_x]
-		
-		var wortbeginn_x 
-		#var abstand_letter = check_x - find_x
-		var suchrichtung = - 1
-		var zelle 
-		var lege_dict = {}
+	for check_wort_aus_wortliste in global_concepts.wortliste_lst:
+		if pruef_wortteil in check_wort_aus_wortliste: # wortteil enthalten
 			
-		while not abbruch:
-			while is_a_letter(letter):
-				var abstand_letter = check_x - find_x
-				zelle = [wortbeginn_zelle[0] + wortrichtung[0] * abstand_letter, wortbeginn_zelle[1] + wortrichtung[1] * abstand_letter]
+			var fund_beginn_stelle = check_wort_aus_wortliste.find(pruef_wortteil)
+			var fund_ende_stelle = fund_beginn_stelle + len(pruef_wortteil)
+			
+			# welche buchstaben fehlen?
+			var fehlende_buchstaben = check_wort_aus_wortliste.substr(0,fund_beginn_stelle) + check_wort_aus_wortliste.substr(fund_beginn_stelle + len(pruef_wortteil))
+			var fehlende_buchstaben_lst = get_list_of_string(fehlende_buchstaben)
+			
+			if not fehlende_buchstaben_lst:  # ist ident mit bereits gelegtem
+				continue
+			if not hat_alle_buchstaben(fehlende_buchstaben_lst, computer_buchstaben):
+				continue
+			
+			# liegen die zellen außerhalb?
+			var wortbeginn_zelle = [pruefwort_zelle_beginn[0] - richtung[0] * fund_beginn_stelle, pruefwort_zelle_beginn[1] - richtung[1] * fund_beginn_stelle]
+			var wortende_zelle = [wortbeginn_zelle[0] + len(check_wort_aus_wortliste) * richtung[0], wortbeginn_zelle[1] + len(check_wort_aus_wortliste) * richtung[1]]
+			
+			#if zellen_ausserhalb(wortbeginn_zelle, wortende_zelle):
+				#continue
+			#
+			# lege dict
+			var lege_dict = get_lege_dict(fund_beginn_stelle, fund_ende_stelle, check_wort_aus_wortliste, wortbeginn_zelle, wortende_zelle, richtung, belegte_felder)
+			if not lege_dict:
+				continue
+			moegliche_woerter.append([check_wort_aus_wortliste, lege_dict, richtung])
 				
-				if zelle[0] < 0 or zelle[1] < 0 or zelle[0] > GlobalGameSettings.anzahl_felder or zelle[1] > GlobalGameSettings.anzahl_felder:
-					#print(zelle, " außerhalb!")
-					abbruch = true
-					break
-				if not zelle in belegte_felder:
-					
-					
-					
-					fehlende_buchstaben.append(letter)
-					lege_dict[zelle] = letter
-					
-					if not letter in computer_buchstaben:
-						#print(letter, " fehlt")
-						abbruch = true
-						break
-				else:
-					var gelegter_letter = belegte_felder[zelle]
-					if letter != gelegter_letter:
-						#print("würde überlegt werden!")
-						abbruch = true
-						break
-					
-				check_x += suchrichtung
-				letter = global_concepts.wortliste_txt[check_x]
-				#abstand_letter = check_x - find_x 
-				
-			if not wortbeginn_x:  # wortbeginn erzielt
-				#print("wortbeginn erreicht")
-				wortbeginn_x = check_x + 1
-				check_x = find_x + 1
-				letter = global_concepts.wortliste_txt[check_x]
-				suchrichtung = 1
-				#abstand_letter = check_x - find_x 
-			else:
-				break
-		if not abbruch: # normales wortende erzielt
-			#print("normales wortende erreicht")
-			var wortende_x = check_x
-			var length_of_word = wortende_x - wortbeginn_x
-			var gesuchtes_wort = global_concepts.wortliste_txt.substr(wortbeginn_x, length_of_word)
-			
-			if not wort.strip_edges() == gesuchtes_wort.strip_edges():
-				#print("wort ", gesuchtes_wort, " gesucht")
-				#print("computer buchstaben ", computer_buchstaben)
-				#print("fehlende buchstaben ", fehlende_buchstaben)
-				var allow_wort = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
-				if allow_wort:
-					moegliche_woerter.append([gesuchtes_wort, lege_dict, wortrichtung])
-					#print("mögliches wort ", gesuchtes_wort)
-				#else:
-					#print("nicht erlaubt", gesuchtes_wort)
-			suche_start_x = wortende_x
-		else:  # gewaltsamer abbruch
-			#print("gewaltsamer abbruch")
-			suche_start_x = find_x + 2
-		
-		find_x = global_concepts.wortliste_txt.find(wort, suche_start_x)
-		
-	
-			
 	return moegliche_woerter
+			
+func get_list_of_string(wort):
+	var buchstaben = []
+	for buch in wort:
+		buchstaben.append(buch)
+	return buchstaben
 	
+	
+
+
+
 func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 	fehlende_buchstaben.sort()
 	for buchst in fehlende_buchstaben:
@@ -292,6 +254,117 @@ func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 			return false  # nicht dieselbe anzahl vorhanden
 	#print(" ... kann geschrieben werden")
 	return true
+
+
+func get_lege_dict(fund_beginn_stelle, fund_ende_stelle, check_wort_aus_wortliste, wortbeginn_zelle, wortende_zelle, richtung, belegte_felder):
+	
+	for check_zelle in [wortbeginn_zelle, wortende_zelle]:
+		if check_zelle[0] < 0 or check_zelle[1] < 0 or check_zelle[0] > GlobalGameSettings.anzahl_felder or check_zelle[1] > GlobalGameSettings.anzahl_felder:
+			return false  # zellen liegen außerhalb!
+	
+	var lege_dict = {}
+	
+	
+	for range_beginn_oder_ende in [range(fund_beginn_stelle), range(fund_ende_stelle, len(check_wort_aus_wortliste))]:
+			for abst in range_beginn_oder_ende:
+				var lege_zelle = [wortbeginn_zelle[0] + richtung[0] * abst, wortbeginn_zelle[1] + richtung[1] * abst]
+				if lege_zelle in belegte_felder:
+					return false  # nicht möglich weil feld belegt!
+				
+				
+				var zu_legender_buchstabe = check_wort_aus_wortliste[abst]
+				lege_dict[lege_zelle] = zu_legender_buchstabe
+	return lege_dict
+			
+
+#func find_moegliche_woerter_old(wort, suche_start_x, computer_buchstaben, wortbeginn_zelle, wortrichtung, belegte_felder):
+	#"""
+	#dies überprüft allein die möglichkeit, die aufgrund der buchstaben und der wortliste gegeben sind.
+	#"""
+	#var moegliche_woerter = []
+	#
+	#var find_x = global_concepts.wortliste_txt.find(wort, suche_start_x)
+	#
+	#while find_x != -1:
+		##print("Fortschritt: ", find_x, "/", len(global_concepts.wortliste_txt))
+		#var abbruch = false
+		#var fehlende_buchstaben = []
+		#var check_x = find_x - 1
+		#var letter = global_concepts.wortliste_txt[check_x]
+		#
+		#var wortbeginn_x 
+		##var abstand_letter = check_x - find_x
+		#var suchrichtung = - 1
+		#var zelle 
+		#var lege_dict = {}
+			#
+		#while not abbruch:
+			#while is_a_letter(letter):
+				#var abstand_letter = check_x - find_x
+				#zelle = [wortbeginn_zelle[0] + wortrichtung[0] * abstand_letter, wortbeginn_zelle[1] + wortrichtung[1] * abstand_letter]
+				#
+				#if zelle[0] < 0 or zelle[1] < 0 or zelle[0] > GlobalGameSettings.anzahl_felder or zelle[1] > GlobalGameSettings.anzahl_felder:
+					##print(zelle, " außerhalb!")
+					#abbruch = true
+					#break
+				#if not zelle in belegte_felder:
+					#
+					#
+					#
+					#fehlende_buchstaben.append(letter)
+					#lege_dict[zelle] = letter
+					#
+					#if not letter in computer_buchstaben:
+						##print(letter, " fehlt")
+						#abbruch = true
+						#break
+				#else:
+					#var gelegter_letter = belegte_felder[zelle]
+					#if letter != gelegter_letter:
+						##print("würde überlegt werden!")
+						#abbruch = true
+						#break
+					#
+				#check_x += suchrichtung
+				#letter = global_concepts.wortliste_txt[check_x]
+				##abstand_letter = check_x - find_x 
+				#
+			#if not wortbeginn_x:  # wortbeginn erzielt
+				##print("wortbeginn erreicht")
+				#wortbeginn_x = check_x + 1
+				#check_x = find_x + 1
+				#letter = global_concepts.wortliste_txt[check_x]
+				#suchrichtung = 1
+				##abstand_letter = check_x - find_x 
+			#else:
+				#break
+		#if not abbruch: # normales wortende erzielt
+			##print("normales wortende erreicht")
+			#var wortende_x = check_x
+			#var length_of_word = wortende_x - wortbeginn_x
+			#var gesuchtes_wort = global_concepts.wortliste_txt.substr(wortbeginn_x, length_of_word)
+			#
+			#if not wort.strip_edges() == gesuchtes_wort.strip_edges():
+				##print("wort ", gesuchtes_wort, " gesucht")
+				##print("computer buchstaben ", computer_buchstaben)
+				##print("fehlende buchstaben ", fehlende_buchstaben)
+				#var allow_wort = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
+				#if allow_wort:
+					#moegliche_woerter.append([gesuchtes_wort, lege_dict, wortrichtung])
+					##print("mögliches wort ", gesuchtes_wort)
+				##else:
+					##print("nicht erlaubt", gesuchtes_wort)
+			#suche_start_x = wortende_x
+		#else:  # gewaltsamer abbruch
+			##print("gewaltsamer abbruch")
+			#suche_start_x = find_x + 2
+		#
+		#find_x = global_concepts.wortliste_txt.find(wort, suche_start_x)
+		#
+	#
+			#
+	#return moegliche_woerter
+	
 
 
 func _process(delta: float) -> void:
@@ -308,7 +381,6 @@ func _process(delta: float) -> void:
 		
 
 func lege_steine(wort_arr):
-	# TODO. teilweise löcher im wort, wahrscheinlich wenn mehrere steine mit gleichem buchstaben genommen werden!!!
 	
 	var steine_pos_dict = wort_arr[0][1]
 	#var computer_steine = global_concepts.computer.steine_dict
@@ -345,5 +417,7 @@ func lege_steine(wort_arr):
 		tween.tween_property(rel_stein_aus_hand, "position", Vector2(new_pos_x, new_pos_y), 0.5)
 		
 		rel_stein_aus_hand.fixiert = true
+		global_concepts.all_spielfelder[stein_pos].spielstein_auf_feld = rel_stein_aus_hand
 		rel_stein_aus_hand.frisch_gelegt_sprite.visible = false
 		rel_stein_aus_hand.fixiert_sprite.visible = true
+		

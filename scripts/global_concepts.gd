@@ -30,7 +30,12 @@ var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-var wortliste_txt = load_wortliste()
+var wortliste_lst = load_wortliste()
+
+
+
+
+pass
 #var moegliche_woerter_dict = load_moegliche_woerter_dict()
 
 
@@ -53,8 +58,15 @@ func create_buchstaben_im_sackerl():
 
 func load_wortliste():
 	var wortliste_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
-	return wortliste_file.get_as_text()
-#
+	var wortliste_txt = wortliste_file.get_as_text()
+	var wortliste_lst = wortliste_txt.split("\n")
+	var wortliste_dict = {}
+	
+	for wort in wortliste_lst:
+		if wort:
+			wortliste_dict[wort.strip_edges()] = true
+	return wortliste_dict
+	
 #func load_moegliche_woerter_dict():
 	#moegliche_woerter_dict = {}
 	#for buchstabe in GlobalGameSettings.allowed_letters:
@@ -130,9 +142,10 @@ func get_belegte_felder(check_is_frisch_belegt):
 				frisch_belegte_felder.append(feld_instance.feld)
 	if not check_is_frisch_belegt:				
 				
-		#print(belegte_felder)
+		print("belegte felder :", belegte_felder)
 		return belegte_felder
 	else:
+		print("frisch belegte felder: ", frisch_belegte_felder)
 		return frisch_belegte_felder
 #
 #func get_frisch_belegte_felder():
@@ -250,6 +263,7 @@ func get_allowed_spielfelder():
 							
 							if not checkfeld in allowed_felder:
 								allowed_felder.append(checkfeld)
+	print(allowed_felder)
 	return allowed_felder
 	
 	
@@ -266,7 +280,7 @@ func set_allowed_spielfelder(allowed_felder):
 		
 
 
-func update_spielbrett(zug_erlaubt):
+func update_spielbrett(player_zug_erlaubt):
 	for feld in all_spielfelder:  
 		var spielfeld = all_spielfelder[feld]
 		
@@ -277,7 +291,7 @@ func update_spielbrett(zug_erlaubt):
 			
 			
 			var spielstein_auf_feld = spielfeld.spielstein_auf_feld
-			if zug_erlaubt:  # steine werden am feld fixiert
+			if player_zug_erlaubt:  # steine werden am feld fixiert
 				spielstein_auf_feld.frisch_gelegt_sprite.visible = false
 				spielstein_auf_feld.fixiert_sprite.visible = true
 				spielstein_auf_feld.fixiert = true
@@ -294,28 +308,25 @@ func update_spielbrett(zug_erlaubt):
 	#print("nicht mehr frisch")
 	
 	
-func zug_beenden():
+func player_zug_beenden():
 	
 	
 	var gelegte_woerter = read_gelegte_woerter(false)
 	#print(gelegte_woerter)
-	var zug_erlaubt = true
+	var player_zug_erlaubt = true
 	if not gelegte_woerter:
-		zug_erlaubt = false
+		player_zug_erlaubt = false
 	
-	# TODO NICHT GUT GENUG!!!! (WEIL WORT TEXT ALS RIESENLANGER STRING!)
 	for wort in gelegte_woerter:
-		#print(wort)
-		if wort not in wortliste_txt:
+		print(wort, len(wort))
+		#print(wortliste_lst)
+		if wort.strip_edges() not in wortliste_lst:
 			print(wort, " nicht in liste")
-			zug_erlaubt = false
+			player_zug_erlaubt = false
 			break
-	
-	
 		
-	
-	update_spielbrett(zug_erlaubt)
-	if zug_erlaubt:
+	update_spielbrett(player_zug_erlaubt)
+	if player_zug_erlaubt:
 		change_an_der_reihe()
 		
 		
@@ -338,6 +349,7 @@ func change_an_der_reihe():
 		
 		an_der_reihe = player
 		zug_beenden_button.disabled = false
+		#animation_player.stop("computer_denkt")
 		animation_player.play("RESET")
 		zug_beenden_button_label.text = "Zug beenden"
 		

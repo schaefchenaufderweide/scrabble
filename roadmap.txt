@@ -11,9 +11,12 @@
 0.32 IN PROGRESS ... Fixe Liste, welche Wörter mit welchen anderen Wörtern gelegt werden können (19.11)
 0.33 IN PROGRESS: fixe liste zu zeitaufwendig. prüfen welche worte können gelegt werden (19.11)
 0.34 IN PROGRESS: prüfen auf querwörter, punkte müssen noch erstellt werden (19.11)
-0.5 legen der buchstaben durch computer
+0.5 legen der buchstaben durch computer (19.11)
 0.55 legen der buchstaben durch computer erfolgt, computer wählt beste möglichkeit, teilweise bugs beim legen, wahrscheinlich wenn mehrere steine mit gleichem buchstaben genommen werden (27.11)
+0.56 effizientere wortermittlung, aber bugs bei finden der möglichen ausgangsstellen! (28.11)
 0.6 fragezeichen buchstaben - für computer und spieler ...
-0.7 einstellungen/menü
-0.8 wortliste reinigen
+0.7 einstellungen/menü/punkteanzeigen
+0.8 im spiel wörter hinzufügen/löschen
+0.9 wortliste reinigen
+0.95 highscore und wortlisten online
 haha
