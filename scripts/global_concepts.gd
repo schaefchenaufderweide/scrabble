@@ -149,21 +149,8 @@ func get_belegte_felder(check_is_frisch_belegt):
 	else:
 		#print("frisch belegte felder: ", frisch_belegte_felder)
 		return frisch_belegte_felder
-#
-#func get_frisch_belegte_felder():
-	#var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
-	#var frisch_belegte_felder  = []
-	#
-	#for feld in group_alle_felder:
-		#if feld.frisch_belegt:
-			#frisch_belegte_felder.append(feld.feld)
-	#return frisch_belegte_felder
 
-func get_buchstaben_auf_feld(belegte_felder, feld):
-	
-	return belegte_felder[feld].label.text
-
-func read_gelegte_woerter(is_computerzug):
+func read_gelegte_woerter():
 	
 	var belegte_felder = get_belegte_felder(false)
 	
@@ -183,11 +170,11 @@ func read_gelegte_woerter(is_computerzug):
 				feld = [x, y]
 				
 			
-			if is_computerzug:  # bei computerzug auch einzelbuchstaben und genaue angaben 
-				var end_feld = [beginn_feld[0] + len(new_word), beginn_feld[1]]
-				woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
-			
-			elif len(new_word) > 1:
+			#if is_computerzug:  # bei computerzug auch einzelbuchstaben und genaue angaben 
+				#var end_feld = [beginn_feld[0] + len(new_word), beginn_feld[1]]
+				#woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
+			#
+			if len(new_word) > 1:
 				woerter_horizontal.append(new_word)
 			x += 1
 	#print(woerter_horizontal)
@@ -207,23 +194,28 @@ func read_gelegte_woerter(is_computerzug):
 				feld = [x, y]
 			
 		
-			if is_computerzug:
-				var end_feld = [beginn_feld[0], beginn_feld[1] + len(new_word)]
-				woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
-				
-				
-			elif len(new_word) > 1:
+			#if is_computerzug:
+				#var end_feld = [beginn_feld[0], beginn_feld[1] + len(new_word)]
+				#woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
+				#
+				#
+			if len(new_word) > 1:
 				woerter_vertikal.append(new_word)
 			y += 1
 	
 	return woerter_horizontal + woerter_vertikal
 	
 func get_allowed_spielfelder():
-	var allowed_felder = []
+	# TODO: nicht ganz korrekt - erlaubt nur direkt miteinander verbundene! (nicht alle in reihe!)
+	# TODO: erlauben, buchstaben zu legen, aber markieren, wenn nicht in allowed
+	
+	
 	
 	var belegte_felder = get_belegte_felder(false)
 	var frisch_belegte_felder = get_belegte_felder(true)
-		
+	
+	var allowed_felder = frisch_belegte_felder#[]
+	
 	var allowed_x = []
 	var allowed_y = []
 	if len(frisch_belegte_felder) == 0:  
@@ -273,14 +265,17 @@ func get_allowed_spielfelder():
 	
 	
 func set_allowed_spielfelder(allowed_felder):
+	var frisch_belegte_felder = get_belegte_felder(true)
 	# setzen der spielfelder
 	for feld in all_spielfelder:
+		#all_spielfelder[feld].animation_player.play("RESET")
 		if feld in allowed_felder:
 			all_spielfelder[feld].allowed = true
 			all_spielfelder[feld].animation_player.play("allowed")
 		else:
 			all_spielfelder[feld].animation_player.stop()
 			all_spielfelder[feld].allowed = false
+			
 		
 		
 
@@ -314,16 +309,29 @@ func update_spielbrett(player_zug_erlaubt):
 	
 	
 func player_zug_beenden():
-	
-	
-	var gelegte_woerter = read_gelegte_woerter(false)
-	#print(gelegte_woerter)
 	var player_zug_erlaubt = true
-	if not gelegte_woerter:
+	var frisch_gelegt = get_belegte_felder(true)
+	#var allowed_felder = get_allowed_spielfelder()
+	if not frisch_gelegt:
+		print("keine frischen buchstaben!")
 		player_zug_erlaubt = false
 	
+	#for frisch in frisch_gelegt:
+		#if frisch not in allowed_felder:
+			#print("frisch gelegtes feld ", frisch, " nicht allowed!")
+			#player_zug_erlaubt = false
+	
+	
+	var gelegte_woerter = read_gelegte_woerter()
+	#print(gelegte_woerter)
+	
+	if not gelegte_woerter:
+		print("keine wörter gelegt")
+		player_zug_erlaubt = false
+	
+	#print(len(wortliste_lst))
 	for wort in gelegte_woerter:
-		print(wort, len(wort))
+		#print(wort, len(wort))
 		#print(wortliste_lst)
 		if wort.strip_edges() not in wortliste_lst:
 			print(wort, " nicht in liste")

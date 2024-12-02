@@ -4,6 +4,10 @@ extends Camera2D
 
 var is_pressed = false
 
+func _ready() -> void:
+	var spielbrett_size = preload("res://graphics/spielbrett.png").get_size()
+	position = Vector2(spielbrett_size.x/2, spielbrett_size.y/2)
+
 func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventMouseButton:

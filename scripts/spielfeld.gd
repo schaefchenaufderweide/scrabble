@@ -15,6 +15,8 @@ var spielstein_auf_feld = null
 var allowed = false
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer
+
+
 var feld
 var frisch_belegt
 
