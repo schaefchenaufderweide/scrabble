@@ -30,7 +30,9 @@ var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-var wortliste_lst = load_wortliste()
+var wortliste_lst_and_txt = load_wortliste()
+var wortliste_lst = wortliste_lst_and_txt[0]
+var wortliste_txt = wortliste_lst_and_txt[1]
 
 
 
@@ -65,7 +67,7 @@ func load_wortliste():
 	for wort in wortliste_lst:
 		if wort:
 			wortliste_dict[wort.strip_edges()] = true
-	return wortliste_dict
+	return [wortliste_dict, wortliste_txt]
 	
 #func load_moegliche_woerter_dict():
 	#moegliche_woerter_dict = {}
@@ -142,10 +144,10 @@ func get_belegte_felder(check_is_frisch_belegt):
 				frisch_belegte_felder.append(feld_instance.feld)
 	if not check_is_frisch_belegt:				
 				
-		print("belegte felder :", belegte_felder)
+		#print("belegte felder :", belegte_felder)
 		return belegte_felder
 	else:
-		print("frisch belegte felder: ", frisch_belegte_felder)
+		#print("frisch belegte felder: ", frisch_belegte_felder)
 		return frisch_belegte_felder
 #
 #func get_frisch_belegte_felder():
@@ -163,9 +165,9 @@ func get_buchstaben_auf_feld(belegte_felder, feld):
 
 func read_gelegte_woerter(is_computerzug):
 	
-	
-	
 	var belegte_felder = get_belegte_felder(false)
+	
+				
 	# read horizontal
 	var woerter_horizontal = []
 	for y in range(GlobalGameSettings.anzahl_felder):
@@ -180,12 +182,13 @@ func read_gelegte_woerter(is_computerzug):
 				x += 1
 				feld = [x, y]
 				
-			if len(new_word) > 1:
-				if is_computerzug:
-					woerter_horizontal.append([new_word, beginn_feld, "horizontal"])
 			
-				else:
-					woerter_horizontal.append(new_word)
+			if is_computerzug:  # bei computerzug auch einzelbuchstaben und genaue angaben 
+				var end_feld = [beginn_feld[0] + len(new_word), beginn_feld[1]]
+				woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
+			
+			elif len(new_word) > 1:
+				woerter_horizontal.append(new_word)
 			x += 1
 	#print(woerter_horizontal)
 	
@@ -203,12 +206,14 @@ func read_gelegte_woerter(is_computerzug):
 				y += 1
 				feld = [x, y]
 			
-			if len(new_word) > 1:
-				if is_computerzug:
-					woerter_vertikal.append([new_word, beginn_feld, "vertikal"])
+		
+			if is_computerzug:
+				var end_feld = [beginn_feld[0], beginn_feld[1] + len(new_word)]
+				woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
 				
-				else:
-					woerter_vertikal.append(new_word)
+				
+			elif len(new_word) > 1:
+				woerter_vertikal.append(new_word)
 			y += 1
 	
 	return woerter_horizontal + woerter_vertikal
@@ -263,7 +268,7 @@ func get_allowed_spielfelder():
 							
 							if not checkfeld in allowed_felder:
 								allowed_felder.append(checkfeld)
-	print(allowed_felder)
+	#print(allowed_felder)
 	return allowed_felder
 	
 	
@@ -338,10 +343,9 @@ func change_an_der_reihe():
 		an_der_reihe = computer
 		zug_beenden_button.disabled = true
 		zug_beenden_button_label.text = "Computer denkt ..."
-		computerdenkt_fortschrittanzeige.visible = true
-		computerzug.aktiv = true
-		computerzug.durchgang = 0
+		
 		animation_player.play("computer_denkt")
+		computerzug.restart()
 		#computerzug.init_word_array()
 		
 	else: # computer WAR an der reihe, wechsel zu player

@@ -14,6 +14,7 @@
 0.5 legen der buchstaben durch computer (19.11)
 0.55 legen der buchstaben durch computer erfolgt, computer wählt beste möglichkeit, teilweise bugs beim legen, wahrscheinlich wenn mehrere steine mit gleichem buchstaben genommen werden (27.11)
 0.56 effizientere wortermittlung, aber bugs bei finden der möglichen ausgangsstellen! (28.11)
+0.57 kluger computerzug! (2.12)
 0.6 fragezeichen buchstaben - für computer und spieler ...
 0.7 einstellungen/menü/punkteanzeigen
 0.8 im spiel wörter hinzufügen/löschen
