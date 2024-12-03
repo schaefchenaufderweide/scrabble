@@ -5,17 +5,23 @@
 0.18 erlaubte felder fertig, versuch der animation der erlaubten felder (16.11)
 0.181 animation der erlaubten felder korrekt (17.11)
 0.182 fälschlich "doppelte" global_concepts korrigiert, übergang zwischen player und computerzug (18.11)
-0.2 Button: Zug beenden, prüfung: wort in liste? animation, buchstaben werden neu gezogen (DURCHEINANDER!!!)
+0.2 Button: Zug beenden, prüfung: wort in liste? animation, 
+			buchstaben werden neu gezogen (DURCHEINANDER!!!)
 0.3 Computerzug: beginn etablieren (18.11)
 0.31 computerzug: mögliche wörter anhand von gelegten eruieren... (its a long way) (18.11)
 0.32 IN PROGRESS ... Fixe Liste, welche Wörter mit welchen anderen Wörtern gelegt werden können (19.11)
 0.33 IN PROGRESS: fixe liste zu zeitaufwendig. prüfen welche worte können gelegt werden (19.11)
 0.34 IN PROGRESS: prüfen auf querwörter, punkte müssen noch erstellt werden (19.11)
 0.5 legen der buchstaben durch computer (19.11)
-0.55 legen der buchstaben durch computer erfolgt, computer wählt beste möglichkeit, teilweise bugs beim legen, wahrscheinlich wenn mehrere steine mit gleichem buchstaben genommen werden (27.11)
+0.55 	legen der buchstaben durch computer erfolgt, 
+		computer wählt beste möglichkeit, bugs (27.11)
 0.56 effizientere wortermittlung, aber bugs bei finden der möglichen ausgangsstellen! (28.11)
 0.57 kluger computerzug! (2.12)
-0.58 allowed_buchstaben nicht ganz korrekt - erlauben, buchstaben zu legen, aber markieren, wenn nicht in allowed
+0.58 korrektur mögliche wörter: 
+	leerzeichen im regex am ende fehlte, sodass falsche wörter gewählt wurden (2.12)
+0.59 allowed_buchstaben bug behoben, dass reihe durchgehend allowed wurde, 
+	auch wenn wörter nicht durch frisch gelegte verbunden waren (3.12)
+0.591 einführung label für wert auf buchstaben (3.12)
 0.6 fragezeichen buchstaben - für computer und spieler ...
 0.65 austauschen von buchstaben/passen
 0.66 ende des spiels

@@ -25,7 +25,7 @@ var frisch_belegt
 
 func _on_mouse_entered() -> void:
 	#print(feld)
-	if global_concepts.spielstein_is_dragged and allowed:
+	if global_concepts.spielstein_is_dragged and not global_concepts.player.is_touched:# and allowed:
 		
 		select_rect.visible = true
 		

@@ -15,5 +15,9 @@ position = Vector2(250, 750)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HandArea"]
 shape = SubResource("RectangleShape2D_7tyfo")
 
-[node name="Sprite2D" type="Sprite2D" parent="HandArea"]
+[node name="SelectRect" type="Sprite2D" parent="HandArea"]
+visible = false
 texture = ExtResource("2_5j0w0")
+
+[connection signal="mouse_entered" from="HandArea" to="." method="_on_hand_area_mouse_entered"]
+[connection signal="mouse_exited" from="HandArea" to="." method="_on_hand_area_mouse_exited"]

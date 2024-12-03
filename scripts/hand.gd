@@ -5,12 +5,14 @@ extends Node
 
 
 @onready var hand_area = $HandArea
+@onready var select_rect = $HandArea/SelectRect
 
 var steine_dict = {}
 var stein_hand_positions = {}
-
+var is_touched = false
 
 func _ready() -> void:
+	
 	ziehe_steine()
 
 func ziehe_steine():
@@ -42,7 +44,8 @@ func ziehe_steine():
 			var new_buchstabe = global_concepts.buchstaben_im_sackerl.pop_at(random_buchstabe_nr)
 			
 			
-			new_stein.label.text = new_buchstabe
+			new_stein.label_buchstabe.text = new_buchstabe
+			new_stein.label_wert.text = str(GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"])
 			steine_dict[nr_stein] = new_stein
 			
 			stein_hand_positions[new_stein] = Vector2(new_pos_x, new_pos_y)
@@ -54,5 +57,19 @@ func ziehe_steine():
 func get_buchstaben():
 	var buchstaben = []
 	for stein_nr in steine_dict:
-		buchstaben.append(steine_dict[stein_nr].label.text)
+		buchstaben.append(steine_dict[stein_nr].label_buchstabe.text)
 	return buchstaben
+
+
+func _on_hand_area_mouse_entered() -> void:
+	#print("hand")
+	is_touched = true
+	if global_concepts.spielstein_is_dragged:
+		select_rect.visible = true
+	pass # Replace with function body.
+
+
+func _on_hand_area_mouse_exited() -> void:
+	select_rect.visible = false
+	is_touched = false
+	pass # Replace with function body.

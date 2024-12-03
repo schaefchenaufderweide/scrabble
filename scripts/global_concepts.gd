@@ -47,6 +47,7 @@ func _ready() -> void:
 	#print("start global concepts")
 	an_der_reihe = player
 	#print(an_der_reihe)
+
 func create_buchstaben_im_sackerl():
 	var sackerl = []
 	for buchstabe in GlobalGameSettings.spielsteine_start:
@@ -60,14 +61,14 @@ func create_buchstaben_im_sackerl():
 
 func load_wortliste():
 	var wortliste_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
-	var wortliste_txt = wortliste_file.get_as_text()
-	var wortliste_lst = wortliste_txt.split("\n")
+	var wortliste_text = wortliste_file.get_as_text()
+	var wortliste_list = wortliste_text.split("\n")
 	var wortliste_dict = {}
 	
-	for wort in wortliste_lst:
+	for wort in wortliste_list:
 		if wort:
 			wortliste_dict[wort.strip_edges()] = true
-	return [wortliste_dict, wortliste_txt]
+	return [wortliste_dict, wortliste_text]
 	
 #func load_moegliche_woerter_dict():
 	#moegliche_woerter_dict = {}
@@ -138,7 +139,7 @@ func get_belegte_felder(check_is_frisch_belegt):
 		if not check_is_frisch_belegt:
 			
 			if feld_instance.spielstein_auf_feld:
-				belegte_felder[feld_instance.feld] = feld_instance.spielstein_auf_feld.label.text
+				belegte_felder[feld_instance.feld] = feld_instance.spielstein_auf_feld.label_buchstabe.text
 		else:
 			if feld_instance.frisch_belegt:
 				frisch_belegte_felder.append(feld_instance.feld)
@@ -168,11 +169,7 @@ func read_gelegte_woerter():
 				new_word += belegte_felder[feld]
 				x += 1
 				feld = [x, y]
-				
-			
-			#if is_computerzug:  # bei computerzug auch einzelbuchstaben und genaue angaben 
-				#var end_feld = [beginn_feld[0] + len(new_word), beginn_feld[1]]
-				#woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
+		
 			#
 			if len(new_word) > 1:
 				woerter_horizontal.append(new_word)
@@ -194,11 +191,6 @@ func read_gelegte_woerter():
 				feld = [x, y]
 			
 		
-			#if is_computerzug:
-				#var end_feld = [beginn_feld[0], beginn_feld[1] + len(new_word)]
-				#woerter_horizontal.append([new_word, [beginn_feld, end_feld], [1,0]])
-				#
-				#
 			if len(new_word) > 1:
 				woerter_vertikal.append(new_word)
 			y += 1
@@ -206,7 +198,6 @@ func read_gelegte_woerter():
 	return woerter_horizontal + woerter_vertikal
 	
 func get_allowed_spielfelder():
-	# TODO: nicht ganz korrekt - erlaubt nur direkt miteinander verbundene! (nicht alle in reihe!)
 	# TODO: erlauben, buchstaben zu legen, aber markieren, wenn nicht in allowed
 	
 	
@@ -214,7 +205,7 @@ func get_allowed_spielfelder():
 	var belegte_felder = get_belegte_felder(false)
 	var frisch_belegte_felder = get_belegte_felder(true)
 	
-	var allowed_felder = frisch_belegte_felder#[]
+	var allowed_felder = []
 	
 	var allowed_x = []
 	var allowed_y = []
@@ -234,8 +225,9 @@ func get_allowed_spielfelder():
 		allowed_x = [frisch_belegte_felder[0][0]]
 	
 	
-		
-	if not all_spielfelder[[7,7]].spielstein_auf_feld:  # mitte wurde noch nicht platziert
+	
+	if not belegte_felder and not frisch_belegte_felder:  # mitte wurde noch nicht platziert
+		#print("keine mitte")
 		allowed_felder = [[7,7]]
 		# dann ist NUR dieses erlaubt
 	else:
@@ -247,28 +239,50 @@ func get_allowed_spielfelder():
 			
 			for richtung in [[-1, 0], [1, 0], [0, -1], [0, 1]]:
 				var checkfeld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+				#print("checking ", checkfeld)
 				
-					
 				if not checkfeld in belegte_felder and checkfeld in all_spielfelder:
 					if richtung == [-1, 0] or richtung == [1, 0]:
 						if checkfeld[1] in allowed_y:  # wenn horizontal check muss y stimmen
-							if not checkfeld in allowed_felder:
-								allowed_felder.append(checkfeld)
+							if is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
+								if not checkfeld in allowed_felder:
+									allowed_felder.append(checkfeld)
 							
 					elif richtung == [0, -1] or richtung == [0, 1]: # wenn vertikel muss x stimmen
 						if checkfeld[0] in allowed_x:
-							
-							if not checkfeld in allowed_felder:
-								allowed_felder.append(checkfeld)
+							if is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
+								if not checkfeld in allowed_felder:
+									allowed_felder.append(checkfeld)
 	#print(allowed_felder)
 	return allowed_felder
+	
+func is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
+	"""
+	prüft, ob checkfeld mit einem frisch belegten feld benachbart ist. 
+	auch erlaubt ist, wenn es noch keine frisch belegten felder gibt
+	"""
+	if not frisch_belegte_felder:
+		return true
+	for feld in frisch_belegte_felder:
+		var test_feld
+		for richtung in [[1,0], [-1,0], [0,1], [0,-1]]:
+			test_feld = [feld[0] + richtung[0], feld[1] + richtung[1]]
+			if test_feld == checkfeld:
+				return true
+			while test_feld in belegte_felder:
+				# prüft weiter in die richtung, ob ein frisch 
+				test_feld = [test_feld[0] + richtung[0], test_feld[1] + richtung[1]]
+				if test_feld == checkfeld:
+					return true
+	return false
+	
 	
 	
 func set_allowed_spielfelder(allowed_felder):
 	var frisch_belegte_felder = get_belegte_felder(true)
 	# setzen der spielfelder
 	for feld in all_spielfelder:
-		#all_spielfelder[feld].animation_player.play("RESET")
+		all_spielfelder[feld].animation_player.play("RESET")
 		if feld in allowed_felder:
 			all_spielfelder[feld].allowed = true
 			all_spielfelder[feld].animation_player.play("allowed")
@@ -369,3 +383,4 @@ func change_an_der_reihe():
 		
 		computerzug.aktiv = false
 		
+	# TODO anzeige der punkte auf steinen, anzeige punkte bei namen

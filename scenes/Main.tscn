@@ -111,6 +111,8 @@ shape = SubResource("RectangleShape2D_o7rvn")
 [node name="Player" parent="." instance=ExtResource("5_0h5wa")]
 
 [node name="Computer" parent="." instance=ExtResource("5_0h5wa")]
+offset = Vector2(0, 500)
+transform = Transform2D(1, 0, 0, 1, 0, 500)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

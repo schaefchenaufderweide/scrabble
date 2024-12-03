@@ -11,3 +11,18 @@ func _ready() -> void:
 	global_concepts.set_allowed_spielfelder(allowed_felder)
 	
 	
+	## DEBUG
+	#var pattern = ".{0,10}R.{0,4}\n"
+	#
+	#
+	#var regex = RegEx.new()
+	#if regex.compile(pattern) == OK:
+		#var matches = regex.search_all(global_concepts.wortliste_txt)
+		#if not matches:
+			##print("Keine Matches gefunden!")
+			#pass
+		#else:
+			#for sing_match in matches:
+				#if sing_match.get_string()[0] == "R":
+					#print(sing_match.get_string())
+	#pass

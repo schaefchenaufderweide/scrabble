@@ -1,6 +1,7 @@
 extends Area2D
 
-@onready var label = $Label
+@onready var label_buchstabe = $Label_Buchstabe
+@onready var label_wert = $Label_Wert
 @onready var size = $SpriteFrischGelegt.texture.get_width() * scale
 @onready var frisch_gelegt_sprite = $SpriteFrischGelegt
 @onready var fixiert_sprite = $SpriteFixiert
@@ -46,7 +47,11 @@ func _input(event: InputEvent) -> void:
 				is_pressed = false
 				global_concepts.spielstein_is_dragged = false
 				#print("snap field: ", GlobalConcepts.snap_field)
-				if global_concepts.snap_field: # stein wird auf spielbrett gelegt
+				if global_concepts.player.is_touched:  # stein geht zurück zur hand
+					print("geht zurück")
+					return_to_hand(event.position)
+					
+				elif global_concepts.snap_field: # stein wird auf spielbrett gelegt
 					position = global_concepts.snap_field.position
 					global_concepts.snap_field.spielstein_auf_feld = self
 					abgelegtes_feld = global_concepts.snap_field
