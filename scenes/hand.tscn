@@ -19,5 +19,9 @@ shape = SubResource("RectangleShape2D_7tyfo")
 visible = false
 texture = ExtResource("2_5j0w0")
 
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
 [connection signal="mouse_entered" from="HandArea" to="." method="_on_hand_area_mouse_entered"]
 [connection signal="mouse_exited" from="HandArea" to="." method="_on_hand_area_mouse_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

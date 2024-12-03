@@ -24,7 +24,7 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var screen_size = get_viewport().size
 
 
-
+var dragged_stein = null
 var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
@@ -204,7 +204,7 @@ func get_allowed_spielfelder():
 	
 	var belegte_felder = get_belegte_felder(false)
 	var frisch_belegte_felder = get_belegte_felder(true)
-	
+	change_zug_beenden_label(frisch_belegte_felder, [])
 	if not is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
 		print("keine gültigen allowed felder!")
 		return []
@@ -399,37 +399,41 @@ func update_spielbrett(player_zug_erlaubt):
 	
 func player_zug_beenden():
 	var player_zug_erlaubt = true
+	
+	
 	var frisch_gelegt = get_belegte_felder(true)
 	var allowed_felder = get_allowed_spielfelder()
-	if not allowed_felder:  # zug ungültig!
-		print("zug ungültig! falsch gelegt")
-		player_zug_erlaubt = false
-	if not frisch_gelegt:
-		print("keine frischen buchstaben!")
-		player_zug_erlaubt = false
-	
-	#for frisch in frisch_gelegt:
-		#if frisch not in allowed_felder:
-			#print("frisch gelegtes feld ", frisch, " nicht allowed!")
-			#player_zug_erlaubt = false
-	
-	
-	var gelegte_woerter = read_gelegte_woerter()
-	#print(gelegte_woerter)
-	
-	if not gelegte_woerter:
-		print("keine wörter gelegt")
-		player_zug_erlaubt = false
-		#set_allowed_spielfelder(allowed_felder)
-	#print(len(wortliste_lst))
-	for wort in gelegte_woerter:
-		#print(wort, len(wort))
-		#print(wortliste_lst)
-		if wort.strip_edges() not in wortliste_lst:
-			print(wort, " nicht in liste")
+	if zug_beenden_button_label.text == "Steine tauschen":
+		assert(not frisch_gelegt)
+		player.steine_tauschen()
+	else:
+			
+		if not allowed_felder:  # zug ungültig!
+			print("zug ungültig! falsch gelegt")
 			player_zug_erlaubt = false
-			break
+		if not frisch_gelegt:
+			print("keine frischen buchstaben!")
+			player_zug_erlaubt = false
 		
+		
+		
+		
+		var gelegte_woerter = read_gelegte_woerter()
+		#print(gelegte_woerter)
+		
+		if not gelegte_woerter:
+			print("keine wörter gelegt")
+			player_zug_erlaubt = false
+			#set_allowed_spielfelder(allowed_felder)
+		#print(len(wortliste_lst))
+		for wort in gelegte_woerter:
+			#print(wort, len(wort))
+			#print(wortliste_lst)
+			if wort.strip_edges() not in wortliste_lst:
+				print(wort, " nicht in liste")
+				player_zug_erlaubt = false
+				break
+			
 	update_spielbrett(player_zug_erlaubt)
 	if player_zug_erlaubt:
 		change_an_der_reihe()
@@ -457,7 +461,7 @@ func change_an_der_reihe():
 		zug_beenden_button.disabled = false
 		#animation_player.stop("computer_denkt")
 		animation_player.play("RESET")
-		zug_beenden_button_label.text = "Zug beenden"
+		zug_beenden_button_label.text = "Passen"
 		
 		computerdenkt_fortschrittanzeige.visible = false
 		
@@ -465,3 +469,17 @@ func change_an_der_reihe():
 		var allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
 	# TODO anzeige der punkte auf steinen, anzeige punkte bei namen
+
+func change_zug_beenden_label(frisch_belegt, player_steine_dict):
+	var markierte_steine = false
+	for stein_nr in player_steine_dict:
+		if player_steine_dict[stein_nr].eintauschen_sprite.visible:
+			markierte_steine = true
+	
+	if markierte_steine:
+		zug_beenden_button_label.text = "Steine tauschen"
+	elif not frisch_belegt:
+		zug_beenden_button_label.text = "Passen"
+	else:
+		zug_beenden_button_label.text = "Wort legen"
+	

@@ -6,6 +6,7 @@ extends Node
 
 @onready var hand_area = $HandArea
 @onready var select_rect = $HandArea/SelectRect
+@onready var timer = $Timer
 
 var steine_dict = {}
 var stein_hand_positions = {}
@@ -66,10 +67,27 @@ func _on_hand_area_mouse_entered() -> void:
 	is_touched = true
 	if global_concepts.spielstein_is_dragged:
 		select_rect.visible = true
-	pass # Replace with function body.
+		timer.start()
+		print("Timer start")
 
 
 func _on_hand_area_mouse_exited() -> void:
 	select_rect.visible = false
 	is_touched = false
-	pass # Replace with function body.
+	if global_concepts.spielstein_is_dragged:
+		timer.stop()
+		print("timer stopped")
+		
+
+
+func _on_timer_timeout() -> void:
+	print("timer ended")
+	if global_concepts.spielstein_is_dragged:
+		var frisch_belegt = global_concepts.get_belegte_felder(true)
+		if not frisch_belegt:
+			global_concepts.dragged_stein.zum_tausch_markieren()
+		global_concepts.change_zug_beenden_label(frisch_belegt, steine_dict)
+
+func steine_tauschen():
+	# TODO!!!!
+	pass

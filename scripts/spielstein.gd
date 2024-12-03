@@ -8,7 +8,7 @@ extends Area2D
 @onready var global_concepts: Node =  $"/root/Main/GlobalConcepts"
 
 @onready var offset_hand = Vector2(-global_concepts.screen_size.x/2, -global_concepts.screen_size.y/2)
-
+@onready var eintauschen_sprite = $SpriteEintauschen
 
 
 var is_touched = false
@@ -18,6 +18,7 @@ var wert
 var fixiert = false
 var pos_in_hand 
 
+
 func _input(event: InputEvent) -> void:	
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
@@ -26,11 +27,15 @@ func _input(event: InputEvent) -> void:
 				
 				is_pressed = true
 				global_concepts.spielstein_is_dragged = true
+				global_concepts.dragged_stein = self
 				if get_parent() == global_concepts.player:  # aus hand entnommen
 					#print("aus hand entnommen")
 					global_concepts.player.remove_child(self)
 					global_concepts.spielbereich_abgelegte_steine.add_child(self)
+					global_concepts.player.timer.start()
+					print("Timer start")
 				else:
+					
 					#print("aus spielfeld entnommen")
 					abgelegtes_feld.spielstein_auf_feld = null
 					#abgelegtes_feld.animation_player.play("select")
@@ -39,6 +44,7 @@ func _input(event: InputEvent) -> void:
 				#print("check allowed spielfelder")
 				var allowed_felder = global_concepts.get_allowed_spielfelder()
 				global_concepts.set_allowed_spielfelder(allowed_felder)
+				
 					
 				position = event.position + offset_hand + global_concepts.camera.position
 				
@@ -46,6 +52,7 @@ func _input(event: InputEvent) -> void:
 				# spielstein wird losgelassen
 				is_pressed = false
 				global_concepts.spielstein_is_dragged = false
+				global_concepts.dragged_stein = null
 				#print("snap field: ", GlobalConcepts.snap_field)
 				if global_concepts.player.is_touched:  # stein geht zurück zur hand
 					print("geht zurück")
@@ -69,7 +76,8 @@ func _input(event: InputEvent) -> void:
 		if is_pressed:
 			
 			position = event.position + offset_hand + global_concepts.camera.position
-
+			
+			
 func return_to_hand(old_position):
 	
 	get_parent().remove_child(self)
@@ -89,3 +97,18 @@ func _on_mouse_entered() -> void:
 func _on_mouse_exited() -> void:
 	if not is_pressed:
 		is_touched = false
+
+
+func _on_timer_timeout() -> void:
+	print("timer press runout")
+	pass # Replace with function body.
+
+func zum_tausch_markieren():
+	if eintauschen_sprite.visible:
+		eintauschen_sprite.visible = false
+	else:
+		eintauschen_sprite.visible = true
+	global_concepts.dragged_stein = null
+	global_concepts.spielstein_is_dragged = false
+	
+	

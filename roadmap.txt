@@ -23,13 +23,19 @@
 	auch wenn wörter nicht durch frisch gelegte verbunden waren (3.12)
 0.591 einführung label für wert auf buchstaben (3.12)
 0.592 nun sollten die allowed_buchstaben wirklich wirklich funktionieren ... (3.12)
-0.6 fragezeichen buchstaben - für computer und spieler ...
-0.65 austauschen von buchstaben/passen
-0.66 ende des spiels
-0.67 punkte anzeige/wort anzeige
+0.6 steine tauschen für player begonnen ... (3.12)
+0.61 passen für player
+0.62 steine tauschen für computer
+0.63 passen für computer
+0.64 spielende
+0.7 punkte anzeige/wort anzeige
+0.8 fragezeichen buchstaben - für computer und spieler ...
+
+
+
 0.7 einstellungen/menü/punkteanzeigen
-0.8 im spiel wörter hinzufügen/löschen
-0.9 wortliste reinigen
-0.95 highscore und wortlisten online
+0.9 im spiel wörter hinzufügen/löschen
+0.95 wortliste reinigen
+0.98 highscore und wortlisten online
 1.00 Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true
 haha
