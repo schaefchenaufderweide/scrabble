@@ -205,6 +205,10 @@ func get_allowed_spielfelder():
 	var belegte_felder = get_belegte_felder(false)
 	var frisch_belegte_felder = get_belegte_felder(true)
 	
+	if not is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
+		print("keine gültigen allowed felder!")
+		return []
+	
 	var allowed_felder = []
 	
 	var allowed_x = []
@@ -255,7 +259,77 @@ func get_allowed_spielfelder():
 									allowed_felder.append(checkfeld)
 	#print(allowed_felder)
 	return allowed_felder
+
+func is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
 	
+	
+	if len(frisch_belegte_felder) == 0:
+		return true
+	
+	
+	if not [7,7] in frisch_belegte_felder and not [7,7] in belegte_felder:
+		print("mitte nicht besetzt")
+		return false
+	
+	if len(frisch_belegte_felder) == 1:  # prüfen, ob das eine frische benachbart mit belegten ist
+		
+		var checkfeld = frisch_belegte_felder[0]
+		if checkfeld == [7,7]:  # mitte besetzt mit allererstem
+			return true
+		for richtung in [[1,0], [-1,0], [0,1], [0,-1]]:
+			var test_feld = [checkfeld[0] + richtung[0], checkfeld[1] + richtung[1]]
+			if test_feld in belegte_felder:
+				return true
+				
+		
+		return false
+	
+	var check_reihe_oder_spalte = null
+	var check_reihe_oder_spalte_nr = null
+	if frisch_belegte_felder[-2][1] == frisch_belegte_felder[-1][1]:
+		check_reihe_oder_spalte = "reihe"
+		check_reihe_oder_spalte_nr = frisch_belegte_felder[-2][1]
+	elif frisch_belegte_felder[-2][0] == frisch_belegte_felder[-1][0]:
+		check_reihe_oder_spalte = "spalte"
+		check_reihe_oder_spalte_nr = frisch_belegte_felder[-2][0]
+	else:  # letzten zwei sind nicht in einer reihe oder spalte
+		return false
+	
+	var reihenfolge = []
+	for frisch in frisch_belegte_felder:
+		
+		# es müssen alle frisch gelegten die gleiche reihe bzw. spalte haben
+		if check_reihe_oder_spalte == "reihe":
+			if not frisch[1] == check_reihe_oder_spalte_nr:
+				return false
+			
+		else:
+			if not frisch[0] == check_reihe_oder_spalte_nr:
+				return false
+		reihenfolge.append(frisch)
+		
+	
+	# check frisch gelegt miteinander verbunden - reihenfolge vollständig
+	var richtung
+	if check_reihe_oder_spalte == "reihe":
+		reihenfolge.sort_custom(func(a, b): return a[0] < b[0])
+		richtung = [1, 0]
+	else:
+		reihenfolge.sort_custom(func(a, b): return a[1] < b[1])
+		richtung = [0, 1]
+	var test_feld = reihenfolge[0]
+	while not test_feld == reihenfolge[-1]:
+		test_feld = [test_feld[0] + richtung[0], test_feld[1] + richtung[1]]
+		if test_feld not in frisch_belegte_felder and test_feld not in belegte_felder: 
+			#es besteht eine lücke in der reihenfolge - frisch gelegte sind nicht durchgehend verbunden!
+			return false
+	return true
+	
+				
+	
+	
+
+
 func is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
 	"""
 	prüft, ob checkfeld mit einem frisch belegten feld benachbart ist. 
@@ -264,6 +338,7 @@ func is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
 	if not frisch_belegte_felder:
 		return true
 	for feld in frisch_belegte_felder:
+		#var benachbart = false
 		var test_feld
 		for richtung in [[1,0], [-1,0], [0,1], [0,-1]]:
 			test_feld = [feld[0] + richtung[0], feld[1] + richtung[1]]
@@ -325,7 +400,10 @@ func update_spielbrett(player_zug_erlaubt):
 func player_zug_beenden():
 	var player_zug_erlaubt = true
 	var frisch_gelegt = get_belegte_felder(true)
-	#var allowed_felder = get_allowed_spielfelder()
+	var allowed_felder = get_allowed_spielfelder()
+	if not allowed_felder:  # zug ungültig!
+		print("zug ungültig! falsch gelegt")
+		player_zug_erlaubt = false
 	if not frisch_gelegt:
 		print("keine frischen buchstaben!")
 		player_zug_erlaubt = false
@@ -342,7 +420,7 @@ func player_zug_beenden():
 	if not gelegte_woerter:
 		print("keine wörter gelegt")
 		player_zug_erlaubt = false
-	
+		#set_allowed_spielfelder(allowed_felder)
 	#print(len(wortliste_lst))
 	for wort in gelegte_woerter:
 		#print(wort, len(wort))
@@ -355,7 +433,9 @@ func player_zug_beenden():
 	update_spielbrett(player_zug_erlaubt)
 	if player_zug_erlaubt:
 		change_an_der_reihe()
-		
+	else:
+		allowed_felder = get_allowed_spielfelder()
+		set_allowed_spielfelder(allowed_felder)
 		
 		
 func change_an_der_reihe():
@@ -382,5 +462,6 @@ func change_an_der_reihe():
 		computerdenkt_fortschrittanzeige.visible = false
 		
 		computerzug.aktiv = false
-		
+		var allowed_felder = get_allowed_spielfelder()
+		set_allowed_spielfelder(allowed_felder)
 	# TODO anzeige der punkte auf steinen, anzeige punkte bei namen
