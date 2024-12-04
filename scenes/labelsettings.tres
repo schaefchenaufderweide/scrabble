@@ -1,0 +1,9 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://c837enva1pxih"]
+
+[ext_resource type="FontFile" uid="uid://can2ojupcbppw" path="res://fonts/comici.ttf" id="1_h5v8y"]
+
+[resource]
+font = ExtResource("1_h5v8y")
+font_size = 35
+font_color = Color(0, 0, 0, 1)
+outline_size = 6

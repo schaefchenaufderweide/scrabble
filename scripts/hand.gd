@@ -12,6 +12,7 @@ var steine_dict = {}
 var stein_hand_positions = {}
 var is_touched = false
 
+
 func _ready() -> void:
 	
 	ziehe_steine()
@@ -61,33 +62,67 @@ func get_buchstaben():
 		buchstaben.append(steine_dict[stein_nr].label_buchstabe.text)
 	return buchstaben
 
-
+func get_markierte_steine():
+	var markierte_steine = []
+	for stein_nr in steine_dict:
+		if steine_dict[stein_nr].eintauschen_sprite.visible:
+			markierte_steine.append(stein_nr)
+			
+			
+	
+	return markierte_steine
+		
 func _on_hand_area_mouse_entered() -> void:
 	#print("hand")
 	is_touched = true
 	if global_concepts.spielstein_is_dragged:
 		select_rect.visible = true
-		timer.start()
-		print("Timer start")
-
+		
 
 func _on_hand_area_mouse_exited() -> void:
 	select_rect.visible = false
 	is_touched = false
 	if global_concepts.spielstein_is_dragged:
 		timer.stop()
-		print("timer stopped")
+		#print("timer stopped")
 		
 
 
 func _on_timer_timeout() -> void:
-	print("timer ended")
+	#print("timer ended")
+	zum_tausch_markieren()
+	
+func check_markieren():
+	if not get_markierte_steine():
+		timer.start()
+		#print("Timer start")
+	else:
+		#print("fast markieren")
+		zum_tausch_markieren()
+		
+func zum_tausch_markieren():
 	if global_concepts.spielstein_is_dragged:
 		var frisch_belegt = global_concepts.get_belegte_felder(true)
 		if not frisch_belegt:
 			global_concepts.dragged_stein.zum_tausch_markieren()
-		global_concepts.change_zug_beenden_label(frisch_belegt, steine_dict)
-
+		
+			global_concepts.change_zug_beenden_label(frisch_belegt, steine_dict)
+			
 func steine_tauschen():
-	# TODO!!!!
-	pass
+	var markierte_steine = get_markierte_steine()
+	
+	for stein_nr in markierte_steine:
+		
+		var buchstabe = steine_dict[stein_nr].label_buchstabe.text
+		global_concepts.buchstaben_im_sackerl.append(buchstabe)
+		
+		# hinaus
+		var new_pos_x = steine_dict[stein_nr].position.x
+		var new_pos_y = global_concepts.screen_size.y + 100
+		var tween = create_tween()
+		tween.tween_property(steine_dict[stein_nr], "position", Vector2(new_pos_x, new_pos_y), 0.5)
+		steine_dict[stein_nr] = null
+	global_concepts.buchstaben_im_sackerl.shuffle()
+	
+	
+	

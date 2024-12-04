@@ -20,6 +20,7 @@ visible = false
 texture = ExtResource("2_5j0w0")
 
 [node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
 one_shot = true
 
 [connection signal="mouse_entered" from="HandArea" to="." method="_on_hand_area_mouse_entered"]

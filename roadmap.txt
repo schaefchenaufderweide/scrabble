@@ -24,9 +24,10 @@
 0.591 einführung label für wert auf buchstaben (3.12)
 0.592 nun sollten die allowed_buchstaben wirklich wirklich funktionieren ... (3.12)
 0.6 steine tauschen für player begonnen ... (3.12)
-0.61 passen für player
-0.62 steine tauschen für computer
-0.63 passen für computer
+0.605 steine tauschen für player erledigt (4.12)
+0.61 punkte berechnen für player ...
+0.62 computer: was tun, wenn noch kein wort geschrieben ist? -> richtige wortfindung bei leerem brett
+0.63 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
 0.64 spielende
 0.7 punkte anzeige/wort anzeige
 0.8 fragezeichen buchstaben - für computer und spieler ...

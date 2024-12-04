@@ -1,15 +1,15 @@
-[gd_scene load_steps=17 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=15 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
 [ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/hand.tscn" id="5_0h5wa"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
+[ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://scenes/labelsettings.tres" id="7_l1e77"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
-[ext_resource type="FontFile" uid="uid://can2ojupcbppw" path="res://fonts/comici.ttf" id="9_b2lyv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
@@ -76,16 +76,6 @@ _data = {
 "computer_denkt": SubResource("Animation_xjd0v")
 }
 
-[sub_resource type="LabelSettings" id="LabelSettings_gfvow"]
-font = ExtResource("9_b2lyv")
-font_size = 34
-font_color = Color(0, 0, 0, 1)
-outline_size = 6
-
-[sub_resource type="LabelSettings" id="LabelSettings_mjjpn"]
-font = ExtResource("9_b2lyv")
-font_size = 60
-
 [node name="Main" type="Node"]
 script = ExtResource("1_6iaw0")
 
@@ -93,6 +83,7 @@ script = ExtResource("1_6iaw0")
 script = ExtResource("2_vusr7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(249, 411)
 script = ExtResource("6_r55eh")
 
 [node name="Spielbrett" type="Area2D" parent="."]
@@ -125,9 +116,10 @@ libraries = {
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -250.0
-offset_right = 250.0
-offset_bottom = 111.0
+offset_left = -237.0
+offset_top = 40.0
+offset_right = 237.0
+offset_bottom = 151.0
 grow_horizontal = 2
 size_flags_vertical = 4
 texture_normal = ExtResource("7_p3hy0")
@@ -137,19 +129,16 @@ script = ExtResource("8_dr8w6")
 [node name="Label" type="Label" parent="UICanvasLayer/ZugBeenden"]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.299
-anchor_top = 0.283784
-anchor_right = 0.701
-anchor_bottom = 0.716216
-offset_left = 50.0
-offset_top = 12.5
-offset_right = -50.0
-offset_bottom = -12.5
+anchor_left = 0.0421941
+anchor_top = 0.171171
+anchor_right = 0.945148
+anchor_bottom = 0.774775
 grow_horizontal = 2
 grow_vertical = 2
 text = "Passen"
-label_settings = SubResource("LabelSettings_gfvow")
+label_settings = ExtResource("7_l1e77")
 horizontal_alignment = 1
+vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="ComputerdenktFortschrittanzeige" type="ColorRect" parent="UICanvasLayer/ZugBeenden"]
@@ -168,26 +157,30 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0, 0.545098)
 
-[node name="Computerzug" type="Node" parent="."]
-script = ExtResource("9_avwwi")
-
-[node name="LoadingLabel" type="Label" parent="."]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -248.0
-offset_top = -63.5
-offset_right = 248.0
-offset_bottom = 63.5
-grow_horizontal = 2
-grow_vertical = 2
-text = "Test"
-label_settings = SubResource("LabelSettings_mjjpn")
+[node name="LabelPlayer" type="Label" parent="UICanvasLayer"]
+offset_left = 10.0
+offset_right = 152.0
+offset_bottom = 50.0
+text = "Player: 0"
+label_settings = ExtResource("7_l1e77")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="LabelComputer" type="Label" parent="UICanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -208.0
+offset_right = -10.0
+offset_bottom = 50.0
+grow_horizontal = 0
+text = "Computer: 0"
+label_settings = ExtResource("7_l1e77")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Computerzug" type="Node" parent="."]
+script = ExtResource("9_avwwi")
 
 [connection signal="button_down" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_down"]
 [connection signal="button_up" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_up"]

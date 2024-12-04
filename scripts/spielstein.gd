@@ -32,8 +32,8 @@ func _input(event: InputEvent) -> void:
 					#print("aus hand entnommen")
 					global_concepts.player.remove_child(self)
 					global_concepts.spielbereich_abgelegte_steine.add_child(self)
-					global_concepts.player.timer.start()
-					print("Timer start")
+					global_concepts.player.check_markieren()
+					
 				else:
 					
 					#print("aus spielfeld entnommen")
@@ -84,7 +84,7 @@ func return_to_hand(old_position):
 	global_concepts.player.add_child(self)
 	position = old_position
 	var tween = create_tween()
-	#tween.position = position
+	
 	tween.tween_property(self, "position", Vector2(global_concepts.player.stein_hand_positions[self]), 0.5)
 	#position = GlobalConcepts.player_hand.stein_positions[self]
 		

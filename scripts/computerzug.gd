@@ -224,12 +224,13 @@ func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
 
-func test_moegliches_wort_auf_querschlaeger(wort_dict, belegte_felder):
+func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	ist seitlich bzw. ober-unterhalb des probeweise gelegten buchstabens ein bereits gelegter buchstabe? 
 	dann schauen, ob gültiges wort
 	die legerichtung ist bereits überprüft! es geht nur um "querschläger"
+	außerdem werden die punkte ermittelt
 	"""
 	var moegliche_punkte = 0
 	var wort_wert_bonus_faktor = 1 
@@ -331,6 +332,8 @@ func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 
 
 func _process(delta: float) -> void:
+	# todo: was tun, wenn kein wort geschrieben ist?
+	# todo: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen!
 	if aktiv:
 		#print("aktiv", aktiv)
 			
@@ -357,7 +360,7 @@ func thinking_ende():
 		if not pruefwort in global_concepts.wortliste_lst:
 			
 			push_error("Fehler!! Wort ", pruefwort, " nicht in Wortliste!")
-		var ergebnis_test = test_moegliches_wort_auf_querschlaeger(pruefwort, belegte_felder)
+		var ergebnis_test = test_moegliches_wort_auf_querschlaeger_und_get_punkte(pruefwort, belegte_felder)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
@@ -368,7 +371,7 @@ func thinking_ende():
 			#print("nicht erlaubt: ", [pruefwort, punkte])
 	
 	var sort_erlaubte_woerter = sort_by_punkte(erlaubte_woerter)
-	# TODO: WAS wenn keines legbar? -> computer tauscht steine!
+	# TODO: WAS wenn keines legbar? -> computer tauscht steine oder passt
 	print("bestes wort ", sort_erlaubte_woerter[0])
 	
 	print("computer steine vor legen: ", computer_buchstaben)

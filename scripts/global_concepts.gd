@@ -398,6 +398,7 @@ func update_spielbrett(player_zug_erlaubt):
 	
 	
 func player_zug_beenden():
+	print("player zug beenden")
 	var player_zug_erlaubt = true
 	
 	
@@ -411,19 +412,19 @@ func player_zug_beenden():
 		if not allowed_felder:  # zug ungültig!
 			print("zug ungültig! falsch gelegt")
 			player_zug_erlaubt = false
-		if not frisch_gelegt:
-			print("keine frischen buchstaben!")
-			player_zug_erlaubt = false
-		
+		#if not frisch_gelegt:
+			#print("keine frischen buchstaben!")
+			#player_zug_erlaubt = false
+		#
 		
 		
 		
 		var gelegte_woerter = read_gelegte_woerter()
 		#print(gelegte_woerter)
 		
-		if not gelegte_woerter:
-			print("keine wörter gelegt")
-			player_zug_erlaubt = false
+		#if not gelegte_woerter:
+			#print("keine wörter gelegt")
+			#player_zug_erlaubt = false
 			#set_allowed_spielfelder(allowed_felder)
 		#print(len(wortliste_lst))
 		for wort in gelegte_woerter:
@@ -436,6 +437,9 @@ func player_zug_beenden():
 			
 	update_spielbrett(player_zug_erlaubt)
 	if player_zug_erlaubt:
+		# TODO HIER WEITER!!! func von computerzug verwenden!
+		#var wort_dict = neues_wort, dict mit zu legenden buchstaben, richtung
+		#punkte = global_concepts.test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder):
 		change_an_der_reihe()
 	else:
 		allowed_felder = get_allowed_spielfelder()
@@ -471,12 +475,8 @@ func change_an_der_reihe():
 	# TODO anzeige der punkte auf steinen, anzeige punkte bei namen
 
 func change_zug_beenden_label(frisch_belegt, player_steine_dict):
-	var markierte_steine = false
-	for stein_nr in player_steine_dict:
-		if player_steine_dict[stein_nr].eintauschen_sprite.visible:
-			markierte_steine = true
+	if player.get_markierte_steine():
 	
-	if markierte_steine:
 		zug_beenden_button_label.text = "Steine tauschen"
 	elif not frisch_belegt:
 		zug_beenden_button_label.text = "Passen"
