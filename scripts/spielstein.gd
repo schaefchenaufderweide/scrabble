@@ -17,7 +17,7 @@ var is_pressed = false
 var wert
 var fixiert = false
 var pos_in_hand 
-
+@onready var punkte_label = $PunkteLabel
 
 func _input(event: InputEvent) -> void:	
 	if event is InputEventMouseButton:
@@ -55,7 +55,7 @@ func _input(event: InputEvent) -> void:
 				global_concepts.dragged_stein = null
 				#print("snap field: ", GlobalConcepts.snap_field)
 				if global_concepts.player.is_touched:  # stein geht zurück zur hand
-					print("geht zurück")
+					#print("geht zurück")
 					return_to_hand(event.position)
 					
 				elif global_concepts.snap_field: # stein wird auf spielbrett gelegt
@@ -100,7 +100,7 @@ func _on_mouse_exited() -> void:
 
 
 func _on_timer_timeout() -> void:
-	print("timer press runout")
+	#print("timer press runout")
 	pass # Replace with function body.
 
 func zum_tausch_markieren():

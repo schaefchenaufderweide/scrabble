@@ -15,7 +15,7 @@ var spielstein_auf_feld = null
 var allowed = false
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer
-
+@onready var punkte_label = $PunkteLabel
 
 var feld
 var frisch_belegt
@@ -24,7 +24,7 @@ var frisch_belegt
 
 
 func _on_mouse_entered() -> void:
-	#print(feld)
+	print(feld, position)
 	if global_concepts.spielstein_is_dragged and not global_concepts.player.is_touched:# and allowed:
 		
 		select_rect.visible = true

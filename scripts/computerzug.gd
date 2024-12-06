@@ -28,12 +28,19 @@ func restart():
 	zu_pruefende_reihen = []
 	zu_pruefende_spalten = []
 	
-	for all_feld in global_concepts.get_belegte_felder(false):
+	var belegte_felder = global_concepts.get_belegte_felder(false)
+	
+	
+	
+	for all_feld in belegte_felder:
 		if all_feld[0] not in belegte_felder and all_feld[0] not in zu_pruefende_spalten:
 			zu_pruefende_spalten.append(all_feld[0])
 		if all_feld[1] not in belegte_felder and all_feld[1] not in zu_pruefende_reihen:
 			zu_pruefende_reihen.append(all_feld[1])
-			
+	
+	if not belegte_felder:  # neues spiel
+		zu_pruefende_reihen = [7]
+	
 	max_durchgaenge = len(zu_pruefende_reihen) + len(zu_pruefende_spalten)
 	computer_buchstaben = global_concepts.computer.get_buchstaben()
 	computer_buchstaben.sort()
@@ -96,6 +103,8 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	var buchstaben_dict = all_lst[0]
 	var pattern = all_lst[1]
 	
+	#if not belegte_felder:
+		#moegliche_woerter += global_concepts.wortliste_dict.keys()
 	
 	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, belegte_felder)
 
@@ -142,12 +151,14 @@ func get_words_and_zellen_from_string_and_pattern(text, reihe_oder_spalte_nr, wa
 		
 	pattern += ".{0," + str(leerzeichen) +  "}\n"
 	
-	print(waag_oder_senkrecht, " ", reihe_oder_spalte_nr)
-	print(buchstaben_dict)
-	print(pattern)
+	#print(waag_oder_senkrecht, " ", reihe_oder_spalte_nr)
+	#print(buchstaben_dict)
+	#print(pattern)
 	return [buchstaben_dict, pattern]
 
 func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waag_oder_senkrecht, reihe_oder_spalte_nr, belegte_felder):
+	
+	
 	#var woerter_in_reihe_oder_spalte = get_words_and_zellen_from_string(zu_pruefende_reihe_oder_spalte_txt)
 	
 	var moegliche_woerter = []
@@ -162,10 +173,21 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		for single_match in matches:
 			var single_match_txt = single_match.get_string()
 			single_match_txt = single_match_txt.strip_edges()
+			
 			var wortbeginn_wort
 			#var position = single_match.get_start()
 			#print("Gefunden: ", single_match_txt)
 			var gelegtes_wort = null
+			if not woerter_dict: # neues spiel - leeres brett, computer legt nur waagrecht
+				var fehlende_buchstaben = single_match_txt.split()
+				if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
+					continue
+				var lege_dict = get_lege_dict_for_new_game(single_match_txt, "reihe")
+				var richtung = [1,0]
+				
+				moegliche_woerter.append([single_match_txt, lege_dict, richtung])
+				continue
+			
 			for wort in woerter_dict:
 				var stelle_in_woerterbuch_wort = single_match_txt.find(wort)
 				if stelle_in_woerterbuch_wort != -1:
@@ -193,6 +215,94 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 			
 					
 	return moegliche_woerter
+
+func get_lege_dict_for_new_game(single_match_txt, info_waagrecht_oder_senkrecht):
+	
+	var richtung = 1
+	
+	var alle_buchstabenwerte_lst = []
+	
+	var stelle = 0
+	for buchstabe in single_match_txt:
+		var wert = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"]
+		alle_buchstabenwerte_lst.append([wert, stelle])
+		stelle += 1
+	alle_buchstabenwerte_lst.sort()
+	alle_buchstabenwerte_lst.reverse()
+	
+	var platz_vorn
+	var platz_hinten
+	var lege_dict = {}
+	var first_zelle = null
+	if len(single_match_txt) <= 4:
+		first_zelle = [7,7]
+	
+	
+	
+	
+	for info in alle_buchstabenwerte_lst:
+		if first_zelle:
+			break
+		
+		for test_zelle in [[3,7], [11,7]]:
+			platz_vorn = info[1]
+			platz_hinten = len(single_match_txt) - (platz_vorn + 1)
+			if test_zelle == [3,7]:
+				if platz_hinten < 4:
+					continue
+				else:
+					first_zelle = [3-platz_vorn, 7]
+					break
+			if test_zelle == [11,7]:
+				if  platz_vorn < 4:
+					continue
+				else:
+					first_zelle = [11-platz_vorn, 7]
+					break
+	var zelle = first_zelle
+	for buchstabe in single_match_txt:
+	
+		lege_dict[zelle] = buchstabe
+		zelle = [zelle[0] + richtung, zelle[1]]
+	return lege_dict
+		
+		
+		
+		
+		
+		#var wert = info[0]
+		#
+		#if platz_vorn < 4 and platz_hinten < 4:  # geht sich weder vorn noch hinten aus
+			#first_zelle = [7,7]
+			#
+		#elif platz_vorn >= 4:
+			#first_zelle = [7 - richtung * platz_hinten, 7]
+		#elif platz_hinten >= 4:
+			#first_zelle = [7 - richtung * platz_hinten, 7]
+		#else:
+			#push_error("Fehler!")
+		#if not first_zelle == [7,7]:
+			#print(single_match_txt, " first zelle: ", first_zelle)
+		#var zelle = first_zelle
+		#for buchstabe in single_match_txt:
+			#
+			#lege_dict[zelle] = buchstabe
+			#zelle = [zelle[0] + richtung, zelle[1]]
+		#return lege_dict
+	# TODO!!!!!
+	#while not wortbeginn:
+#		var best_ix = alle_buchstabenwerte.index(max(alle_buchstabenwerte))
+	
+	#if len(single_match_txt) < 4:
+		#wortbeginn = [7,7]
+	#
+	#
+	#for buchstabe in single_match_txt:
+		#pass
+	#
+	
+	for spezial in GlobalGameSettings.spezialfelder:
+		pass
 
 func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 	#print("checking ", single_match_txt, " länge: ", len(single_match_txt))
@@ -224,7 +334,7 @@ func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
 
-func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder):
+func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder, check_querwoerter):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	ist seitlich bzw. ober-unterhalb des probeweise gelegten buchstabens ein bereits gelegter buchstabe? 
@@ -239,22 +349,27 @@ func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_fe
 	var richtung = wort_dict[2]
 	
 	var abrechnen_bereits_gelegtes_wort = wort
-	
+	var alle_buchstaben_gelegt_bonus 
+	if len(zu_legende_buchstaben_dict) == GlobalGameSettings.anzahl_steine_pro_hand:
+		alle_buchstaben_gelegt_bonus = 50
+	else:
+		alle_buchstaben_gelegt_bonus = 0
+			
 	for feld in zu_legende_buchstaben_dict:
 		var buchstaben_wert_bonus_faktor = 1
 		var buchstabe = zu_legende_buchstaben_dict[feld]
-		
-		var querrichtung = [richtung[1], richtung[0]]
-		var querwort_pruefung_ergebnis = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
-		var ergebnis_okay = querwort_pruefung_ergebnis[0]
-		var zusatzpunkte = querwort_pruefung_ergebnis[1]
-		
-		if not ergebnis_okay:
-			return [false, 0]
-		else:
-			moegliche_punkte += zusatzpunkte
-			#print("zusatzpunkte querwort ", zusatzpunkte)
-		
+		if check_querwoerter:
+			var querrichtung = [richtung[1], richtung[0]]
+			var querwort_pruefung_ergebnis = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
+			var ergebnis_okay = querwort_pruefung_ergebnis[0]
+			var zusatzpunkte = querwort_pruefung_ergebnis[1]
+			
+			if not ergebnis_okay:
+				return [false, 0]
+			else:
+				moegliche_punkte += zusatzpunkte
+				#print("zusatzpunkte querwort ", zusatzpunkte)
+			
 		if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
 			wort_wert_bonus_faktor = 3
 		elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
@@ -265,7 +380,7 @@ func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_fe
 			buchstaben_wert_bonus_faktor = 2
 		
 		
-		moegliche_punkte += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
+		moegliche_punkte += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor + alle_buchstaben_gelegt_bonus
 		#print("punkte für ", buchstabe, " :", GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor)
 		abrechnen_bereits_gelegtes_wort = replace_first_occurance(abrechnen_bereits_gelegtes_wort, buchstabe)	
 	
@@ -346,21 +461,23 @@ func _process(delta: float) -> void:
 		elif zu_pruefende_spalten:
 			var zu_pruefende_spalte = zu_pruefende_spalten.pop_front()
 			think_durchgang(zu_pruefende_spalte, "spalte", belegte_felder)
-		print("bisher ", len(moegliche_woerter), " gefunden")
+		#print("bisher ", len(moegliche_woerter), " gefunden")
 		if durchgang >= max_durchgaenge:
-			print("ende computerzug")
-			
-			thinking_ende()
+			#print("ende computerzug")
+			if not belegte_felder:
+				thinking_ende(false)
+			else:
+				thinking_ende(true)
 			
 
-func thinking_ende():
+func thinking_ende(brett_ist_nicht_leer):
 	var erlaubte_woerter = []
 	for pruefwort in moegliche_woerter:
 		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		if not pruefwort in global_concepts.wortliste_lst:
+		if not pruefwort in global_concepts.wortliste_dict:
 			
 			push_error("Fehler!! Wort ", pruefwort, " nicht in Wortliste!")
-		var ergebnis_test = test_moegliches_wort_auf_querschlaeger_und_get_punkte(pruefwort, belegte_felder)
+		var ergebnis_test = test_moegliches_wort_auf_querschlaeger_und_get_punkte(pruefwort, belegte_felder, brett_ist_nicht_leer)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
@@ -372,9 +489,9 @@ func thinking_ende():
 	
 	var sort_erlaubte_woerter = sort_by_punkte(erlaubte_woerter)
 	# TODO: WAS wenn keines legbar? -> computer tauscht steine oder passt
-	print("bestes wort ", sort_erlaubte_woerter[0])
+	#print("bestes wort ", sort_erlaubte_woerter[0])
 	
-	print("computer steine vor legen: ", computer_buchstaben)
+	#print("computer steine vor legen: ", computer_buchstaben)
 	lege_steine(sort_erlaubte_woerter[0])
 	
 	#global_concepts.computer.ziehe_steine()
@@ -402,8 +519,8 @@ func lege_steine(wort_arr):
 				rel_stein_aus_hand = test_stein
 				break
 		if not rel_stein_aus_hand:
-			print("Buchstabe fehlt!!!!! ", steine_pos_dict[stein_pos])
-			assert(false, "test error")
+			push_error("Buchstabe fehlt!!!!! ", steine_pos_dict[stein_pos])
+			
 		
 		
 		global_concepts.computer.remove_child(rel_stein_aus_hand)

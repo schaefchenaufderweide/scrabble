@@ -8,10 +8,11 @@ extends Node
 @onready var select_rect = $HandArea/SelectRect
 @onready var timer = $Timer
 
+
 var steine_dict = {}
 var stein_hand_positions = {}
 var is_touched = false
-
+var punkte = 0
 
 func _ready() -> void:
 	
@@ -54,7 +55,7 @@ func ziehe_steine():
 			new_stein.wert = GlobalGameSettings.spielsteine_start[new_buchstabe]["Wert"]
 			if self == global_concepts.computer:
 				new_stein.visible = false
-	print(self, get_buchstaben())
+	#print(self, get_buchstaben())
 
 func get_buchstaben():
 	var buchstaben = []

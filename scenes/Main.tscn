@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
-[ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/hand.tscn" id="5_0h5wa"]
+[ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/Hand.tscn" id="5_0h5wa"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
 [ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://scenes/labelsettings.tres" id="7_l1e77"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]

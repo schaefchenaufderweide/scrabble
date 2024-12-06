@@ -24,20 +24,19 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var screen_size = get_viewport().size
 
 
+
 var dragged_stein = null
 var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-var wortliste_lst_and_txt = load_wortliste()
-var wortliste_lst = wortliste_lst_and_txt[0]
-var wortliste_txt = wortliste_lst_and_txt[1]
+var wortliste_txt = load_wortliste_txt()
+var wortliste_dict = get_wortliste_dict(wortliste_txt)
+#var wortliste_txt = wortliste_lst_and_txt[1]
 
 
 
-
-pass
 #var moegliche_woerter_dict = load_moegliche_woerter_dict()
 
 
@@ -48,6 +47,8 @@ func _ready() -> void:
 	an_der_reihe = player
 	#print(an_der_reihe)
 
+	
+	
 func create_buchstaben_im_sackerl():
 	var sackerl = []
 	for buchstabe in GlobalGameSettings.spielsteine_start:
@@ -59,16 +60,21 @@ func create_buchstaben_im_sackerl():
 	sackerl.shuffle()
 	return sackerl
 
-func load_wortliste():
+func load_wortliste_txt():
 	var wortliste_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
 	var wortliste_text = wortliste_file.get_as_text()
+	return wortliste_text
+
+func get_wortliste_dict(wortliste_text):
 	var wortliste_list = wortliste_text.split("\n")
 	var wortliste_dict = {}
 	
 	for wort in wortliste_list:
+		wort = wort.strip_edges()
 		if wort:
-			wortliste_dict[wort.strip_edges()] = true
-	return [wortliste_dict, wortliste_text]
+			wortliste_dict[wort] = true
+	#print(len(wortliste_dict))
+	return wortliste_dict
 	
 #func load_moegliche_woerter_dict():
 	#moegliche_woerter_dict = {}
@@ -154,49 +160,46 @@ func get_belegte_felder(check_is_frisch_belegt):
 func read_gelegte_woerter():
 	
 	var belegte_felder = get_belegte_felder(false)
+	var frisch_gelegte_felder = get_belegte_felder(true)
+	#var new_words = []
+	var alle_woerter = []
 	
-				
-	# read horizontal
-	var woerter_horizontal = []
-	for y in range(GlobalGameSettings.anzahl_felder):
-		var x = 0
+	for richtung in ["horizontal", "vertikal"]:
 		
-		while x < GlobalGameSettings.anzahl_felder:
-			var new_word = ""
-			var beginn_feld = [x,y]
-			var feld = [x, y]
-			while feld in belegte_felder:
-				new_word += belegte_felder[feld]
-				x += 1
-				feld = [x, y]
-		
-			#
-			if len(new_word) > 1:
-				woerter_horizontal.append(new_word)
-			x += 1
-	#print(woerter_horizontal)
+		for stelle_fix in range(GlobalGameSettings.anzahl_felder):
+			var stelle_variabel = 0
+			while stelle_variabel < GlobalGameSettings.anzahl_felder:
+				var new_word = ""
+				var beginn_feld 
+				if richtung == "horizontal":
+					beginn_feld = [stelle_variabel, stelle_fix]
+					
+				else:
+					beginn_feld = [stelle_fix, stelle_variabel]
+				var feld = beginn_feld
+				var is_new_word = false
+				var buchstaben_dict = {}
+				while feld in belegte_felder:
+					if feld in frisch_gelegte_felder:
+						is_new_word = true
+					new_word += belegte_felder[feld]
+					buchstaben_dict[feld] = belegte_felder[feld]
+					stelle_variabel += 1
+					if richtung == "horizontal":
+						feld = [stelle_variabel, stelle_fix]
+					
+					else:
+						feld = [stelle_fix, stelle_variabel]
+				if len(new_word) > 1:
+					if is_new_word:
+						alle_woerter.append([new_word, buchstaben_dict, true])
+					else:
+						alle_woerter.append([new_word, buchstaben_dict, false])
+				stelle_variabel += 1
 	
-	# read vertikal
-	var woerter_vertikal = []
-	for x in range(GlobalGameSettings.anzahl_felder):
-		var y = 0
-		
-		while y < GlobalGameSettings.anzahl_felder:
-			var new_word = ""
-			var beginn_feld = [x,y]
-			var feld = [x, y]
-			while feld in belegte_felder:
-				new_word += belegte_felder[feld]
-				y += 1
-				feld = [x, y]
-			
-		
-			if len(new_word) > 1:
-				woerter_vertikal.append(new_word)
-			y += 1
+	return alle_woerter
 	
-	return woerter_horizontal + woerter_vertikal
-	
+	#
 func get_allowed_spielfelder():
 	# TODO: erlauben, buchstaben zu legen, aber markieren, wenn nicht in allowed
 	
@@ -398,52 +401,127 @@ func update_spielbrett(player_zug_erlaubt):
 	
 	
 func player_zug_beenden():
-	print("player zug beenden")
+	#print("player zug beenden")
 	var player_zug_erlaubt = true
 	
 	
 	var frisch_gelegt = get_belegte_felder(true)
 	var allowed_felder = get_allowed_spielfelder()
+	var gelegte_woerter = read_gelegte_woerter()
+	
 	if zug_beenden_button_label.text == "Steine tauschen":
 		assert(not frisch_gelegt)
 		player.steine_tauschen()
 	else:
-			
-		if not allowed_felder:  # zug ungültig!
-			print("zug ungültig! falsch gelegt")
-			player_zug_erlaubt = false
-		#if not frisch_gelegt:
-			#print("keine frischen buchstaben!")
-			#player_zug_erlaubt = false
-		#
-		
-		
-		
-		var gelegte_woerter = read_gelegte_woerter()
-		#print(gelegte_woerter)
-		
-		#if not gelegte_woerter:
-			#print("keine wörter gelegt")
-			#player_zug_erlaubt = false
-			#set_allowed_spielfelder(allowed_felder)
-		#print(len(wortliste_lst))
-		for wort in gelegte_woerter:
-			#print(wort, len(wort))
-			#print(wortliste_lst)
-			if wort.strip_edges() not in wortliste_lst:
-				print(wort, " nicht in liste")
-				player_zug_erlaubt = false
-				break
-			
+		player_zug_erlaubt = is_player_zug_gueltig(allowed_felder, gelegte_woerter)
+				
 	update_spielbrett(player_zug_erlaubt)
+	
 	if player_zug_erlaubt:
-		# TODO HIER WEITER!!! func von computerzug verwenden!
-		#var wort_dict = neues_wort, dict mit zu legenden buchstaben, richtung
-		#punkte = global_concepts.test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder):
+		player.punkte += get_punkte(gelegte_woerter, frisch_gelegt)
+		
 		change_an_der_reihe()
 	else:
 		allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
+		
+
+func get_punkte(gelegte_woerter, frisch_gelegte_felder):
+	var neue_woerter = []
+	# gd script kennt wohl keine list comprehension!
+	
+	
+	for wort_lst in gelegte_woerter:
+		var is_new = wort_lst[2]
+		if is_new:
+			neue_woerter.append(wort_lst)
+	
+	# punkte abrechnung
+	
+	
+	#var neue_woerter_sort
+	
+	if len(neue_woerter) > 1:
+		var punkte = []
+		for wort in neue_woerter:
+			var ergebnis = get_punkte_wort(wort, [], frisch_gelegte_felder, false)
+			punkte.append(ergebnis[1])
+		
+		if punkte[1] > punkte[0]:
+			neue_woerter.reverse()
+		
+	
+	var punkte = 0
+	for wort in neue_woerter:
+		var bereits_abgerechnet = []
+		var ergebnis = get_punkte_wort(wort, bereits_abgerechnet, frisch_gelegte_felder, true)
+		bereits_abgerechnet = ergebnis[0]
+		punkte += ergebnis[1]
+	return punkte
+	
+func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder, show_on_screen):
+	var wort_wert_bonus_faktor = 1
+	var buchstaben_wert_bonus_faktor = 1
+	var punkte = 0
+	var buchstaben_dict = wort_lst[1]
+	var alle_buchstaben_bonus = 0
+	if len(frisch_gelegte_felder) == GlobalGameSettings.anzahl_steine_pro_hand:
+		alle_buchstaben_bonus = 50
+		
+	for feld in buchstaben_dict:
+		var buchstabe = buchstaben_dict[feld]
+		if feld in frisch_gelegte_felder and not feld in bereits_abgerechnet:
+			if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
+				wort_wert_bonus_faktor = 3
+			elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
+				wort_wert_bonus_faktor = 2
+			if feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"]:
+				buchstaben_wert_bonus_faktor = 3
+			elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
+				buchstaben_wert_bonus_faktor = 2
+			
+			var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
+			create_punkte_label(feld, new_punkte)
+			
+			punkte += new_punkte
+			bereits_abgerechnet.append(feld)
+			
+	punkte *= wort_wert_bonus_faktor + alle_buchstaben_bonus
+	return [bereits_abgerechnet, punkte]
+		
+	
+	
+func create_punkte_label(feld, punkte):
+	
+	var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
+	punkte_label_auf_stein.visible = true
+	punkte_label_auf_stein.text = str(punkte)
+	var tween = create_tween()
+	tween.tween_property(punkte_label_auf_stein, "scale", Vector2(2.0, 2.0), 2.5)
+	tween.parallel().tween_property(punkte_label_auf_stein, "position", Vector2(-50, -50), 2.5)
+	#var font_size = punkte_label_auf_stein.label_settings.font_size
+	# TODO!!!!!!!
+	#font_size = 100
+	print("show punkte: ", punkte)
+	
+
+
+func is_player_zug_gueltig(allowed_felder, gelegte_woerter):
+	
+	if not allowed_felder:  # zug ungültig!
+		print("zug ungültig! falsch gelegt")
+		return false
+		
+	for wort_lst in gelegte_woerter:
+		var wort = wort_lst[0]
+		
+		if wort.strip_edges() not in wortliste_dict:
+			print(wort, " nicht in liste (weitere wurden nicht geprüft)")
+			return false
+		else:
+			print(wort, " in liste")
+	return true
+	
 		
 		
 func change_an_der_reihe():
