@@ -26,17 +26,16 @@
 0.6 steine tauschen für player begonnen ... (3.12)
 0.605 steine tauschen für player erledigt (4.12)
 0.61 punkte berechnen für player (4.12)
-0.62 computer: was tun, wenn noch kein wort geschrieben ist? -> richtige wortfindung bei leerem brett (6.12)
-0.63 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
-0.64 spielende
-0.7 punkte anzeige/wort anzeige
+0.62 computer: richtige wortfindung bei leerem brett (6.12)
+0.65 punkte anzeige/wort anzeige
+0.7 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
 0.8 fragezeichen buchstaben - für computer und spieler ...
+0.85 spielende
 
 
-
-0.7 einstellungen/menü/punkteanzeigen
-0.9 im spiel wörter hinzufügen/löschen
-0.95 wortliste reinigen
-0.98 highscore und wortlisten online
-1.00 Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true
+0.9 einstellungen/menü/punkteanzeigen
+0.95 im spiel wörter hinzufügen/löschen
+1.0 wortliste reinigen
+1.2 highscore und wortlisten online
+1.3 Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true
 haha

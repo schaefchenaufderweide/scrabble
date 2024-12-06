@@ -16,10 +16,12 @@ var belegte_felder = []
 var word_array_waagrecht = []
 var word_array_senkrecht = []
 
+
 func _ready() -> void:
 	computerdenkt_fortschrittanzeige.visible = false
 
 func restart():
+	print("restart computerzug")
 	moegliche_woerter = []
 	computerdenkt_fortschrittanzeige.visible = true
 	aktiv = true
@@ -28,8 +30,11 @@ func restart():
 	zu_pruefende_reihen = []
 	zu_pruefende_spalten = []
 	
-	var belegte_felder = global_concepts.get_belegte_felder(false)
 	
+	if not global_concepts.get_belegte_felder(false):
+		global_concepts.brett_ist_leer = true
+	else:
+		global_concepts.brett_ist_leer = false
 	
 	
 	for all_feld in belegte_felder:
@@ -334,7 +339,7 @@ func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
 
-func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder, check_querwoerter):
+func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_felder):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	ist seitlich bzw. ober-unterhalb des probeweise gelegten buchstabens ein bereits gelegter buchstabe? 
@@ -342,6 +347,9 @@ func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_fe
 	die legerichtung ist bereits überprüft! es geht nur um "querschläger"
 	außerdem werden die punkte ermittelt
 	"""
+	
+	# TODO! DIE PUNKTEABRECHNUNG FÜR COMPUTER STIMMT NICHT! Es werden auch Querwörter gezählt, die nichts Neues haben! Mach es so wie bei Player punktezählen!
+	# TODO außerdem sollte abrechnung und prüfen getrennt werden!
 	var moegliche_punkte = 0
 	var wort_wert_bonus_faktor = 1 
 	var wort = wort_dict[0]
@@ -358,7 +366,7 @@ func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_fe
 	for feld in zu_legende_buchstaben_dict:
 		var buchstaben_wert_bonus_faktor = 1
 		var buchstabe = zu_legende_buchstaben_dict[feld]
-		if check_querwoerter:
+		if not global_concepts.brett_ist_leer:
 			var querrichtung = [richtung[1], richtung[0]]
 			var querwort_pruefung_ergebnis = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder)
 			var ergebnis_okay = querwort_pruefung_ergebnis[0]
@@ -372,21 +380,24 @@ func test_moegliches_wort_auf_querschlaeger_und_get_punkte(wort_dict, belegte_fe
 			
 		if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
 			wort_wert_bonus_faktor = 3
+			print("Wort x 3", feld)
 		elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
 			wort_wert_bonus_faktor = 2
+			print("Wort x 2", feld)
 		if feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"]:
 			buchstaben_wert_bonus_faktor = 3
+			print("Buchstabe x 3", feld)
 		elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
 			buchstaben_wert_bonus_faktor = 2
-		
+			print("Buchstabe x 2", feld)
 		
 		moegliche_punkte += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor + alle_buchstaben_gelegt_bonus
-		#print("punkte für ", buchstabe, " :", GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor)
+		print("punkte für ", buchstabe, " :", GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor)
 		abrechnen_bereits_gelegtes_wort = replace_first_occurance(abrechnen_bereits_gelegtes_wort, buchstabe)	
 	
 	for abr_buchstabe in abrechnen_bereits_gelegtes_wort:
 		moegliche_punkte += GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"]
-		#print("punkte für bereits gelegten buchstaben ", abr_buchstabe, " :", GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"])
+		print("punkte für bereits gelegten buchstaben ", abr_buchstabe, " :", GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"])
 	moegliche_punkte *= wort_wert_bonus_faktor
 		
 	
@@ -418,7 +429,7 @@ func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder):
 				new_wort += new_buchstabe
 			distance += 1
 			
-	if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_lst:
+	if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_dict:
 		# wort kann geschrieben werden
 		var zusatzpunkte = 0
 		
@@ -464,25 +475,20 @@ func _process(delta: float) -> void:
 		#print("bisher ", len(moegliche_woerter), " gefunden")
 		if durchgang >= max_durchgaenge:
 			#print("ende computerzug")
-			if not belegte_felder:
-				thinking_ende(false)
-			else:
-				thinking_ende(true)
+			thinking_ende()
 			
 
-func thinking_ende(brett_ist_nicht_leer):
+func thinking_ende():
 	var erlaubte_woerter = []
-	for pruefwort in moegliche_woerter:
+	for pruefwort_lst in moegliche_woerter:
 		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		if not pruefwort in global_concepts.wortliste_dict:
-			
-			push_error("Fehler!! Wort ", pruefwort, " nicht in Wortliste!")
-		var ergebnis_test = test_moegliches_wort_auf_querschlaeger_und_get_punkte(pruefwort, belegte_felder, brett_ist_nicht_leer)
+		assert(pruefwort_lst[0] in global_concepts.wortliste_dict, "FEHLER, Wort nicht in Liste!")
+		var ergebnis_test = test_moegliches_wort_auf_querschlaeger_und_get_punkte(pruefwort_lst, belegte_felder)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
 		if allowed:
-			erlaubte_woerter.append([pruefwort, punkte])
+			erlaubte_woerter.append([pruefwort_lst, punkte])
 			#print("erlaubt: ", [pruefwort, punkte])
 		#else:
 			#print("nicht erlaubt: ", [pruefwort, punkte])
@@ -493,7 +499,12 @@ func thinking_ende(brett_ist_nicht_leer):
 	
 	#print("computer steine vor legen: ", computer_buchstaben)
 	lege_steine(sort_erlaubte_woerter[0])
-	
+	var punkte = sort_erlaubte_woerter[0][1]
+	var first_feld = sort_erlaubte_woerter[0][0][1].keys()[0]
+	global_concepts.create_punkte_label(first_feld, punkte)
+	global_concepts.computer.punkte += punkte 
+	print("Computer erhält ", punkte, " Punkte für ", sort_erlaubte_woerter[0][0])
+	#create_punkte_label(frisch_gelegte_felder[0], punkte)
 	#global_concepts.computer.ziehe_steine()
 	aktiv = false
 	global_concepts.change_an_der_reihe()
@@ -518,8 +529,7 @@ func lege_steine(wort_arr):
 				global_concepts.computer.steine_dict[stein_nr] = null
 				rel_stein_aus_hand = test_stein
 				break
-		if not rel_stein_aus_hand:
-			push_error("Buchstabe fehlt!!!!! ", steine_pos_dict[stein_pos])
+		assert (rel_stein_aus_hand != null, "Buchstabe fehlt!")
 			
 		
 		

@@ -17,7 +17,8 @@ var is_pressed = false
 var wert
 var fixiert = false
 var pos_in_hand 
-@onready var punkte_label = $PunkteLabel
+#@onready var punkte_label = $PunkteLabel
+#@onready var punkte_label_timer = $PunkteLabel/Timer
 
 func _input(event: InputEvent) -> void:	
 	if event is InputEventMouseButton:

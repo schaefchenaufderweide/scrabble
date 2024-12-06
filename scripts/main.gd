@@ -11,5 +11,4 @@ func _ready() -> void:
 	global_concepts.set_allowed_spielfelder(allowed_felder)
 	
 	
-	## DEBUG
-	global_concepts.create_punkte_label([7, 7], 100)
+	

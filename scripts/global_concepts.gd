@@ -7,7 +7,8 @@ extends Node
 @onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbrett/AbgelegteSteine"
 @onready var player = $"/root/Main/Player"
 @onready var computer = $"/root/Main/Computer"
-
+@onready var player_punkte_label = $"/root/Main/UICanvasLayer/LabelPlayer"
+@onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelComputer"
 
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 @onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
@@ -23,8 +24,9 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 
 @onready var screen_size = get_viewport().size
 
+var punkte_tweens = {}
 
-
+var brett_ist_leer 
 var dragged_stein = null
 var spielstein_is_dragged = false
 var snap_field = null
@@ -418,7 +420,7 @@ func player_zug_beenden():
 	update_spielbrett(player_zug_erlaubt)
 	
 	if player_zug_erlaubt:
-		player.punkte += get_punkte(gelegte_woerter, frisch_gelegt)
+		player.punkte += get_punkte_player(gelegte_woerter, frisch_gelegt)
 		
 		change_an_der_reihe()
 	else:
@@ -426,18 +428,21 @@ func player_zug_beenden():
 		set_allowed_spielfelder(allowed_felder)
 		
 
-func get_punkte(gelegte_woerter, frisch_gelegte_felder):
+func get_punkte_player(gelegte_woerter, frisch_gelegte_felder):
 	var neue_woerter = []
 	# gd script kennt wohl keine list comprehension!
 	
-	
+	var punkte_fuer_bereits_gelegte_felder = 0
 	for wort_lst in gelegte_woerter:
 		var is_new = wort_lst[2]
 		if is_new:
 			neue_woerter.append(wort_lst)
-	
-	# punkte abrechnung
-	
+			# abrechnung für bereits gelegte felder
+			var buchstaben_dict = wort_lst[1]
+			for feld in buchstaben_dict:
+				if not feld in frisch_gelegte_felder:
+					var buchstabe = buchstaben_dict[feld]
+					punkte_fuer_bereits_gelegte_felder += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"]
 	
 	#var neue_woerter_sort
 	
@@ -457,7 +462,8 @@ func get_punkte(gelegte_woerter, frisch_gelegte_felder):
 		var ergebnis = get_punkte_wort(wort, bereits_abgerechnet, frisch_gelegte_felder, true)
 		bereits_abgerechnet = ergebnis[0]
 		punkte += ergebnis[1]
-	return punkte
+	print("Player erhält ", punkte + punkte_fuer_bereits_gelegte_felder, " Punkte")
+	return punkte + punkte_fuer_bereits_gelegte_felder
 	
 func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder, show_on_screen):
 	var wort_wert_bonus_faktor = 1
@@ -481,11 +487,13 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder, show_
 				buchstaben_wert_bonus_faktor = 2
 			
 			var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
-			create_punkte_label(feld, new_punkte)
+			
 			
 			punkte += new_punkte
 			bereits_abgerechnet.append(feld)
-			
+	
+	if show_on_screen:
+		create_punkte_label(frisch_gelegte_felder[0], punkte)
 	punkte *= wort_wert_bonus_faktor + alle_buchstaben_bonus
 	return [bereits_abgerechnet, punkte]
 		
@@ -494,17 +502,19 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder, show_
 func create_punkte_label(feld, punkte):
 	
 	var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
+	var punkte_label_auf_stein_timer = all_spielfelder[feld].punkte_label_timer
 	punkte_label_auf_stein.visible = true
 	punkte_label_auf_stein.text = str(punkte)
 	var tween = create_tween()
-	tween.tween_property(punkte_label_auf_stein, "scale", Vector2(2.0, 2.0), 2.5)
-	tween.parallel().tween_property(punkte_label_auf_stein, "position", Vector2(-50, -50), 2.5)
-	#var font_size = punkte_label_auf_stein.label_settings.font_size
-	# TODO!!!!!!!
-	#font_size = 100
-	print("show punkte: ", punkte)
+	punkte_tweens[feld] = tween
+	var max_size = 1 + punkte/4
+	var dauer = 1.5
+	tween.tween_property(punkte_label_auf_stein, "scale", Vector2(max_size, max_size), dauer)
+	tween.parallel().tween_property(punkte_label_auf_stein, "modulate:a", 0, dauer)
+	punkte_label_auf_stein_timer.wait_time = dauer
+	punkte_label_auf_stein_timer.start()
 	
-
+	
 
 func is_player_zug_gueltig(allowed_felder, gelegte_woerter):
 	
@@ -535,7 +545,7 @@ func change_an_der_reihe():
 		animation_player.play("computer_denkt")
 		computerzug.restart()
 		#computerzug.init_word_array()
-		
+		player_punkte_label.text = "Player: " + str(player.punkte)
 	else: # computer WAR an der reihe, wechsel zu player
 		computer.ziehe_steine()
 		
@@ -550,7 +560,7 @@ func change_an_der_reihe():
 		computerzug.aktiv = false
 		var allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
-	# TODO anzeige der punkte auf steinen, anzeige punkte bei namen
+		computer_punkte_label.text = "Computer: " + str(computer.punkte)
 
 func change_zug_beenden_label(frisch_belegt, player_steine_dict):
 	if player.get_markierte_steine():
