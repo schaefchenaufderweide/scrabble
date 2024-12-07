@@ -47,6 +47,6 @@ func _on_mouse_exited() -> void:
 
 func _on_timer_timeout() -> void:
 	punkte_label.visible = false
-	global_concepts.punkte_tweens.erase(feld)
+	global_concepts.punkte_labels.erase(feld)
 	
 	pass # Replace with function body.

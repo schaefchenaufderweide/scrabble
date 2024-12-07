@@ -27,7 +27,8 @@
 0.605 steine tauschen für player erledigt (4.12)
 0.61 punkte berechnen für player (4.12)
 0.62 computer: richtige wortfindung bei leerem brett (6.12)
-0.65 punkte anzeige/wort anzeige
+0.63 endlich korrektes berechnen der punkte ... (7.12)
+0.65 punkte anzeige
 0.7 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
 0.8 fragezeichen buchstaben - für computer und spieler ...
 0.85 spielende
