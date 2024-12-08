@@ -1,0 +1,12 @@
+TODOS:
+
+Computer Schrift rot, Player grün
+
+2.	computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
+3. 	fragezeichen buchstaben - für computer und spieler ...
+4.	spielende - wer hat gewonnen?
+5. 	einstellungen/menü
+6.	im spiel wörter hinzufügen/löschen
+7.	wortliste reinigen
+8.	highscore und wortlisten online
+9.	Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true

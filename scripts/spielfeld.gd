@@ -15,8 +15,8 @@ var spielstein_auf_feld = null
 var allowed = false
 @onready var select_rect = $SelectRect
 @onready var animation_player  = $AnimationPlayer
-@onready var punkte_label = $PunkteLabel
-@onready var punkte_label_timer = $PunkteLabel/Timer
+#@onready var punkte_label = $PunkteLabel
+#@onready var punkte_label_timer = $PunkteLabel/Timer
 
 var feld
 var frisch_belegt
@@ -44,11 +44,11 @@ func _on_mouse_exited() -> void:
 
 
 
-
-func _on_timer_timeout() -> void:
-	print(feld, " expired")
-	punkte_label.visible = false
-	
-	global_concepts.punkte_labels.erase(feld)
-	
-	pass # Replace with function body.
+#
+#func _on_timer_timeout() -> void:
+	#print(feld, " expired")
+	#punkte_label.visible = false
+	#
+	#global_concepts.punkte_labels.erase(feld)
+	#
+	#pass # Replace with function body.

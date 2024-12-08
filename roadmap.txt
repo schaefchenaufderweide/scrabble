@@ -30,13 +30,14 @@
 0.63 endlich korrektes berechnen der punkte ... (7.12)
 0.65 punkte anzeige für jedes feld (7.12)
 0.66 zoom etabliert - positionen korrekt (8.12)
-0.7 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
-0.8 fragezeichen buchstaben - für computer und spieler ...
-0.85 spielende
+0.7 punkteanzeige korrekt (8.12)
+0.8 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
+0.9 fragezeichen buchstaben - für computer und spieler ...
+0.95 spielende
 
 
-0.9 einstellungen/menü/punkteanzeigen
-0.95 im spiel wörter hinzufügen/löschen
+0.97 einstellungen/menü/punkteanzeigen
+0.99 im spiel wörter hinzufügen/löschen
 1.0 wortliste reinigen
 1.2 highscore und wortlisten online
 1.3 Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true

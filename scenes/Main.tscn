@@ -1,11 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=12 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
 [ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/Hand.tscn" id="5_0h5wa"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
-[ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://scenes/labelsettings.tres" id="7_l1e77"]
+[ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://labelsettings.tres" id="7_l1e77"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
@@ -13,68 +13,6 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
-
-[sub_resource type="Animation" id="Animation_hfkhn"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("UICanvasLayer/ZugBeenden/Label:label_settings:font_color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(0, 0, 0, 1)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("UICanvasLayer/ZugBeenden/Label:label_settings:outline_color")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_xjd0v"]
-resource_name = "computer_denkt"
-length = 2.0
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("UICanvasLayer/ZugBeenden/Label:label_settings:font_color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1, 2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("UICanvasLayer/ZugBeenden/Label:label_settings:outline_color")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ob7eb"]
-_data = {
-"RESET": SubResource("Animation_hfkhn"),
-"computer_denkt": SubResource("Animation_xjd0v")
-}
 
 [node name="Main" type="Node"]
 script = ExtResource("1_6iaw0")
@@ -105,12 +43,29 @@ shape = SubResource("RectangleShape2D_o7rvn")
 offset = Vector2(0, 500)
 transform = Transform2D(1, 0, 0, 1, 0, 500)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_ob7eb")
-}
-
 [node name="UICanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="LabelPunktePlayer" type="Label" parent="UICanvasLayer"]
+offset_left = 20.0
+offset_right = 162.0
+offset_bottom = 50.0
+text = "Player: 0"
+label_settings = ExtResource("7_l1e77")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelPunkteComputer" type="Label" parent="UICanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -218.0
+offset_right = -20.0
+offset_bottom = 50.0
+grow_horizontal = 0
+text = "Computer: 0"
+label_settings = ExtResource("7_l1e77")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ZugBeenden" type="TextureButton" parent="UICanvasLayer"]
 anchors_preset = 5
@@ -156,28 +111,6 @@ offset_bottom = 30.5
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0, 0.545098)
-
-[node name="LabelPlayer" type="Label" parent="UICanvasLayer"]
-offset_left = 10.0
-offset_right = 152.0
-offset_bottom = 50.0
-text = "Player: 0"
-label_settings = ExtResource("7_l1e77")
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LabelComputer" type="Label" parent="UICanvasLayer"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -208.0
-offset_right = -10.0
-offset_bottom = 50.0
-grow_horizontal = 0
-text = "Computer: 0"
-label_settings = ExtResource("7_l1e77")
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="Computerzug" type="Node" parent="."]
 script = ExtResource("9_avwwi")

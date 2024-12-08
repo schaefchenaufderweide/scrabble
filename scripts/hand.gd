@@ -13,11 +13,28 @@ var steine_dict = {}
 var stein_hand_positions = {}
 var is_touched = false
 var punkte = 0
+var soll_punkte = 0
+var rel_punkte_label
+var slow_count = 0
+var slow_count_max = 5
 
 func _ready() -> void:
 	
 	ziehe_steine()
+	if name == "Player":
+		rel_punkte_label = global_concepts.player_punkte_label
+	else:
+		rel_punkte_label = global_concepts.computer_punkte_label
 
+func _process(delta: float) -> void:
+	if punkte < soll_punkte:
+		slow_count += 1
+		if slow_count == slow_count_max:
+			
+			punkte += 1
+			rel_punkte_label.text = name + ": " + str(punkte)
+			slow_count = 0
+		
 func ziehe_steine():
 	
 	var anzahl_steine = GlobalGameSettings.anzahl_steine_pro_hand
@@ -127,3 +144,6 @@ func steine_tauschen():
 	
 	
 	
+func add_punkte(new_punkte):
+	soll_punkte += new_punkte
+	#xxx.text = "Player: " + str(player.punkte)

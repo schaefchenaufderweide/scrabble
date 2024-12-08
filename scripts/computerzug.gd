@@ -445,7 +445,7 @@ func thinking_ende():
 		
 		#var first_feld = sort_erlaubte_woerter[0][0][1].keys()[0]
 		#global_concepts.create_punkte_label(first_feld, punkte)
-		global_concepts.computer.punkte += punkte 
+		global_concepts.computer.add_punkte(punkte) # .punkte += punkte 
 		#print("Computer erhält ", punkte, " Punkte für ", sort_erlaubte_woerter[0][0])
 		
 	aktiv = false

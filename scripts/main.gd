@@ -10,5 +10,6 @@ func _ready() -> void:
 	var allowed_felder = global_concepts.get_allowed_spielfelder()
 	global_concepts.set_allowed_spielfelder(allowed_felder)
 	
-	
-	
+	## DEBUG
+	#global_concepts.punkte_labels = {[7,7]: ["TEST"]}
+	#global_concepts.create_new_punkte_labels()

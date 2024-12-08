@@ -7,8 +7,8 @@ extends Node
 @onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbrett/AbgelegteSteine"
 @onready var player = $"/root/Main/Player"
 @onready var computer = $"/root/Main/Computer"
-@onready var player_punkte_label = $"/root/Main/UICanvasLayer/LabelPlayer"
-@onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelComputer"
+@onready var player_punkte_label = $"/root/Main/UICanvasLayer/LabelPunktePlayer"
+@onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelPunkteComputer"
 
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 @onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
@@ -433,7 +433,7 @@ func player_zug_beenden():
 		var ergebnis = get_punkte(gelegte_woerter, frisch_gelegt)
 		var new_punkte = ergebnis[0]
 		var new_labels = ergebnis[1]
-		player.punkte += new_punkte
+		player.add_punkte(new_punkte)#player.punkte += new_punkte
 		for lab in new_labels:
 			punkte_labels[lab] = new_labels[lab]
 		
@@ -482,20 +482,21 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 	var punkte_insgesamt = 0
 	var buchstaben_dict = wort_lst[1]
 	var alle_buchstaben_bonus = 0
-	var punkte_label_wort = {}
+	var new_punkte_labels_fuer_wort = {}
 	if len(frisch_gelegte_felder) == GlobalGameSettings.anzahl_steine_pro_hand:
 		alle_buchstaben_bonus = 50
 		
 	for feld in buchstaben_dict:
+		var new_punkte_labels_fuer_feld = []
 		var buchstabe = buchstaben_dict[feld]
 		var buchstaben_wert_bonus_faktor = 1
 		if feld in frisch_gelegte_felder and not feld in bereits_abgerechnet:
 			if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
 				wort_wert_bonus_faktor = 3
-				#print(feld, " ist dreifacher Wortwert")
+				new_punkte_labels_fuer_feld.append("Wort x 3!")
 			elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
 				wort_wert_bonus_faktor = 2
-				#print(feld, " ist doppelter Wortwert")
+				new_punkte_labels_fuer_feld.append("Wort x 2!")
 			if feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"]:
 				buchstaben_wert_bonus_faktor = 3
 				#print(feld, " ist dreifacher Buchstabenwert")
@@ -504,45 +505,87 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 				#print(feld, " ist doppelter Buchstabenwert")
 			bereits_abgerechnet.append(feld)
 		var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
-		punkte_label_wort[feld] = new_punkte * wort_wert_bonus_faktor
+		new_punkte_labels_fuer_feld.append(new_punkte * wort_wert_bonus_faktor)
+		if alle_buchstaben_bonus and not "Alle Buchstaben! + 50!" in new_punkte_labels_fuer_feld:
+			new_punkte_labels_fuer_feld.append("Alle Buchstaben! + 50!")
 		
 		punkte_insgesamt += new_punkte
 			
-	
+		new_punkte_labels_fuer_wort[feld] = new_punkte_labels_fuer_feld
 	
 	
 	punkte_insgesamt *= wort_wert_bonus_faktor + alle_buchstaben_bonus
 	#print(punkte, " punkte für ", wort_lst[0])
-	return [bereits_abgerechnet, punkte_insgesamt, punkte_label_wort]
+	return [bereits_abgerechnet, punkte_insgesamt, new_punkte_labels_fuer_wort]
 		
 	
 	
 func create_new_punkte_labels():
-	#print("create new punkte labels", punkte_labels)
+	
+	
+	var punkte_scene = preload("res://scenes/PunkteLabel.tscn")
+	
 	for feld in punkte_labels:
 		
-		# TODO AUCH ÜBERSCHNEIDUNGEN!
-		var punkte = punkte_labels[feld]
-		#if typeof(punkte) != TYPE_INT:
-			#continue
-		var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
-		var punkte_label_auf_stein_timer = all_spielfelder[feld].punkte_label_timer
-		punkte_label_auf_stein.visible = true
-		punkte_label_auf_stein.scale.x = 0.75
-		punkte_label_auf_stein.scale.y = 0.75
-		punkte_label_auf_stein.modulate.a = 1
-		punkte_label_auf_stein.text = str(punkte)
-		var tween = create_tween()
-		#punkte_labels[feld] = tween
-		#punkte_labels.erase(feld)
-		var max_size = 1 + punkte/3
-		var dauer = 3
-		tween.tween_property(punkte_label_auf_stein, "scale", Vector2(max_size, max_size), dauer)
-		tween.parallel().tween_property(punkte_label_auf_stein, "modulate:a", 0, dauer)
-		punkte_label_auf_stein_timer.wait_time = dauer
-		punkte_label_auf_stein_timer.start()
 		
-	
+		
+		var position = all_spielfelder[feld].position
+		var offset = all_spielfelder[feld].size/2
+		
+		for punkte_text in punkte_labels[feld]:
+			
+			#var punkte_text = punkte_labels[feld]
+			var new_punkte_label = punkte_scene.instantiate()
+			new_punkte_label.position = position - offset
+			new_punkte_label.text = str(punkte_text)
+			
+			spielbereich_spielfelder.add_child(new_punkte_label)
+			var tween = create_tween()
+			var max_size
+			var new_position = null
+			var new_rotation = 0
+			
+			if typeof(punkte_text) == TYPE_INT:
+				max_size = 1 + punkte_text/2
+			else:   # keine punkte angeführt, sondern text
+				max_size = 3
+				new_position = new_punkte_label.position + Vector2(randi_range(-50, 50), randi_range(-50, 50))
+				new_rotation = randi_range(-2,2)
+				
+			var dauer = 3
+			tween.tween_property(new_punkte_label, "scale", Vector2(max_size, max_size), dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+			tween.parallel().tween_property(new_punkte_label, "modulate:a", 0, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+			if new_position:
+				tween.parallel().tween_property(new_punkte_label, "position", new_position, dauer)
+				tween.parallel().tween_property(new_punkte_label, "rotation", new_rotation, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+			new_punkte_label.timer.wait_time = dauer
+			new_punkte_label.timer.start()
+	punkte_labels = {}
+	##print("create new punkte labels", punkte_labels)
+	# OLD!!
+	#for feld in punkte_labels:
+		#if typeof(feld) == TYPE_STRING:
+			#pass # spezial!
+		#var punkte = punkte_labels[feld]
+		#
+		#var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
+		#var punkte_label_auf_stein_timer = all_spielfelder[feld].punkte_label_timer
+		#punkte_label_auf_stein.visible = true
+		#punkte_label_auf_stein.scale.x = 0.75
+		#punkte_label_auf_stein.scale.y = 0.75
+		#punkte_label_auf_stein.modulate.a = 1
+		#punkte_label_auf_stein.text = str(punkte)
+		#var tween = create_tween()
+		##punkte_labels[feld] = tween
+		##punkte_labels.erase(feld)
+		#var max_size = 1 + punkte/3
+		#var dauer = 3
+		#tween.tween_property(punkte_label_auf_stein, "scale", Vector2(max_size, max_size), dauer)
+		#tween.parallel().tween_property(punkte_label_auf_stein, "modulate:a", 0, dauer)
+		#punkte_label_auf_stein_timer.wait_time = dauer
+		#punkte_label_auf_stein_timer.start()
+		##print("tween auf feld ", feld, " startet!")
+	#
 
 func is_zug_gueltig(allowed_felder, gelegte_woerter):
 	
@@ -573,9 +616,9 @@ func change_an_der_reihe():
 		computerzug.restart()
 		zug_beenden_button.disabled = true
 		zug_beenden_button_label.text = "Computer denkt ..."
-		animation_player.play("computer_denkt")
+		#animation_player.play("computer_denkt")
 		
-		player_punkte_label.text = "Player: " + str(player.punkte)
+		#player_punkte_label.text = "Player: " + str(player.punkte)
 		
 		
 		
@@ -585,7 +628,7 @@ func change_an_der_reihe():
 		an_der_reihe = player
 		zug_beenden_button.disabled = false
 		#animation_player.stop("computer_denkt")
-		animation_player.play("RESET")
+		#animation_player.play("RESET")
 		zug_beenden_button_label.text = "Passen"
 		
 		computerdenkt_fortschrittanzeige.visible = false
@@ -593,7 +636,7 @@ func change_an_der_reihe():
 		computerzug.aktiv = false
 		var allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
-		computer_punkte_label.text = "Computer: " + str(computer.punkte)
+		#computer_punkte_label.text = "Computer: " + str(computer.punkte)
 
 func change_zug_beenden_label(frisch_belegt, player_steine_dict):
 	if player.get_markierte_steine():
