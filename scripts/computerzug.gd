@@ -271,41 +271,6 @@ func get_lege_dict_for_new_game(single_match_txt, info_waagrecht_oder_senkrecht)
 		lege_dict[zelle] = buchstabe
 		zelle = [zelle[0] + richtung, zelle[1]]
 	return lege_dict
-		
-		
-		
-		
-		
-		#var wert = info[0]
-		#
-		#if platz_vorn < 4 and platz_hinten < 4:  # geht sich weder vorn noch hinten aus
-			#first_zelle = [7,7]
-			#
-		#elif platz_vorn >= 4:
-			#first_zelle = [7 - richtung * platz_hinten, 7]
-		#elif platz_hinten >= 4:
-			#first_zelle = [7 - richtung * platz_hinten, 7]
-		#else:
-			#push_error("Fehler!")
-		#if not first_zelle == [7,7]:
-			#print(single_match_txt, " first zelle: ", first_zelle)
-		#var zelle = first_zelle
-		#for buchstabe in single_match_txt:
-			#
-			#lege_dict[zelle] = buchstabe
-			#zelle = [zelle[0] + richtung, zelle[1]]
-		#return lege_dict
-	# TODO!!!!!
-	#while not wortbeginn:
-#		var best_ix = alle_buchstabenwerte.index(max(alle_buchstabenwerte))
-	
-	#if len(single_match_txt) < 4:
-		#wortbeginn = [7,7]
-	#
-	#
-	#for buchstabe in single_match_txt:
-		#pass
-	#
 	
 	for spezial in GlobalGameSettings.spezialfelder:
 		pass
@@ -346,15 +311,9 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict, belegt
 	außerdem werden die punkte ermittelt
 	"""
 	
-	# TODO! DIE PUNKTEABRECHNUNG FÜR COMPUTER STIMMT NICHT! Es werden auch Querwörter gezählt, die nichts Neues haben! Mach es so wie bei Player punktezählen!
-	# TODO außerdem sollte abrechnung und prüfen getrennt werden!
-	#var punkte = 0
-	#var wort_wert_bonus_faktor = 1 
 	var wort = wort_dict[0]
 	var zu_legende_buchstaben_dict = wort_dict[1]
-	#var richtung = wort_dict[2]
 	
-	#var abrechnen_bereits_gelegtes_wort = wort
 	var alle_buchstaben_gelegt_bonus 
 	if len(zu_legende_buchstaben_dict) == GlobalGameSettings.anzahl_steine_pro_hand:
 		alle_buchstaben_gelegt_bonus = 50
@@ -365,99 +324,54 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict, belegt
 	if not global_concepts.is_zug_gueltig(true, alle_woerter):
 		return [false, 0, null]
 	
-	#var frisch_gelegte_felder = global_concepts.get_belegte_felder(true)
 	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys())
 	var punkte = ergebnis[0]
 	var new_punkte_labels = ergebnis[1]
 	#print(wort, " würde ", punkte, " bringen")
 	return [true, punkte, new_punkte_labels]
-	#for feld in zu_legende_buchstaben_dict:
-		#var buchstaben_wert_bonus_faktor = 1
-		#var buchstabe = zu_legende_buchstaben_dict[feld]
-		#if not global_concepts.brett_ist_leer:
-			#var querrichtung = [richtung[1], richtung[0]]
-			#var ergebnis = check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder, zu_legende_buchstaben_dict)
-			#
-			#if not ergebnis[0]:
-				#return [false, 0]
-			#
-			#else:
-				#var zusatz_woerter_gelegt = ergebnis[1]
-				#var alle_woerter = [wort] + zusatz_woerter_gelegt + global_concepts.read_gelegte_woerter()
-				#
-				#var frisch_gelegte_felder = global_concepts.get_belegte_felder(true)
-				#punkte = global_concepts.get_punkte_player(alle_woerter, frisch_gelegte_felder)
-				###print("zusatzpunkte querwort ", zusatzpunkte)
-	#return [true, punkte]
-			##
-		#if feld in GlobalGameSettings.spezialfelder["dreifacher Wortwert"]:
-			#wort_wert_bonus_faktor = 3
-			#print("Wort x 3", feld)
-		#elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
-			#wort_wert_bonus_faktor = 2
-			#print("Wort x 2", feld)
-		#if feld in GlobalGameSettings.spezialfelder["dreifacher Buchstabenwert"]:
-			#buchstaben_wert_bonus_faktor = 3
-			#print("Buchstabe x 3", feld)
-		#elif feld in GlobalGameSettings.spezialfelder["doppelter Wortwert"]:
-			#buchstaben_wert_bonus_faktor = 2
-			#print("Buchstabe x 2", feld)
-		#
-		#moegliche_punkte += GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor + alle_buchstaben_gelegt_bonus
-		#print("punkte für ", buchstabe, " :", GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor)
-		#abrechnen_bereits_gelegtes_wort = replace_first_occurance(abrechnen_bereits_gelegtes_wort, buchstabe)	
+	
+#func replace_first_occurance(wort, buchstabe):
+	#var index = wort.find(buchstabe)
+	#if index != -1:
+		#return wort.substr(0, index) + "" + wort.substr(index + 1)
+	#return wort
+
+
+#func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder, zu_legende_buchstaben_dict):
 	#
-	#for abr_buchstabe in abrechnen_bereits_gelegtes_wort:
-		#moegliche_punkte += GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"]
-		#print("punkte für bereits gelegten buchstaben ", abr_buchstabe, " :", GlobalGameSettings.spielsteine_start[abr_buchstabe]["Wert"])
-	#moegliche_punkte *= wort_wert_bonus_faktor
-		
-	
-	
-	#return [true, moegliche_punkte]
-
-func replace_first_occurance(wort, buchstabe):
-	var index = wort.find(buchstabe)
-	if index != -1:
-		return wort.substr(0, index) + "" + wort.substr(index + 1)
-	return wort
-
-
-func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder, zu_legende_buchstaben_dict):
-	
-	var new_wort = buchstabe
-	var zusatzwoerter = []
-	var wort_is_new = false
-	for vor_zurueck in [[querrichtung[0] * -1, querrichtung[1] * -1], [querrichtung[0], querrichtung[1]]]:
-		
-		var distance = 1
-		
-		while true:
-			var checkfeld = [feld[0] + vor_zurueck[0] * distance, feld[1] + vor_zurueck[1] * distance]
-			if checkfeld in zu_legende_buchstaben_dict:
-				wort_is_new = true
-			var new_buchstabe = belegte_felder.get(checkfeld)
-			if not new_buchstabe:
-				break
-			if vor_zurueck[0] == -1 or vor_zurueck[1] == - 1:  # es geht rückwärts
-				new_wort = new_buchstabe + new_wort
-			else:
-				new_wort += new_buchstabe
-			distance += 1
-			
-	if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_dict:
-		# wort kann geschrieben werden
-		#var zusatzpunkte = 0
+	#var new_wort = buchstabe
+	#var zusatzwoerter = []
+	#var wort_is_new = false
+	#for vor_zurueck in [[querrichtung[0] * -1, querrichtung[1] * -1], [querrichtung[0], querrichtung[1]]]:
 		#
-		if len(new_wort) > 1 and wort_is_new:
-			zusatzwoerter.append(new_wort)
-			#for abr_buchst in new_wort:
-				#zusatzpunkte += GlobalGameSettings.spielsteine_start[abr_buchst]["Wert"]	
+		#var distance = 1
 		#
-		return [true, zusatzwoerter]
-	else:
-		# wort kann nicht geschrieben werden
-		return [false, zusatzwoerter]
+		#while true:
+			#var checkfeld = [feld[0] + vor_zurueck[0] * distance, feld[1] + vor_zurueck[1] * distance]
+			#if checkfeld in zu_legende_buchstaben_dict:
+				#wort_is_new = true
+			#var new_buchstabe = belegte_felder.get(checkfeld)
+			#if not new_buchstabe:
+				#break
+			#if vor_zurueck[0] == -1 or vor_zurueck[1] == - 1:  # es geht rückwärts
+				#new_wort = new_buchstabe + new_wort
+			#else:
+				#new_wort += new_buchstabe
+			#distance += 1
+			#
+	#if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_dict:
+		## wort kann geschrieben werden
+		##var zusatzpunkte = 0
+		##
+		#if len(new_wort) > 1 and wort_is_new:
+			#zusatzwoerter.append(new_wort)
+			##for abr_buchst in new_wort:
+				##zusatzpunkte += GlobalGameSettings.spielsteine_start[abr_buchst]["Wert"]	
+		##
+		#return [true, zusatzwoerter]
+	#else:
+		## wort kann nicht geschrieben werden
+		#return [false, zusatzwoerter]
 
 
 func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
@@ -475,8 +389,7 @@ func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 
 
 func _process(delta: float) -> void:
-	# todo: was tun, wenn kein wort geschrieben ist?
-	# todo: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen!
+	
 	if aktiv:
 		#print("aktiv", aktiv)
 			
@@ -499,7 +412,11 @@ func thinking_ende():
 	var erlaubte_woerter = []
 	for pruefwort_lst in moegliche_woerter:
 		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		assert(pruefwort_lst[0] in global_concepts.wortliste_dict, "FEHLER, Wort nicht in Liste!")
+		while pruefwort_lst[0] not in global_concepts.wortliste_dict:
+			print("This should not happen!", pruefwort_lst[0], " nicht in Liste!")
+			pruefwort_lst = moegliche_woerter.pop_front()
+			
+			
 		var ergebnis_test = test_moegliches_wort_und_get_punkte_und_get_punkte_labels(pruefwort_lst, belegte_felder)
 		var allowed = ergebnis_test[0]
 		

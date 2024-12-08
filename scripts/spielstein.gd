@@ -7,7 +7,7 @@ extends Area2D
 @onready var fixiert_sprite = $SpriteFixiert
 @onready var global_concepts: Node =  $"/root/Main/GlobalConcepts"
 
-@onready var offset_hand = Vector2(-global_concepts.screen_size.x/2, -global_concepts.screen_size.y/2)
+
 @onready var eintauschen_sprite = $SpriteEintauschen
 
 
@@ -47,7 +47,7 @@ func _input(event: InputEvent) -> void:
 				global_concepts.set_allowed_spielfelder(allowed_felder)
 				
 					
-				position = event.position + offset_hand + global_concepts.camera.position
+				position = global_concepts.mouse_pos_to_spielfeld_pos(event.position)
 				
 			elif not event.pressed and is_touched:
 				# spielstein wird losgelassen
@@ -76,8 +76,10 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		if is_pressed:
 			
-			position = event.position + offset_hand + global_concepts.camera.position
-			
+			position = global_concepts.mouse_pos_to_spielfeld_pos(event.position) 
+			#if global_concepts.snap_field:
+				#position = global_concepts.snap_field.position
+			#
 			
 func return_to_hand(old_position):
 	

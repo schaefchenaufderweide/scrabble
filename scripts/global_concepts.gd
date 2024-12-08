@@ -23,6 +23,8 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var computerzug: Node = $"/root/Main/Computerzug"
 
 @onready var screen_size = get_viewport().size
+@onready var offset_screen_mitte = Vector2(screen_size.x/2, screen_size.y/2)
+
 
 var punkte_labels = {}
 #var punkte_labels_tweens = {}
@@ -211,7 +213,7 @@ func read_gelegte_woerter(computerzug_zu_testende_buchstaben):
 	
 	#
 func get_allowed_spielfelder():
-	# TODO: erlauben, buchstaben zu legen, aber markieren, wenn nicht in allowed
+	
 	
 	
 	
@@ -399,7 +401,7 @@ func update_spielbrett(player_zug_erlaubt):
 				spielstein_auf_feld.fixiert = true
 				player.steine_dict[spielstein_auf_feld.pos_in_hand] = null
 			else:  # steine wandern zurück zur hand
-				var old_pos = spielstein_auf_feld.position - spielstein_auf_feld.offset_hand - camera.position
+				var old_pos = spielfeld_pos_to_mouse_pos(spielstein_auf_feld.position)
 				
 				spielstein_auf_feld.return_to_hand(old_pos)
 				spielfeld.spielstein_auf_feld = null
@@ -442,8 +444,6 @@ func player_zug_beenden():
 		
 
 func get_punkte(gelegte_woerter, frisch_gelegte_felder):
-	# TODO: GEFÄLLT MIR DAS MIT DEN PUNKTELABELS? VIELLEICHT NUR EINES PRO WORT? ODER NUR BEI BESONDEREN IN DER MITTE?
-	
 	var neue_woerter = []
 	
 	for wort_lst in gelegte_woerter:
@@ -518,21 +518,24 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 	
 	
 func create_new_punkte_labels():
-	print("create new punkte labels", punkte_labels)
+	#print("create new punkte labels", punkte_labels)
 	for feld in punkte_labels:
 		
-		
+		# TODO AUCH ÜBERSCHNEIDUNGEN!
 		var punkte = punkte_labels[feld]
-		if typeof(punkte) != TYPE_INT:
-			continue
+		#if typeof(punkte) != TYPE_INT:
+			#continue
 		var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
 		var punkte_label_auf_stein_timer = all_spielfelder[feld].punkte_label_timer
 		punkte_label_auf_stein.visible = true
+		punkte_label_auf_stein.scale.x = 0.75
+		punkte_label_auf_stein.scale.y = 0.75
+		punkte_label_auf_stein.modulate.a = 1
 		punkte_label_auf_stein.text = str(punkte)
 		var tween = create_tween()
-		punkte_labels[feld] = tween
+		#punkte_labels[feld] = tween
 		#punkte_labels.erase(feld)
-		var max_size = 1 + punkte/4
+		var max_size = 1 + punkte/3
 		var dauer = 3
 		tween.tween_property(punkte_label_auf_stein, "scale", Vector2(max_size, max_size), dauer)
 		tween.parallel().tween_property(punkte_label_auf_stein, "modulate:a", 0, dauer)
@@ -565,13 +568,13 @@ func change_an_der_reihe():
 	if an_der_reihe == player:  # player WAR an der reihe, wechsel zu computer
 		player.ziehe_steine()
 		
-		# DEBUG SOLO!!!
-		#an_der_reihe = computer
-		#computerzug.restart()
-		#zug_beenden_button.disabled = true
-		#zug_beenden_button_label.text = "Computer denkt ..."
-		#animation_player.play("computer_denkt")
-		#
+		
+		an_der_reihe = computer
+		computerzug.restart()
+		zug_beenden_button.disabled = true
+		zug_beenden_button_label.text = "Computer denkt ..."
+		animation_player.play("computer_denkt")
+		
 		player_punkte_label.text = "Player: " + str(player.punkte)
 		
 		
@@ -600,4 +603,15 @@ func change_zug_beenden_label(frisch_belegt, player_steine_dict):
 		zug_beenden_button_label.text = "Passen"
 	else:
 		zug_beenden_button_label.text = "Wort legen"
+	
+
+func mouse_pos_to_spielfeld_pos(mouse_pos):
+	
+	var relative_mouse_pos = (mouse_pos - offset_screen_mitte)  / camera.zoom
+	return relative_mouse_pos + camera.position 
+
+func spielfeld_pos_to_mouse_pos(spielfeld_pos):
+	var relative_mouse_pos = spielfeld_pos - camera.position
+	return (relative_mouse_pos * camera.zoom) + offset_screen_mitte
+	
 	
