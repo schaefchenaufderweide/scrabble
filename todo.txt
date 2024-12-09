@@ -1,7 +1,8 @@
 TODOS:
 
 Computer Schrift rot, Player grün
-
+# wie gibt es das, dass der computer einmal passt, aber danach ohne veränderung des spielfelds matches findet?
+1. Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
 2.	computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
 3. 	fragezeichen buchstaben - für computer und spieler ...
 4.	spielende - wer hat gewonnen?
@@ -10,3 +11,5 @@ Computer Schrift rot, Player grün
 7.	wortliste reinigen
 8.	highscore und wortlisten online
 9.	Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true
+
+menus: name spieler, color spieler, stärke computer, highscores

@@ -5,7 +5,6 @@
 
 [node name="PunkteLabel" type="Label"]
 z_index = 1
-anchors_preset = -1
 offset_right = 69.0
 offset_bottom = 50.0
 scale = Vector2(0.5, 0.5)

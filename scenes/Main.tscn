@@ -1,12 +1,14 @@
-[gd_scene load_steps=12 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=14 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
 [ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/Hand.tscn" id="5_0h5wa"]
+[ext_resource type="LabelSettings" uid="uid://ctsmfufcj3uvb" path="res://labelsettings_player.tres" id="6_dv165"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
 [ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://labelsettings.tres" id="7_l1e77"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]
+[ext_resource type="LabelSettings" uid="uid://c3n2qsf4dhfvy" path="res://labelsettings_computer.tres" id="7_pdt05"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
@@ -50,7 +52,7 @@ offset_left = 20.0
 offset_right = 162.0
 offset_bottom = 50.0
 text = "Player: 0"
-label_settings = ExtResource("7_l1e77")
+label_settings = ExtResource("6_dv165")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -63,7 +65,7 @@ offset_right = -20.0
 offset_bottom = 50.0
 grow_horizontal = 0
 text = "Computer: 0"
-label_settings = ExtResource("7_l1e77")
+label_settings = ExtResource("7_pdt05")
 horizontal_alignment = 1
 vertical_alignment = 1
 

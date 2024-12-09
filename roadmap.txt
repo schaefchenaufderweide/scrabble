@@ -31,6 +31,10 @@
 0.65 punkte anzeige für jedes feld (7.12)
 0.66 zoom etabliert - positionen korrekt (8.12)
 0.7 punkteanzeige korrekt (8.12)
+0.75 fehler korrigiert, wonach ein wort geschrieben werden konnte, 
+	das als buchstabenkombination innerhalb eines
+	gültigen wortes auftauchte (9.12)
+
 0.8 computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
 0.9 fragezeichen buchstaben - für computer und spieler ...
 0.95 spielende

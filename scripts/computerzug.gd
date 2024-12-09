@@ -177,9 +177,12 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 			return []
 		
 		for single_match in matches:
-			var single_match_txt = single_match.get_string()
-			single_match_txt = single_match_txt.strip_edges()
 			
+			var single_match_txt = single_match.get_string()
+			
+			single_match_txt = single_match_txt.strip_edges()
+			if not single_match_txt in global_concepts.wortliste_dict:
+				continue
 			var wortbeginn_wort
 			#var position = single_match.get_start()
 			#print("Gefunden: ", single_match_txt)
@@ -190,7 +193,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 					continue
 				var lege_dict = get_lege_dict_for_new_game(single_match_txt, "reihe")
 				var richtung = [1,0]
-				
+				assert(single_match_txt in global_concepts.wortliste_dict)
 				moegliche_woerter.append([single_match_txt, lege_dict, richtung])
 				continue
 			
@@ -215,6 +218,8 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 				
 				if lege_dict:
 					#print("möglich: ", single_match_txt)
+					#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
+					assert(single_match_txt in global_concepts.wortliste_dict)
 					moegliche_woerter.append([single_match_txt, lege_dict, richtung])
 				#else:
 					#print(single_match_txt, " nicht möglich!")
@@ -411,11 +416,12 @@ func _process(delta: float) -> void:
 func thinking_ende():
 	var erlaubte_woerter = []
 	for pruefwort_lst in moegliche_woerter:
+		assert(pruefwort_lst[0] in global_concepts.wortliste_dict)
 		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		while pruefwort_lst[0] not in global_concepts.wortliste_dict:
-			print("This should not happen!", pruefwort_lst[0], " nicht in Liste!")
-			pruefwort_lst = moegliche_woerter.pop_front()
-			
+		#while pruefwort_lst[0] not in global_concepts.wortliste_dict:
+			#print("This should not happen!", pruefwort_lst[0], " nicht in Liste!")
+			#pruefwort_lst = moegliche_woerter.pop_front()
+			#
 			
 		var ergebnis_test = test_moegliches_wort_und_get_punkte_und_get_punkte_labels(pruefwort_lst, belegte_felder)
 		var allowed = ergebnis_test[0]

@@ -506,15 +506,16 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 			bereits_abgerechnet.append(feld)
 		var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
 		new_punkte_labels_fuer_feld.append(new_punkte * wort_wert_bonus_faktor)
-		if alle_buchstaben_bonus and not "Alle Buchstaben! + 50!" in new_punkte_labels_fuer_feld:
-			new_punkte_labels_fuer_feld.append("Alle Buchstaben! + 50!")
+		if alle_buchstaben_bonus and not "Alle Buchstaben + 50!" in new_punkte_labels_fuer_feld:
+			new_punkte_labels_fuer_feld.append("Alle Buchstaben + 50!")
 		
 		punkte_insgesamt += new_punkte
 			
 		new_punkte_labels_fuer_wort[feld] = new_punkte_labels_fuer_feld
 	
 	
-	punkte_insgesamt *= wort_wert_bonus_faktor + alle_buchstaben_bonus
+	punkte_insgesamt *= wort_wert_bonus_faktor
+	punkte_insgesamt += alle_buchstaben_bonus
 	#print(punkte, " punkte für ", wort_lst[0])
 	return [bereits_abgerechnet, punkte_insgesamt, new_punkte_labels_fuer_wort]
 		
@@ -538,7 +539,11 @@ func create_new_punkte_labels():
 			var new_punkte_label = punkte_scene.instantiate()
 			new_punkte_label.position = position - offset
 			new_punkte_label.text = str(punkte_text)
-			
+			# DAS FUNKTIONIERT SO NICHT!!!!
+			#if an_der_reihe == player:
+				#new_punkte_label.label_settings.resource_path = "res://labelsettings_player.tres"
+			#else:
+				#new_punkte_label.label_settings.resource_path = "res://labelsettings_computer.tres"
 			spielbereich_spielfelder.add_child(new_punkte_label)
 			var tween = create_tween()
 			var max_size
