@@ -27,7 +27,7 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 
 
 var punkte_labels = {}
-#var punkte_labels_tweens = {}
+var punkte_scene = preload("res://scenes/PunkteLabel.tscn")
 
 var brett_ist_leer 
 var dragged_stein = null
@@ -523,46 +523,42 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 	
 func create_new_punkte_labels():
 	
-	
-	var punkte_scene = preload("res://scenes/PunkteLabel.tscn")
-	
 	for feld in punkte_labels:
 		
+		var position
+		var offset
 		
 		
-		var position = all_spielfelder[feld].position
-		var offset = all_spielfelder[feld].size/2
-		
+		position = all_spielfelder[feld].position
+		offset = all_spielfelder[feld].size/2
+	
 		for punkte_text in punkte_labels[feld]:
 			
 			#var punkte_text = punkte_labels[feld]
 			var new_punkte_label = punkte_scene.instantiate()
 			new_punkte_label.position = position - offset
 			new_punkte_label.text = str(punkte_text)
-			# DAS FUNKTIONIERT SO NICHT!!!!
-			#if an_der_reihe == player:
-				#new_punkte_label.label_settings.resource_path = "res://labelsettings_player.tres"
-			#else:
-				#new_punkte_label.label_settings.resource_path = "res://labelsettings_computer.tres"
+			
 			spielbereich_spielfelder.add_child(new_punkte_label)
 			var tween = create_tween()
 			var max_size
 			var new_position = null
-			var new_rotation = 0
+			#var new_rotation = 0
 			
 			if typeof(punkte_text) == TYPE_INT:
 				max_size = 1 + punkte_text/2
 			else:   # keine punkte angeführt, sondern text
 				max_size = 3
 				new_position = new_punkte_label.position + Vector2(randi_range(-50, 50), randi_range(-50, 50))
-				new_rotation = randi_range(-2,2)
+				var new_rotation = randi_range(-45,45)
+				new_punkte_label.rotation = deg_to_rad(new_rotation)
 				
 			var dauer = 3
 			tween.tween_property(new_punkte_label, "scale", Vector2(max_size, max_size), dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 			tween.parallel().tween_property(new_punkte_label, "modulate:a", 0, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 			if new_position:
 				tween.parallel().tween_property(new_punkte_label, "position", new_position, dauer)
-				tween.parallel().tween_property(new_punkte_label, "rotation", new_rotation, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+				#tween.parallel().tween_property(new_punkte_label, "rotation", new_rotation, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 			new_punkte_label.timer.wait_time = dauer
 			new_punkte_label.timer.start()
 	punkte_labels = {}

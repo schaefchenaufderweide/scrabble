@@ -31,7 +31,7 @@ func restart():
 	zu_pruefende_spalten = []
 	
 	
-	
+	belegte_felder = global_concepts.get_belegte_felder(false)
 	
 	
 	for all_feld in belegte_felder:
@@ -46,7 +46,7 @@ func restart():
 	max_durchgaenge = len(zu_pruefende_reihen) + len(zu_pruefende_spalten)
 	computer_buchstaben = global_concepts.computer.get_buchstaben()
 	computer_buchstaben.sort()
-	belegte_felder = global_concepts.get_belegte_felder(false)
+	
 	if not belegte_felder:
 		global_concepts.brett_ist_leer = true
 	else:
@@ -56,6 +56,7 @@ func restart():
 	word_array_waagrecht = word_array_lst[0]
 	word_array_senkrecht = word_array_lst[1]
 	
+	print("zu prüfende reihen: ", zu_pruefende_spalten, " zu prüfende spalten: ", zu_pruefende_spalten)
 	
 func draw_bar():
 	var new_breite = fortschrittanzeige_max_breite * percent
@@ -108,9 +109,6 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	var all_lst = get_words_and_zellen_from_string_and_pattern(zu_pruefende_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt)
 	var buchstaben_dict = all_lst[0]
 	var pattern = all_lst[1]
-	
-	#if not belegte_felder:
-		#moegliche_woerter += global_concepts.wortliste_dict.keys()
 	
 	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, belegte_felder)
 
@@ -292,6 +290,9 @@ func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 		zelle = [zelle_beginn[0] + richtung[0] * abstand, zelle_beginn[1] + richtung[1] * abstand]
 		#buchstabe = single_match_txt[stelle]
 		if zelle not in belegte_felder:  # muss gelegt werden
+			if zelle not in global_concepts.all_spielfelder:
+				print("Zelle außerhalb des Spielfelds!")
+				return false 
 			lege_dict[zelle] = buchstabe
 			if not buchstabe in computer_buchstaben:
 				#if len(single_match_txt) < 5:
@@ -396,8 +397,9 @@ func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 func _process(delta: float) -> void:
 	
 	if aktiv:
+		
 		#print("aktiv", aktiv)
-			
+		
 		durchgang += 1
 		percent = durchgang/max_durchgaenge
 		draw_bar()
@@ -407,9 +409,7 @@ func _process(delta: float) -> void:
 		elif zu_pruefende_spalten:
 			var zu_pruefende_spalte = zu_pruefende_spalten.pop_front()
 			think_durchgang(zu_pruefende_spalte, "spalte", belegte_felder)
-		#print("bisher ", len(moegliche_woerter), " gefunden")
-		if durchgang >= max_durchgaenge:
-			#print("ende computerzug")
+		else:
 			thinking_ende()
 			
 
@@ -417,11 +417,6 @@ func thinking_ende():
 	var erlaubte_woerter = []
 	for pruefwort_lst in moegliche_woerter:
 		assert(pruefwort_lst[0] in global_concepts.wortliste_dict)
-		#print("prüfe ", pruefwort, " aus moeglichen wortern auf querwortprobleme")
-		#while pruefwort_lst[0] not in global_concepts.wortliste_dict:
-			#print("This should not happen!", pruefwort_lst[0], " nicht in Liste!")
-			#pruefwort_lst = moegliche_woerter.pop_front()
-			#
 			
 		var ergebnis_test = test_moegliches_wort_und_get_punkte_und_get_punkte_labels(pruefwort_lst, belegte_felder)
 		var allowed = ergebnis_test[0]
@@ -430,19 +425,30 @@ func thinking_ende():
 		var new_punkte_labels = ergebnis_test[2]
 		if allowed:
 			erlaubte_woerter.append([pruefwort_lst, punkte, new_punkte_labels])
-			#print("erlaubt: ", [pruefwort, punkte])
-		#else:
-			#print("nicht erlaubt: ", [pruefwort, punkte])
+			
 	
 	var sort_erlaubte_woerter = sort_by_punkte(erlaubte_woerter)
-	# TODO: WAS wenn keines legbar? -> computer tauscht steine oder passt
-	#print("bestes wort ", sort_erlaubte_woerter[0])
 	
-	#print("computer steine vor legen: ", computer_buchstaben)
-	if not sort_erlaubte_woerter:
-		print("Computer passt ...")
+	if not sort_erlaubte_woerter and global_concepts.buchstaben_im_sackerl:
+		var zurueck_ins_sackerl = []
+		for buch in computer_buchstaben:
+			if GlobalGameSettings.spielsteine_start[buch]["Wert"] > GlobalGameSettings.computer_tausch_schwelle_wert:
+				zurueck_ins_sackerl.append(buch)
+				var buch_position_in_hand = computer_buchstaben.find(buch)
+				
+				global_concepts.computer.steine_dict[buch_position_in_hand] = null
+		global_concepts.buchstaben_im_sackerl += zurueck_ins_sackerl
+		var tausch_text = "Computer tauscht " + str(len(zurueck_ins_sackerl)) + " Buchstaben ..."
+		global_concepts.punkte_labels[[7,7]] = [tausch_text]
+		#print("Computer tauscht ...")
+		
+		
+	elif not sort_erlaubte_woerter:
+		global_concepts.punkte_labels[[7,7]] = ["Computer passt ..."]
+		#print("Computer passt ... (Buchstaben: ", computer_buchstaben, ")")
 		
 	else:
+		#print("Computer passt nicht ... (Buchstaben: ", computer_buchstaben, ")")
 		lege_steine(sort_erlaubte_woerter[0])
 		var punkte = sort_erlaubte_woerter[0][1]
 		var new_punkte_labels = sort_erlaubte_woerter[0][2]

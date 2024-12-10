@@ -1,9 +1,13 @@
 TODOS:
 
-Computer Schrift rot, Player grün
-# wie gibt es das, dass der computer einmal passt, aber danach ohne veränderung des spielfelds matches findet?
-1. Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
-2.	computer: was tun, wenn kein wort geschrieben werden kann? -> buchstaben tauschen/passen
+wie gibt es das, dass der computer einmal passt, aber danach ohne veränderung des spielfelds matches findet?
+Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
+
+schneller punkte zählen je größer der abstand zw. soll und ist 
+animiert: buchstaben tauschen image
+
+"computer tauscht 0 Buchstaben" - > "Computer passt ..."
+
 3. 	fragezeichen buchstaben - für computer und spieler ...
 4.	spielende - wer hat gewonnen?
 5. 	einstellungen/menü
