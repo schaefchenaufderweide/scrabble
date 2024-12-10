@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=16 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
@@ -12,6 +12,8 @@
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
+[ext_resource type="Script" path="res://scenes/internet.gd" id="13_qtrk6"]
+[ext_resource type="Script" path="res://scenes/wortliste.gd" id="14_66vb2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
@@ -69,6 +71,22 @@ label_settings = ExtResource("7_pdt05")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="UIInfo" type="Label" parent="UICanvasLayer"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -239.5
+offset_top = -23.0
+offset_right = 239.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Internet Info ..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="ZugBeenden" type="TextureButton" parent="UICanvasLayer"]
 anchors_preset = 5
 anchor_left = 0.5
@@ -117,5 +135,12 @@ color = Color(1, 1, 0, 0.545098)
 [node name="Computerzug" type="Node" parent="."]
 script = ExtResource("9_avwwi")
 
+[node name="Internet" type="HTTPRequest" parent="."]
+script = ExtResource("13_qtrk6")
+
+[node name="Wortliste" type="Node" parent="."]
+script = ExtResource("14_66vb2")
+
 [connection signal="button_down" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_down"]
 [connection signal="button_up" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_up"]
+[connection signal="request_completed" from="Internet" to="Internet" method="_on_request_completed"]

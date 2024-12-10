@@ -13,7 +13,7 @@ extends Node
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 @onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
 @onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
-
+@onready var wortliste = $"/root/Main/Wortliste"
 
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
@@ -24,6 +24,7 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 
 @onready var screen_size = get_viewport().size
 @onready var offset_screen_mitte = Vector2(screen_size.x/2, screen_size.y/2)
+@onready var ui_info_label: Node = $"/root/Main/UICanvasLayer/UIInfo"
 
 
 var punkte_labels = {}
@@ -36,18 +37,16 @@ var snap_field = null
 var all_spielfelder = {}
 #var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-var wortliste_txt = load_wortliste_txt()
-var wortliste_dict = get_wortliste_dict(wortliste_txt)
-#var wortliste_txt = wortliste_lst_and_txt[1]
-
-
-
-#var moegliche_woerter_dict = load_moegliche_woerter_dict()
 
 
 var an_der_reihe 
+var wortliste_txt
+var wortliste_dict 
 
 func _ready() -> void:
+	wortliste_txt = wortliste.get_wortliste()
+	wortliste_dict = wortliste.get_wortliste_dict(wortliste_txt)
+	
 	#print("start global concepts")
 	an_der_reihe = player
 	#print(an_der_reihe)
@@ -64,41 +63,6 @@ func create_buchstaben_im_sackerl():
 			sackerl.append(buchstabe)
 	sackerl.shuffle()
 	return sackerl
-
-func load_wortliste_txt():
-	var wortliste_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
-	var wortliste_text = wortliste_file.get_as_text()
-	return wortliste_text
-
-func get_wortliste_dict(wortliste_text):
-	var wortliste_list = wortliste_text.split("\n")
-	var wortliste_dict = {}
-	
-	for wort in wortliste_list:
-		wort = wort.strip_edges()
-		if wort:
-			wortliste_dict[wort] = true
-	#print(len(wortliste_dict))
-	return wortliste_dict
-	
-#func load_moegliche_woerter_dict():
-	#moegliche_woerter_dict = {}
-	#for buchstabe in GlobalGameSettings.allowed_letters:
-		#var json = JSON.new()
-		#var filename = "res://moegliche_woerter" + buchstabe + ".txt"
-		#var moegliche_woerter_file = FileAccess.open(filename, FileAccess.READ)
-		#var new_buchstaben_dict = JSON.parse_string(moegliche_woerter_file.get_as_text())
-		#moegliche_woerter_dict[buchstabe] = new_buchstaben_dict
-		##print(moegliche_woerter_dict)
-	#
-	#return moegliche_woerter_dict
-	#
-
-func save_wortliste():
-	pass
-#
-#func save_moegliche_woerter_dict():
-	#pass
 
 func init_spielfeld():
 	#var spielbrett_size = spielbrett.size

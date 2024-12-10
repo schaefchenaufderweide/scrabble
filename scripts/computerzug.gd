@@ -58,6 +58,8 @@ func restart():
 	
 	print("zu prüfende reihen: ", zu_pruefende_spalten, " zu prüfende spalten: ", zu_pruefende_spalten)
 	
+	
+	
 func draw_bar():
 	var new_breite = fortschrittanzeige_max_breite * percent
 		
@@ -173,6 +175,10 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		if not matches:
 			#print("Keine Matches gefunden!")
 			return []
+		
+		# todo: unterteilen: 
+		# 1. matches in dict speichern: {reihe waagrecht: matches} 
+		# 2. dann nach matches einzeln suchen! sonst zu lange frozen-dauer bei der großen wortliste!
 		
 		for single_match in matches:
 			

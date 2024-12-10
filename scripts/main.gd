@@ -1,6 +1,7 @@
 extends Node
 
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
+@onready var internet: Node = $Internet
 
 func _ready() -> void:
 	
@@ -11,5 +12,5 @@ func _ready() -> void:
 	global_concepts.set_allowed_spielfelder(allowed_felder)
 	
 	## DEBUG
-	#global_concepts.punkte_labels = {[7,7]: ["TEST"]}
-	#global_concepts.create_new_punkte_labels()
+	#internet.start_pruefe_wortliste()
+	
