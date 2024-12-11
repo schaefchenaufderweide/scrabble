@@ -6,15 +6,10 @@ Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunt
 
 animiert: buchstaben tauschen image
 
-1. frames: computer denkt weiter unterteilen in schritte: moegliche wörter und test_moegliche woerter einzeln prüfen
-(lagged ziemlich mit großer wortliste!)
+durchgänge noch weiter unterteilen, vielleicht einfach mal 10 und pro process per zufall eins dazu, 
+	simulieren: permanenter anstieg statt ruckartig in nur wenigen slots
 
-
-
-# todo: wortliste mit erläuterungen einlesen!
-# todo: unterteilen: 
-		# 1. matches in dict speichern: {reihe waagrecht: matches} 
-		# 2. dann nach matches einzeln suchen! sonst zu lange frozen-dauer bei der großen wortliste!
+wenn alle buchstaben gelegt werden, aus irgendeinem grund bei jedem buchtstaben punktelabel!
 
 2."computer tauscht 0 Buchstaben" - > "Computer passt ..."
 3. 	fragezeichen buchstaben - für computer und spieler ...

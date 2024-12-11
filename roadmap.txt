@@ -35,7 +35,8 @@
 	das als buchstabenkombination innerhalb eines
 	gültigen wortes auftauchte (9.12)
 0.8 computer tauscht buchstaben, korrektur fehlerhaftes passen (10.12) 
-0.9 neue wortliste, damit viel zu langsam - to do: matches einzeln pro process suchen, nicht alle in einem process (10.12)
+0.9 neue wortliste, damit viel zu langsam (10.12)
+0.91 viel bessere performance durch threads (11.12)
 0.93 fragezeichen buchstaben - für computer und spieler ...
 0.95 spielende
 

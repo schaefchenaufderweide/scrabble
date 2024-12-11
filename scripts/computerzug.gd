@@ -16,17 +16,54 @@ var belegte_felder = []
 var word_array_waagrecht = []
 var word_array_senkrecht = []
 
+var known_matches = {}
+
+var thread: Thread
+var thread_aktiv = false
 
 func _ready() -> void:
 	computerdenkt_fortschrittanzeige.visible = false
+	thread = Thread.new()
+	
+func _process(delta: float) -> void:
+	
+	if aktiv:
+		
+		if thread_aktiv:
+			pass
+			
+		elif zu_pruefende_reihen:
+			thread.wait_to_finish()
+			var zu_pruefende_reihe = zu_pruefende_reihen.pop_front()
+			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_reihe, "reihe", belegte_felder))
+			thread_aktiv = true
+			#print("thread gestartet!")
+			durchgang += 1
+			percent = durchgang/max_durchgaenge
+			draw_bar()
+			#think_durchgang(zu_pruefende_reihe, "reihe", belegte_felder)
+		elif zu_pruefende_spalten:
+			thread.wait_to_finish()
+			var zu_pruefende_spalte = zu_pruefende_spalten.pop_front()
+			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_spalte, "spalte", belegte_felder))
+			thread_aktiv = true
+			#print("thread gestartet!")
+			durchgang += 1
+			percent = durchgang/max_durchgaenge
+			draw_bar()
+			#think_durchgang(zu_pruefende_spalte, "spalte", belegte_felder)
+			
+		else:
+			thinking_ende()
+	
 
 func restart():
-	#print("restart computerzug")
+	print("restart computerzug")
 	moegliche_woerter = []
 	computerdenkt_fortschrittanzeige.visible = true
 	aktiv = true
 	durchgang = 0
-	
+	thread_aktiv = false
 	zu_pruefende_reihen = []
 	zu_pruefende_spalten = []
 	
@@ -100,6 +137,8 @@ func get_word_array(belegte_felder):
 	
 	
 func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt, belegte_felder):
+	#print("start think durchgang ...")
+	var timer_start = Time.get_ticks_msec()
 	var zu_pruefende_reihe_oder_spalte_txt = ""
 	if info_reihe_oder_spalte_txt == "reihe":
 		zu_pruefende_reihe_oder_spalte_txt = word_array_waagrecht[zu_pruefende_reihe_oder_spalte_nr]
@@ -113,9 +152,15 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	var pattern = all_lst[1]
 	
 	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, belegte_felder)
-
+	#print("Dauer eines kompletten Durchgangs: ", Time.get_ticks_msec() - timer_start)
+	#print("ende think durchgang")
+	#print("Vor thread_aktiv = false: thread_aktiv = ", thread_aktiv)
+	thread_aktiv = false
+	#print("Nach thread_aktiv = false: thread_aktiv = ", thread_aktiv)
+	
 	
 func get_words_and_zellen_from_string_and_pattern(text, reihe_oder_spalte_nr, waag_oder_senkrecht):
+	#var timer_start = Time.get_ticks_msec()
 	var buchstaben_dict = {}
 	var pattern = ""
 	
@@ -155,80 +200,98 @@ func get_words_and_zellen_from_string_and_pattern(text, reihe_oder_spalte_nr, wa
 			
 			break
 		
-	pattern += ".{0," + str(leerzeichen) +  "}\n"
+	pattern += ".{0," + str(leerzeichen) +  "}"
 	
 	#print(waag_oder_senkrecht, " ", reihe_oder_spalte_nr)
 	#print(buchstaben_dict)
 	#print(pattern)
+	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return [buchstaben_dict, pattern]
 
 func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waag_oder_senkrecht, reihe_oder_spalte_nr, belegte_felder):
 	
-	
+	#var timer_start = Time.get_ticks_msec()
 	#var woerter_in_reihe_oder_spalte = get_words_and_zellen_from_string(zu_pruefende_reihe_oder_spalte_txt)
 	
 	var moegliche_woerter = []
 	#print("buchstaben: ", computer_buchstaben)
-	var regex = RegEx.new()
-	if regex.compile(pattern) == OK:
-		var matches = regex.search_all(global_concepts.wortliste_txt)
-		if not matches:
-			#print("Keine Matches gefunden!")
-			return []
+	#var timer_start = Time.get_ticks_msec()
+	var matches_txt
+	if pattern in known_matches:
+		matches_txt = known_matches[pattern]
+		print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
+	else: 
+		matches_txt = regex_operation(pattern)
+		known_matches[pattern] = matches_txt
 		
-		# todo: unterteilen: 
-		# 1. matches in dict speichern: {reihe waagrecht: matches} 
-		# 2. dann nach matches einzeln suchen! sonst zu lange frozen-dauer bei der großen wortliste!
+			
+	if not matches_txt:
+		#print("Keine Matches gefunden!")
+		return []
 		
-		for single_match in matches:
-			
-			var single_match_txt = single_match.get_string()
-			
-			single_match_txt = single_match_txt.strip_edges()
-			if not single_match_txt in global_concepts.wortliste_dict:
+		
+	for single_match_txt in matches_txt:
+		if not single_match_txt in global_concepts.wortliste_dict:
+			continue
+		
+		var wortbeginn_wort
+		#var position = single_match.get_start()
+		#print("Gefunden: ", single_match_txt)
+		var wort_geht_sich_aus = false
+		if not woerter_dict: # neues spiel - leeres brett, computer legt nur waagrecht
+			var fehlende_buchstaben = single_match_txt.split()
+			if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 				continue
-			var wortbeginn_wort
-			#var position = single_match.get_start()
-			#print("Gefunden: ", single_match_txt)
-			var gelegtes_wort = null
-			if not woerter_dict: # neues spiel - leeres brett, computer legt nur waagrecht
-				var fehlende_buchstaben = single_match_txt.split()
-				if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
-					continue
-				var lege_dict = get_lege_dict_for_new_game(single_match_txt, "reihe")
-				var richtung = [1,0]
+			var lege_dict = get_lege_dict_for_new_game(single_match_txt, "reihe")
+			var richtung = [1,0]
+			assert(single_match_txt in global_concepts.wortliste_dict)
+			moegliche_woerter.append([single_match_txt, lege_dict, richtung])
+			continue
+		
+		for wort in woerter_dict:
+			var alle_stellen = []
+			var suche_stelle_beginn = 0
+			while true:  # so lange stellen suchen bis keine mehr zu finden
+				var new_stelle = single_match_txt.find(wort, suche_stelle_beginn)
+				if new_stelle == -1:
+					break
+				else:
+					alle_stellen.append(new_stelle)
+					suche_stelle_beginn = new_stelle + 1
+				
+				#var stelle_in_woerterbuch_wort = single_match_txt.find(wort)
+				
+			for stelle in alle_stellen:
+				wortbeginn_wort = woerter_dict[wort] - stelle
+				#wortbeginn_wort = woerter_dict[gelegtes_wort] - stelle_in_woerterbuch_wort
+				if wortbeginn_wort + len(single_match_txt) < GlobalGameSettings.anzahl_felder:
+					# wort geht sich aus
+					
+					wort_geht_sich_aus = true
+					break
+				
+			if not wort_geht_sich_aus:
+				continue
+			var zelle_beginn
+			var richtung 
+			if info_waag_oder_senkrecht == "reihe":
+				zelle_beginn = [wortbeginn_wort, reihe_oder_spalte_nr]
+				richtung = [1, 0]
+			else:
+				zelle_beginn = [reihe_oder_spalte_nr, wortbeginn_wort]
+				richtung = [0, 1]
+			#print(single_match_txt, " beginn: ", zelle_beginn)
+			var lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)	
+			
+			if lege_dict:
+				#print("möglich: ", single_match_txt)
+				#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
 				assert(single_match_txt in global_concepts.wortliste_dict)
 				moegliche_woerter.append([single_match_txt, lege_dict, richtung])
-				continue
-			
-			for wort in woerter_dict:
-				var stelle_in_woerterbuch_wort = single_match_txt.find(wort)
-				if stelle_in_woerterbuch_wort != -1:
-					gelegtes_wort = wort
-					wortbeginn_wort = woerter_dict[gelegtes_wort] - stelle_in_woerterbuch_wort
-					#break
-				if not gelegtes_wort:
-					continue
-				var zelle_beginn
-				var richtung 
-				if info_waag_oder_senkrecht == "reihe":
-					zelle_beginn = [wortbeginn_wort, reihe_oder_spalte_nr]
-					richtung = [1, 0]
-				else:
-					zelle_beginn = [reihe_oder_spalte_nr, wortbeginn_wort]
-					richtung = [0, 1]
-				#print(single_match_txt, " beginn: ", zelle_beginn)
-				var lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)	
-				
-				if lege_dict:
-					#print("möglich: ", single_match_txt)
-					#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
-					assert(single_match_txt in global_concepts.wortliste_dict)
-					moegliche_woerter.append([single_match_txt, lege_dict, richtung])
-				#else:
-					#print(single_match_txt, " nicht möglich!")
-			
-					
+			#else:
+				#print(single_match_txt, " nicht möglich!")
+		#print("Dauer: ", Time.get_ticks_msec() - timer_start)
+	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return moegliche_woerter
 
 func get_lege_dict_for_new_game(single_match_txt, info_waagrecht_oder_senkrecht):
@@ -296,13 +359,12 @@ func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 		zelle = [zelle_beginn[0] + richtung[0] * abstand, zelle_beginn[1] + richtung[1] * abstand]
 		#buchstabe = single_match_txt[stelle]
 		if zelle not in belegte_felder:  # muss gelegt werden
-			if zelle not in global_concepts.all_spielfelder:
-				print("Zelle außerhalb des Spielfelds!")
-				return false 
+			#if zelle not in global_concepts.all_spielfelder:  # das sollte nicht mehr vorkommen!
+				#print("Zelle außerhalb des Spielfelds!")
+				#return false 
 			lege_dict[zelle] = buchstabe
 			if not buchstabe in computer_buchstaben:
-				#if len(single_match_txt) < 5:
-					#print(buchstabe, " in ", single_match_txt, " fehlt", " buchstaben: ", computer_buchstaben)
+				
 				return false
 			fehlende_buchstaben.append(buchstabe)
 		abstand += 1
@@ -322,6 +384,7 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict, belegt
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	außerdem werden die punkte ermittelt
 	"""
+	#var timer_start = Time.get_ticks_msec()
 	
 	var wort = wort_dict[0]
 	var zu_legende_buchstaben_dict = wort_dict[1]
@@ -340,52 +403,9 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict, belegt
 	var punkte = ergebnis[0]
 	var new_punkte_labels = ergebnis[1]
 	#print(wort, " würde ", punkte, " bringen")
+	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return [true, punkte, new_punkte_labels]
 	
-#func replace_first_occurance(wort, buchstabe):
-	#var index = wort.find(buchstabe)
-	#if index != -1:
-		#return wort.substr(0, index) + "" + wort.substr(index + 1)
-	#return wort
-
-
-#func check_querwort_okay(feld, querrichtung, buchstabe, belegte_felder, zu_legende_buchstaben_dict):
-	#
-	#var new_wort = buchstabe
-	#var zusatzwoerter = []
-	#var wort_is_new = false
-	#for vor_zurueck in [[querrichtung[0] * -1, querrichtung[1] * -1], [querrichtung[0], querrichtung[1]]]:
-		#
-		#var distance = 1
-		#
-		#while true:
-			#var checkfeld = [feld[0] + vor_zurueck[0] * distance, feld[1] + vor_zurueck[1] * distance]
-			#if checkfeld in zu_legende_buchstaben_dict:
-				#wort_is_new = true
-			#var new_buchstabe = belegte_felder.get(checkfeld)
-			#if not new_buchstabe:
-				#break
-			#if vor_zurueck[0] == -1 or vor_zurueck[1] == - 1:  # es geht rückwärts
-				#new_wort = new_buchstabe + new_wort
-			#else:
-				#new_wort += new_buchstabe
-			#distance += 1
-			#
-	#if len(new_wort) <= 1 or new_wort in global_concepts.wortliste_dict:
-		## wort kann geschrieben werden
-		##var zusatzpunkte = 0
-		##
-		#if len(new_wort) > 1 and wort_is_new:
-			#zusatzwoerter.append(new_wort)
-			##for abr_buchst in new_wort:
-				##zusatzpunkte += GlobalGameSettings.spielsteine_start[abr_buchst]["Wert"]	
-		##
-		#return [true, zusatzwoerter]
-	#else:
-		## wort kann nicht geschrieben werden
-		#return [false, zusatzwoerter]
-
-
 func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 	fehlende_buchstaben.sort()
 	for buchst in fehlende_buchstaben:
@@ -398,26 +418,6 @@ func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 	#print(" ... kann geschrieben werden")
 	return true
 
-
-
-func _process(delta: float) -> void:
-	
-	if aktiv:
-		
-		#print("aktiv", aktiv)
-		
-		durchgang += 1
-		percent = durchgang/max_durchgaenge
-		draw_bar()
-		if zu_pruefende_reihen:
-			var zu_pruefende_reihe = zu_pruefende_reihen.pop_front()
-			think_durchgang(zu_pruefende_reihe, "reihe", belegte_felder)
-		elif zu_pruefende_spalten:
-			var zu_pruefende_spalte = zu_pruefende_spalten.pop_front()
-			think_durchgang(zu_pruefende_spalte, "spalte", belegte_felder)
-		else:
-			thinking_ende()
-			
 
 func thinking_ende():
 	var erlaubte_woerter = []
@@ -511,3 +511,16 @@ func lege_steine(wort_arr):
 		rel_stein_aus_hand.frisch_gelegt_sprite.visible = false
 		rel_stein_aus_hand.fixiert_sprite.visible = true
 		
+func regex_operation(pattern):
+	print("unknown pattern")
+	var regex = RegEx.new()
+	if regex.compile(pattern) == OK:
+		var matches_raw = regex.search_all(global_concepts.wortliste_txt)
+		var new_matches_txt = []
+		for single_match in matches_raw:
+			var single_match_txt = single_match.get_string()
+			single_match_txt = single_match_txt.strip_edges()
+			new_matches_txt.append(single_match_txt)
+		
+		return new_matches_txt
+	
