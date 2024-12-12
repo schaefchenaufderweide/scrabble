@@ -32,7 +32,7 @@ var spielsteine_start = {"E": {"Anzahl": 15, "Wert": 1},
 						"X": {"Anzahl": 2, "Wert": 8},
 						"Q": {"Anzahl": 1, "Wert": 10},
 						"Y": {"Anzahl": 1, "Wert": 10},
-						"?": {"Anzahl": 2, "Wert": 0}}
+						"?": {"Anzahl": 20, "Wert": 0}}
 
 var spezialfelder = {"dreifacher Wortwert": [[0,0], [7,0], [14, 0], [0, 7], [14,7], [0, 14], [7,14], [14,14]],
 					"doppelter Wortwert": [[1,1],[2,2], [3,3], [4,4], [10, 4], [11, 3], [12,2], [13,1],[1, 13], [2,12], [3,11], [4,10], [10,10], [11,11], [12,12], [13,13]],

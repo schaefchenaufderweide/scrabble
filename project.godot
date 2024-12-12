@@ -25,6 +25,10 @@ window/size/viewport_width=500
 window/size/viewport_height=800
 window/handheld/orientation=1
 
+[gui]
+
+theme/custom="res://themes/theme.tres"
+
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true

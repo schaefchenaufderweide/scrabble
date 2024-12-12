@@ -1,15 +1,12 @@
 TODOS:
+- wahl der möglichen buchstaben für "?" -> Option Button instantiate - alle Optionen zur Wahl geben
+- Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
 
+- animiert: buchstaben tauschen image
 
-Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
+- computer-denkt-bar noch glatter machen ...
 
-
-animiert: buchstaben tauschen image
-
-durchgänge noch weiter unterteilen, vielleicht einfach mal 10 und pro process per zufall eins dazu, 
-	simulieren: permanenter anstieg statt ruckartig in nur wenigen slots
-
-wenn alle buchstaben gelegt werden, aus irgendeinem grund bei jedem buchtstaben punktelabel!
+- liste mit gelegten wörtern und dazu erhaltenen punkten
 
 2."computer tauscht 0 Buchstaben" - > "Computer passt ..."
 3. 	fragezeichen buchstaben - für computer und spieler ...

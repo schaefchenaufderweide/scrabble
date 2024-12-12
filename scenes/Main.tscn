@@ -1,16 +1,14 @@
-[gd_scene load_steps=16 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=14 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
 [ext_resource type="Texture2D" uid="uid://bk7ijw1r41ygj" path="res://graphics/spielbrett.png" id="3_7hawp"]
 [ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/Hand.tscn" id="5_0h5wa"]
-[ext_resource type="LabelSettings" uid="uid://ctsmfufcj3uvb" path="res://labelsettings_player.tres" id="6_dv165"]
+[ext_resource type="Theme" uid="uid://cftmp74rygmtr" path="res://themes/theme.tres" id="6_ky180"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
-[ext_resource type="LabelSettings" uid="uid://c837enva1pxih" path="res://labelsettings.tres" id="7_l1e77"]
-[ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_p3hy0"]
-[ext_resource type="LabelSettings" uid="uid://c3n2qsf4dhfvy" path="res://labelsettings_computer.tres" id="7_pdt05"]
+[ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_cm5u0"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
-[ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_i0s4k"]
+[ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_j5j5i"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
 [ext_resource type="Script" path="res://scenes/internet.gd" id="13_qtrk6"]
 [ext_resource type="Script" path="res://scenes/wortliste.gd" id="14_66vb2"]
@@ -53,8 +51,9 @@ transform = Transform2D(1, 0, 0, 1, 0, 500)
 offset_left = 20.0
 offset_right = 162.0
 offset_bottom = 50.0
+theme = ExtResource("6_ky180")
+theme_override_colors/font_color = Color(0, 0.513726, 1, 1)
 text = "Player: 0"
-label_settings = ExtResource("6_dv165")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -66,8 +65,9 @@ offset_left = -218.0
 offset_right = -20.0
 offset_bottom = 50.0
 grow_horizontal = 0
+theme = ExtResource("6_ky180")
+theme_override_colors/font_color = Color(1, 0, 0, 1)
 text = "Computer: 0"
-label_settings = ExtResource("7_pdt05")
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -83,6 +83,8 @@ offset_top = -23.0
 offset_right = 239.5
 grow_horizontal = 2
 grow_vertical = 0
+theme = ExtResource("6_ky180")
+theme_override_font_sizes/font_size = 15
 text = "Internet Info ..."
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -97,8 +99,8 @@ offset_right = 237.0
 offset_bottom = 151.0
 grow_horizontal = 2
 size_flags_vertical = 4
-texture_normal = ExtResource("7_p3hy0")
-texture_pressed = ExtResource("8_i0s4k")
+texture_normal = ExtResource("7_cm5u0")
+texture_pressed = ExtResource("8_j5j5i")
 script = ExtResource("8_dr8w6")
 
 [node name="Label" type="Label" parent="UICanvasLayer/ZugBeenden"]
@@ -110,8 +112,8 @@ anchor_right = 0.945148
 anchor_bottom = 0.774775
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("6_ky180")
 text = "Passen"
-label_settings = ExtResource("7_l1e77")
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true

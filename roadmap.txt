@@ -37,13 +37,15 @@
 0.8 computer tauscht buchstaben, korrektur fehlerhaftes passen (10.12) 
 0.9 neue wortliste, damit viel zu langsam (10.12)
 0.91 viel bessere performance durch threads (11.12)
-0.93 fragezeichen buchstaben - für computer und spieler ...
-0.95 spielende
-
-
-0.97 einstellungen/menü/punkteanzeigen
-0.99 im spiel wörter hinzufügen/löschen
-1.0 wortliste reinigen
-1.2 highscore und wortlisten online
+0.92 kleiner bug: alle buchstaben_bonus label wird nun nur noch einmal gelegt (11.12)
+0.93 computer denkt - anzeige glatter (11.12)
+0.931 kleinen bug korrigiert, wonach auf neuem brett ein einzelner buchstabe gelegt werden konnte (11.12)
+0.94 theme für alle labels/buttons angelegt (11.12)
+0.95 fragezeichen buchstaben - für computer und spieler ... für spieler begonnen (11.12)
+1.0 spielende
+1.1 einstellungen/menü/punkteanzeigen
+1.2 im spiel wörter hinzufügen/löschen
+1.3 wortliste reinigen
+1.4 highscore und wortlisten online
 1.3 Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true
-haha
+1.5 export zu android ... huhuuuu!

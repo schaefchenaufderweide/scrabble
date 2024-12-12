@@ -1,0 +1,7 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://d4bgoskuo2tnm"]
+
+[ext_resource type="FontFile" uid="uid://v3iwiqk7vu1f" path="res://fonts/comicbd.ttf" id="1_gv0gl"]
+
+[resource]
+font = ExtResource("1_gv0gl")
+font_size = 40

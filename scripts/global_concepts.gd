@@ -35,9 +35,8 @@ var dragged_stein = null
 var spielstein_is_dragged = false
 var snap_field = null
 var all_spielfelder = {}
-#var allowed_richtungen = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 
-
+var spielfeld_is_locked = false
 
 var an_der_reihe 
 var wortliste_txt
@@ -378,7 +377,7 @@ func update_spielbrett(player_zug_erlaubt):
 	
 func player_zug_beenden():
 	#print("player zug beenden")
-	var player_zug_erlaubt = true
+	var player_zug_erlaubt 
 	
 	
 	var frisch_gelegt = get_belegte_felder(true)
@@ -387,10 +386,13 @@ func player_zug_beenden():
 	
 	if zug_beenden_button_label.text == "Steine tauschen":
 		assert(not frisch_gelegt)
+		player_zug_erlaubt = true
 		player.steine_tauschen()
+	elif zug_beenden_button_label.text == "Passen":
+		player_zug_erlaubt = true
 	else:
 		player_zug_erlaubt = is_zug_gueltig(allowed_felder, gelegte_woerter)
-				
+
 	update_spielbrett(player_zug_erlaubt)
 	
 	if player_zug_erlaubt:
@@ -447,6 +449,7 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 	var buchstaben_dict = wort_lst[1]
 	var alle_buchstaben_bonus = 0
 	var new_punkte_labels_fuer_wort = {}
+	var alle_buchstaben_bonus_gelegt = false
 	if len(frisch_gelegte_felder) == GlobalGameSettings.anzahl_steine_pro_hand:
 		alle_buchstaben_bonus = 50
 		
@@ -470,8 +473,9 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 			bereits_abgerechnet.append(feld)
 		var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
 		new_punkte_labels_fuer_feld.append(new_punkte * wort_wert_bonus_faktor)
-		if alle_buchstaben_bonus and not "Alle Buchstaben + 50!" in new_punkte_labels_fuer_feld:
+		if alle_buchstaben_bonus and not alle_buchstaben_bonus_gelegt:
 			new_punkte_labels_fuer_feld.append("Alle Buchstaben + 50!")
+			alle_buchstaben_bonus_gelegt = true
 		
 		punkte_insgesamt += new_punkte
 			
@@ -526,40 +530,20 @@ func create_new_punkte_labels():
 			new_punkte_label.timer.wait_time = dauer
 			new_punkte_label.timer.start()
 	punkte_labels = {}
-	##print("create new punkte labels", punkte_labels)
-	# OLD!!
-	#for feld in punkte_labels:
-		#if typeof(feld) == TYPE_STRING:
-			#pass # spezial!
-		#var punkte = punkte_labels[feld]
-		#
-		#var punkte_label_auf_stein = all_spielfelder[feld].punkte_label
-		#var punkte_label_auf_stein_timer = all_spielfelder[feld].punkte_label_timer
-		#punkte_label_auf_stein.visible = true
-		#punkte_label_auf_stein.scale.x = 0.75
-		#punkte_label_auf_stein.scale.y = 0.75
-		#punkte_label_auf_stein.modulate.a = 1
-		#punkte_label_auf_stein.text = str(punkte)
-		#var tween = create_tween()
-		##punkte_labels[feld] = tween
-		##punkte_labels.erase(feld)
-		#var max_size = 1 + punkte/3
-		#var dauer = 3
-		#tween.tween_property(punkte_label_auf_stein, "scale", Vector2(max_size, max_size), dauer)
-		#tween.parallel().tween_property(punkte_label_auf_stein, "modulate:a", 0, dauer)
-		#punkte_label_auf_stein_timer.wait_time = dauer
-		#punkte_label_auf_stein_timer.start()
-		##print("tween auf feld ", feld, " startet!")
-	#
-
+	
 func is_zug_gueltig(allowed_felder, gelegte_woerter):
 	
 	if not allowed_felder:  # zug ungültig!
-		print("zug ungültig! falsch gelegt")
+		#print("zug ungültig! falsch gelegt")
 		return false
+	
+	if not gelegte_woerter:
+		return false  # keine wörter gelegt!
 		
 	for wort_lst in gelegte_woerter:
 		var wort = wort_lst[0]
+		if "?" in wort:
+			wort = change_fragezeichen_zu_buchstaben(wort)
 		
 		if wort.strip_edges() not in wortliste_dict:
 			#print(wort, " nicht in liste (weitere wurden nicht geprüft)")
@@ -568,10 +552,15 @@ func is_zug_gueltig(allowed_felder, gelegte_woerter):
 			#print(wort, " in liste")
 	return true
 	
-		
+func change_fragezeichen_zu_buchstaben(wort_anfrage):
+	var pattern = "\\b" + wort_anfrage.replace("?", ".") + "\\b"  # nur ganzes solches wort
+	var matches_txt = regex_operation(pattern)
+	pass
+	# TODO HIER WEITER! 
+	# Option Button instantiate - alle Optionen zur Wahl geben
 		
 func change_an_der_reihe():
-	
+	spielfeld_is_locked = true
 	create_new_punkte_labels()
 	if an_der_reihe == player:  # player WAR an der reihe, wechsel zu computer
 		player.ziehe_steine()
@@ -602,7 +591,8 @@ func change_an_der_reihe():
 		var allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
 		#computer_punkte_label.text = "Computer: " + str(computer.punkte)
-
+		spielfeld_is_locked = false
+		
 func change_zug_beenden_label(frisch_belegt, player_steine_dict):
 	if player.get_markierte_steine():
 	
@@ -623,3 +613,15 @@ func spielfeld_pos_to_mouse_pos(spielfeld_pos):
 	return (relative_mouse_pos * camera.zoom) + offset_screen_mitte
 	
 	
+func regex_operation(pattern):
+	
+	var regex = RegEx.new()
+	if regex.compile(pattern) == OK:
+		var matches_raw = regex.search_all(wortliste_txt)
+		var new_matches_txt = []
+		for single_match in matches_raw:
+			var single_match_txt = single_match.get_string()
+			single_match_txt = single_match_txt.strip_edges()
+			new_matches_txt.append(single_match_txt)
+		
+		return new_matches_txt

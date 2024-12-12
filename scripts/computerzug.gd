@@ -1,12 +1,17 @@
 extends Node
 
 var aktiv = false
-var durchgang:float = 0.0
-var max_durchgaenge = 0#GlobalGameSettings.computer_denktiefe
+var durchgang: float = 0.0  # ich muss sie als float definieren, da gd script scheiße ist
+var max_durchgaenge: float = 0.0
+var faktor_fake_durchgang = 100
+var fake_durchgang:float = 0.0  # pseudozahl: durchgang * faktor_fake, um glattere wartebar zu generieren ich muss sie als float markieren, weil gd script scheiße ist
+
+
+
 @onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
 @onready var fortschrittanzeige_max_breite = computerdenkt_fortschrittanzeige.size.x
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
-var percent: float = 0.0
+
 #var word_array
 var moegliche_woerter = []
 var zu_pruefende_reihen = []
@@ -29,7 +34,10 @@ func _process(delta: float) -> void:
 	
 	if aktiv:
 		
+			
+		
 		if thread_aktiv:
+			count_fake_durchgang_and_draw_bar()
 			pass
 			
 		elif zu_pruefende_reihen:
@@ -39,8 +47,9 @@ func _process(delta: float) -> void:
 			thread_aktiv = true
 			#print("thread gestartet!")
 			durchgang += 1
-			percent = durchgang/max_durchgaenge
-			draw_bar()
+			
+			#percent = durchgang/max_durchgaenge
+			#draw_bar()
 			#think_durchgang(zu_pruefende_reihe, "reihe", belegte_felder)
 		elif zu_pruefende_spalten:
 			thread.wait_to_finish()
@@ -49,8 +58,8 @@ func _process(delta: float) -> void:
 			thread_aktiv = true
 			#print("thread gestartet!")
 			durchgang += 1
-			percent = durchgang/max_durchgaenge
-			draw_bar()
+			#percent = durchgang/max_durchgaenge
+			#draw_bar()
 			#think_durchgang(zu_pruefende_spalte, "spalte", belegte_felder)
 			
 		else:
@@ -58,11 +67,12 @@ func _process(delta: float) -> void:
 	
 
 func restart():
-	print("restart computerzug")
+	#print("restart computerzug")
 	moegliche_woerter = []
 	computerdenkt_fortschrittanzeige.visible = true
 	aktiv = true
 	durchgang = 0
+	fake_durchgang = 0
 	thread_aktiv = false
 	zu_pruefende_reihen = []
 	zu_pruefende_spalten = []
@@ -95,11 +105,33 @@ func restart():
 	
 	print("zu prüfende reihen: ", zu_pruefende_spalten, " zu prüfende spalten: ", zu_pruefende_spalten)
 	
+func count_fake_durchgang_and_draw_bar():
+	if fake_durchgang < durchgang * faktor_fake_durchgang:
+		var fehlen_auf_soll = (durchgang * faktor_fake_durchgang) - fake_durchgang
+		var wahrscheinlichkeit
+		var add 
+		if fehlen_auf_soll > faktor_fake_durchgang / 2:
+			wahrscheinlichkeit = 100
+			add = 5
+		elif fehlen_auf_soll > faktor_fake_durchgang / 3:
+			wahrscheinlichkeit = 100
+			add = 4
+		elif fehlen_auf_soll > faktor_fake_durchgang / 4:
+			wahrscheinlichkeit = 75
+			add = 3
+		elif fehlen_auf_soll > faktor_fake_durchgang / 5:
+			wahrscheinlichkeit = 50
+			add = 2
+		else:
+			wahrscheinlichkeit = 20
+			add = 1
+		if randi_range(0, 100) < wahrscheinlichkeit:
+			fake_durchgang += add
+	var percent: float = fake_durchgang/(max_durchgaenge * faktor_fake_durchgang)
+	print(fake_durchgang, "/", max_durchgaenge * faktor_fake_durchgang, " ", percent)
 	
-	
-func draw_bar():
 	var new_breite = fortschrittanzeige_max_breite * percent
-		
+	
 	computerdenkt_fortschrittanzeige.size.x = new_breite
 	computerdenkt_fortschrittanzeige.color.r = 1- percent
 	computerdenkt_fortschrittanzeige.color.g = percent
@@ -221,7 +253,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		matches_txt = known_matches[pattern]
 		print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
 	else: 
-		matches_txt = regex_operation(pattern)
+		matches_txt = global_concepts.regex_operation(pattern)
 		known_matches[pattern] = matches_txt
 		
 			
@@ -511,16 +543,4 @@ func lege_steine(wort_arr):
 		rel_stein_aus_hand.frisch_gelegt_sprite.visible = false
 		rel_stein_aus_hand.fixiert_sprite.visible = true
 		
-func regex_operation(pattern):
-	print("unknown pattern")
-	var regex = RegEx.new()
-	if regex.compile(pattern) == OK:
-		var matches_raw = regex.search_all(global_concepts.wortliste_txt)
-		var new_matches_txt = []
-		for single_match in matches_raw:
-			var single_match_txt = single_match.get_string()
-			single_match_txt = single_match_txt.strip_edges()
-			new_matches_txt.append(single_match_txt)
-		
-		return new_matches_txt
 	

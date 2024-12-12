@@ -17,6 +17,7 @@ var is_pressed = false
 var wert
 var fixiert = false
 var pos_in_hand 
+
 #@onready var punkte_label = $PunkteLabel
 #@onready var punkte_label_timer = $PunkteLabel/Timer
 
@@ -92,7 +93,7 @@ func return_to_hand(old_position):
 	#position = GlobalConcepts.player_hand.stein_positions[self]
 		
 func _on_mouse_entered() -> void:
-	if not global_concepts.spielstein_is_dragged and not fixiert:
+	if not global_concepts.spielstein_is_dragged and not fixiert and not global_concepts.spielfeld_is_locked:
 		# berührt spielstein
 		is_touched = true
 		#print("berührt")
