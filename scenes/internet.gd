@@ -32,7 +32,7 @@ func _process(_delta: float) -> void:
 		internet_anfrage_aktiv = true
 		global_concepts.ui_info_label.text = "Checking " + next_wort + " (" + str(pruefe_wortliste_nr) + "/" + str(len(global_concepts.wortliste_dict.keys())) + ")"
 		
-func _on_request_completed(result, _response_code, _headers, body):
+func _on_request_completed(result, _response_code, _headers, _body):
 	internet_anfrage_aktiv = false
 	var message 
 	if result == HTTPRequest.RESULT_SUCCESS:

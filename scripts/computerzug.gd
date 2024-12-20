@@ -43,7 +43,7 @@ func _process(_delta: float) -> void:
 		elif zu_pruefende_reihen:
 			thread.wait_to_finish()
 			var zu_pruefende_reihe = zu_pruefende_reihen.pop_front()
-			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_reihe, "reihe", belegte_felder))
+			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_reihe, "reihe"))
 			thread_aktiv = true
 			#print("thread gestartet!")
 			durchgang += 1
@@ -54,7 +54,7 @@ func _process(_delta: float) -> void:
 		elif zu_pruefende_spalten:
 			thread.wait_to_finish()
 			var zu_pruefende_spalte = zu_pruefende_spalten.pop_front()
-			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_spalte, "spalte", belegte_felder))
+			thread.start(Callable(self, "think_durchgang").bind(zu_pruefende_spalte, "spalte"))
 			thread_aktiv = true
 			#print("thread gestartet!")
 			durchgang += 1
@@ -168,7 +168,7 @@ func get_word_array(belegte_felder):
 			
 	
 	
-func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt, belegte_felder):
+func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt):
 	#print("start think durchgang ...")
 	#var timer_start = Time.get_ticks_msec()
 	var zu_pruefende_reihe_oder_spalte_txt = ""
@@ -251,7 +251,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 	var matches_txt
 	if pattern in known_matches:
 		matches_txt = known_matches[pattern]
-		print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
+		#print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
 	else: 
 		#print("starte regex mit ", pattern)
 		matches_txt = global_concepts.regex_operation(pattern)

@@ -12,6 +12,7 @@ func _ready() -> void:
 	global_concepts.set_allowed_spielfelder(allowed_felder)
 	
 	## DEBUG
+	
 	#internet.start_pruefe_wortliste()
 	#global_concepts.show_popup(["Option 1", "Option 2", "Option 3"])
 	#var matches_txt = global_concepts.regex_operation("RU.N.{0,1}")

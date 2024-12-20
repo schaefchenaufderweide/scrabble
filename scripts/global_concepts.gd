@@ -18,7 +18,7 @@ extends Node
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
-#@onready var animation_player = $"/root/Main/AnimationPlayer"
+@onready var animation_player = $"/root/Main/AnimationPlayer"
 #@onready var computerzug_sprite = $"/root/Main/UICanvasLayer/ComputerzugSprite"
 @onready var computerzug: Node = $"/root/Main/Computerzug"
 
@@ -75,8 +75,8 @@ func init_spielfeld():
 	var anzahl_felder = GlobalGameSettings.anzahl_felder
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
 	
-	var erste_x:int = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
-	var erste_y: int = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
+	var erste_x = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
+	var erste_y = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
 	for y in range(anzahl_felder):
 		for x in range(anzahl_felder):
 			
@@ -335,7 +335,7 @@ func is_valid(checkfeld, frisch_belegte_felder, belegte_felder):
 	
 	
 func set_allowed_spielfelder(allowed_felder):
-	var frisch_belegte_felder = get_belegte_felder(true)
+	#var frisch_belegte_felder = get_belegte_felder(true)
 	# setzen der spielfelder
 	for feld in all_spielfelder:
 		all_spielfelder[feld].animation_player.play("RESET")
@@ -601,7 +601,7 @@ func change_an_der_reihe():
 		#animation_player.play("computer_denkt")
 		
 		#player_punkte_label.text = "Player: " + str(player.punkte)
-		
+		print("Computer Buchstaben: ", computer.get_buchstaben())
 		
 		
 	else: # computer WAR an der reihe, wechsel zu player
