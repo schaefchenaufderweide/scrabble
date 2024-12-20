@@ -9,6 +9,8 @@ TODOS:
 
 - liste mit gelegten wörtern und dazu erhaltenen punkten
 
+- computerzug dauert lange - kann man das optimieren? wo hängt es länger?
+
 2."computer tauscht 0 Buchstaben" - > "Computer passt ..."
 3. 	fragezeichen buchstaben - für computer und spieler ...
 4.	spielende - wer hat gewonnen?

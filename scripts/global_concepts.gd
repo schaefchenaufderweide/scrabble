@@ -258,8 +258,8 @@ func is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
 		if checkfeld == [7,7]:  # mitte besetzt mit allererstem
 			return true
 		for richtung in [[1,0], [-1,0], [0,1], [0,-1]]:
-			var test_feld = [checkfeld[0] + richtung[0], checkfeld[1] + richtung[1]]
-			if test_feld in belegte_felder:
+			var test_feld_check = [checkfeld[0] + richtung[0], checkfeld[1] + richtung[1]]
+			if test_feld_check in belegte_felder:
 				return true
 				
 		
@@ -536,7 +536,7 @@ func create_new_punkte_labels():
 				var new_rotation = randi_range(-45,45)
 				new_punkte_label.rotation = deg_to_rad(new_rotation)
 				
-			var dauer = 3
+			var dauer = 5
 			tween.tween_property(new_punkte_label, "scale", Vector2(max_size, max_size), dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 			tween.parallel().tween_property(new_punkte_label, "modulate:a", 0, dauer).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 			if new_position:

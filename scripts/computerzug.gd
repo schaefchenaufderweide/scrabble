@@ -165,7 +165,7 @@ func get_word_array(belegte_felder):
 	
 	return [array_waagrecht, array_vertikal]
 	
-			
+	
 	
 	
 func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt):
@@ -251,7 +251,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 	var matches_txt
 	if pattern in known_matches:
 		matches_txt = known_matches[pattern]
-		#print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
+		#print("knwon pattern") 
 	else: 
 		#print("starte regex mit ", pattern)
 		matches_txt = global_concepts.regex_operation(pattern)
@@ -263,7 +263,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		return []
 		
 		
-	for single_match_txt in matches_txt:
+	for single_match_txt in matches_txt:  # suche bei völlig neuem spielfeld
 		if not single_match_txt in global_concepts.wortliste_dict:
 			continue
 		
@@ -273,12 +273,15 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		var wort_geht_sich_aus = false
 		if not woerter_dict: # neues spiel - leeres brett, computer legt nur waagrecht
 			var fehlende_buchstaben = single_match_txt.split()
-			if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
+			var ergebnis_hat_alle_buchstaben = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
+			var erlaubt = ergebnis_hat_alle_buchstaben[0]
+			var verwendet_fragezeichen = ergebnis_hat_alle_buchstaben[1]
+			if not erlaubt:
 				continue
 			var lege_dict = get_lege_dict_for_new_game(single_match_txt)
 			var richtung = [1,0]
 			assert(single_match_txt in global_concepts.wortliste_dict)
-			moegliche_woerter.append([single_match_txt, lege_dict, richtung])
+			moegliche_woerter.append([single_match_txt, lege_dict, richtung, verwendet_fragezeichen])
 			continue
 		
 		for wort in woerter_dict:
@@ -314,13 +317,15 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 				zelle_beginn = [reihe_oder_spalte_nr, wortbeginn_wort]
 				richtung = [0, 1]
 			#print(single_match_txt, " beginn: ", zelle_beginn)
-			var lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)	
+			var ergebnis_lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)
+			var lege_dict = ergebnis_lege_dict[0]
+			var verwendet_fragezeichen = ergebnis_lege_dict[1]
 			
 			if lege_dict:
 				#print("möglich: ", single_match_txt)
 				#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
 				assert(single_match_txt in global_concepts.wortliste_dict)
-				moegliche_woerter.append([single_match_txt, lege_dict, richtung])
+				moegliche_woerter.append([single_match_txt, lege_dict, richtung, verwendet_fragezeichen])
 			#else:
 				#print(single_match_txt, " nicht möglich!")
 		#print("Dauer: ", Time.get_ticks_msec() - timer_start)
@@ -394,17 +399,20 @@ func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 				#print("Zelle außerhalb des Spielfelds!")
 				#return false 
 			lege_dict[zelle] = buchstabe
-			if not buchstabe in computer_buchstaben:
-				
-				return false
+			#if not buchstabe in computer_buchstaben:
+				#
+				#return false
 			fehlende_buchstaben.append(buchstabe)
 		abstand += 1
 	if not fehlende_buchstaben:  # ist ident mit bereits gelegtem
-		return false 
-	if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
-		return false
+		return [false, false] 
+	var ergebnis_hat_alle_buchstaben = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
+	var erlaubt = ergebnis_hat_alle_buchstaben[0]
+	var verwendet_fragezeichen = ergebnis_hat_alle_buchstaben[1]
+	if not erlaubt:
+		return [false, false]
 
-	return lege_dict
+	return [lege_dict, verwendet_fragezeichen]
 
 func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
@@ -419,7 +427,7 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict):
 	
 	#var wort = wort_dict[0]
 	var zu_legende_buchstaben_dict = wort_dict[1]
-	
+	var verwendet_fragezeichen = wort_dict[3]
 	#var alle_buchstaben_gelegt_bonus 
 	#if len(zu_legende_buchstaben_dict) == GlobalGameSettings.anzahl_steine_pro_hand:
 		#alle_buchstaben_gelegt_bonus = 50
@@ -429,25 +437,85 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict):
 	var alle_woerter = global_concepts.read_gelegte_woerter(zu_legende_buchstaben_dict)
 	if not global_concepts.is_zug_gueltig(true, alle_woerter):
 		return [false, 0, null]
+	
+	var fragezeichen_zellen
+	if verwendet_fragezeichen:
+		fragezeichen_zellen = find_fragezeichen_zellen(zu_legende_buchstaben_dict)
+	else:
+		fragezeichen_zellen = []
 	# todo: fragezeichen für computer!
-	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys(), [])
+	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys(), fragezeichen_zellen)
 	var punkte = ergebnis[0]
 	var new_punkte_labels = ergebnis[1]
 	#print(wort, " würde ", punkte, " bringen")
 	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return [true, punkte, new_punkte_labels]
-	
+
+func find_fragezeichen_zellen(zu_legende_buchstaben_dict):
+	var fragezeichen_zellen = []
+	var computer_buchstaben_dict_for_fragezeichen = {}
+	for zelle in zu_legende_buchstaben_dict:
+		var buchst = zu_legende_buchstaben_dict[zelle]
+		if not computer_buchstaben_dict_for_fragezeichen.get(buchst):
+			computer_buchstaben_dict_for_fragezeichen[buchst] = computer_buchstaben.count(buchst)
+		
+		if computer_buchstaben_dict_for_fragezeichen[buchst] == 0:
+			fragezeichen_zellen.append(zelle)
+		else:
+			computer_buchstaben_dict_for_fragezeichen[buchst] -= 1
+				
+	return fragezeichen_zellen
+#func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
+	#var computer_buchstaben_dict = {}
+	#for buchst in computer_buchstaben:
+		#if buchst in computer_buchstaben_dict:
+			#continue
+		#computer_buchstaben_dict[buchst] = computer_buchstaben.count(buchst)
+	#
+	#var fehlende_buchstaben_dict = {}
+	#for buchst in fehlende_buchstaben:
+		#if buchst in fehlende_buchstaben_dict:
+			#continue
+		#fehlende_buchstaben_dict[buchst] = fehlende_buchstaben.count(buchst)
+		#if not computer_buchstaben_dict.get(buchst):
+			#computer_buchstaben_dict[buchst] = 0
+	#
+	#for buchst in fehlende_buchstaben_dict:
+		#var notwendig = fehlende_buchstaben_dict[buchst]
+		#
+		#var vorhanden = computer_buchstaben_dict[buchst]
+		#computer_buchstaben_dict[buchst] -= notwendig
+		#while computer_buchstaben_dict[buchst] < 0:
+			#var fragezeichen_vorhanden = computer_buchstaben_dict.get("?")
+			#if not fragezeichen_vorhanden:
+				#return false
+			#computer_buchstaben_dict["?"] -= 1
+			#computer_buchstaben_dict[buchst] += 1
+		#
+	#
+	#
 func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
+	var uses_fragezeichen = false
+	#var fragezeichen_zur_verfuegung = computer_buchstaben.count("?")
+	#var eingesetzte_fragezeichen = {}
 	fehlende_buchstaben.sort()
+	var fehlende_buchstaben_check_two = fehlende_buchstaben.duplicate()
+	var stelle = 0
 	for buchst in fehlende_buchstaben:
+		#eingesetzte_fragezeichen[buchst] = 0
+		
+		if buchst not in computer_buchstaben and not "?" in computer_buchstaben:
+			return [false, false]
 		if buchst not in computer_buchstaben:
-			#print("... kann nicht geschrieben werden, fehlendes ", buchst)
-			return false
-		if fehlende_buchstaben.count(buchst) > computer_buchstaben.count(buchst):
+			fehlende_buchstaben_check_two[stelle] = "?"
+			uses_fragezeichen = true
+		stelle += 1
+	for buchst in fehlende_buchstaben_check_two:
+		if fehlende_buchstaben_check_two.count(buchst) > computer_buchstaben.count(buchst): 
 			#print("... kann nicht geschrieben werden, nicht genug ", buchst)
-			return false  # nicht dieselbe anzahl vorhanden
+			return [false, false]  # nicht dieselbe anzahl vorhanden
 	#print(" ... kann geschrieben werden")
-	return true
+	return [true, uses_fragezeichen]
 
 
 func thinking_ende():
@@ -511,16 +579,23 @@ func lege_steine(wort_arr):
 	for stein_pos in steine_pos_dict:
 		# suchen des richtigen steins in der computerhand	
 		var gesuchter_buchstabe = steine_pos_dict[stein_pos]
+		rel_stein_aus_hand = find_stein_in_hand(gesuchter_buchstabe)
+	
+		if not rel_stein_aus_hand:
+			rel_stein_aus_hand = find_stein_in_hand("?")  # es wird ein fragezeichen gesucht
 		
-		for stein_nr in range(GlobalGameSettings.anzahl_steine_pro_hand):
-			var test_stein = global_concepts.computer.steine_dict[stein_nr]
-			if not test_stein: # schon ausgespielt
-				continue
-			if test_stein.label_buchstabe.text == gesuchter_buchstabe:
-				global_concepts.computer.steine_dict[stein_nr] = null
-				rel_stein_aus_hand = test_stein
-				break
-		assert (rel_stein_aus_hand != null, "Buchstabe fehlt!")
+		assert(rel_stein_aus_hand)
+		
+		rel_stein_aus_hand.label_buchstabe.text = gesuchter_buchstabe
+		#for stein_nr in range(GlobalGameSettings.anzahl_steine_pro_hand):
+			#var test_stein = global_concepts.computer.steine_dict[stein_nr]
+			#if not test_stein: # schon ausgespielt
+				#continue
+			#if test_stein.label_buchstabe.text == gesuchter_buchstabe:
+				#global_concepts.computer.steine_dict[stein_nr] = null
+				#rel_stein_aus_hand = test_stein
+				#break
+		
 			
 		
 		
@@ -542,4 +617,13 @@ func lege_steine(wort_arr):
 		rel_stein_aus_hand.frisch_gelegt_sprite.visible = false
 		rel_stein_aus_hand.fixiert_sprite.visible = true
 		
+	
+func find_stein_in_hand(gesuchter_buchstabe):
+	for stein_nr in range(GlobalGameSettings.anzahl_steine_pro_hand):
+			var test_stein = global_concepts.computer.steine_dict[stein_nr]
+			if not test_stein: # schon ausgespielt
+				continue
+			if test_stein.label_buchstabe.text == gesuchter_buchstabe:
+				global_concepts.computer.steine_dict[stein_nr] = null
+				return test_stein
 	
