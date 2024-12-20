@@ -38,7 +38,7 @@ func get_wortliste_dict(wortliste_suchtext):
 	
 	
 func save_wortliste():
-	var wortliste_txt_raw = ""
+	#var wortliste_txt_raw = ""
 	var file = FileAccess.open("res://wortliste.txt", FileAccess.WRITE)
 	if file:
 		

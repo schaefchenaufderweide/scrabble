@@ -20,7 +20,7 @@ func stop_pruefe_wortliste():
 	pruefe_wortliste_aktiv = false
 	global_concepts.ui_info_label.visible = false
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if pruefe_wortliste_aktiv and not internet_anfrage_aktiv:
 		
 			
@@ -32,11 +32,11 @@ func _process(delta: float) -> void:
 		internet_anfrage_aktiv = true
 		global_concepts.ui_info_label.text = "Checking " + next_wort + " (" + str(pruefe_wortliste_nr) + "/" + str(len(global_concepts.wortliste_dict.keys())) + ")"
 		
-func _on_request_completed(result, response_code, headers, body):
+func _on_request_completed(result, _response_code, _headers, body):
 	internet_anfrage_aktiv = false
 	var message 
 	if result == HTTPRequest.RESULT_SUCCESS:
-		var html = body.get_string_from_utf8()
+		#var html = body.get_string_from_utf8()
 		# todo: erklärung extrahieren und in datei speichern!
 		message = next_wort + ": " + next_erlaeuterung 
 		print(message)

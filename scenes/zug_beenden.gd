@@ -1,6 +1,6 @@
 extends TextureButton
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
-
+@onready var label = $Label
 
 
 

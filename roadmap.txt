@@ -41,7 +41,9 @@
 0.93 computer denkt - anzeige glatter (11.12)
 0.931 kleinen bug korrigiert, wonach auf neuem brett ein einzelner buchstabe gelegt werden konnte (11.12)
 0.94 theme für alle labels/buttons angelegt (11.12)
-0.95 fragezeichen buchstaben - für computer und spieler ... für spieler begonnen (11.12)
+0.95 fragezeichen buchstaben - für computer und spieler ... für spieler begonnen (12.12)
+0.953 menu für wortauswahl bei fragezeichen für spieler in Progress (20.12)
+
 1.0 spielende
 1.1 einstellungen/menü/punkteanzeigen
 1.2 im spiel wörter hinzufügen/löschen

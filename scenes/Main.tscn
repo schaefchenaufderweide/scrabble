@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=16 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_j5j5i"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
+[ext_resource type="Script" path="res://scenes/pop_up_menu.gd" id="10_5ke6a"]
+[ext_resource type="Texture2D" uid="uid://d2f5nwnjobo33" path="res://graphics/background_HUD.png" id="11_ck8rb"]
 [ext_resource type="Script" path="res://scenes/internet.gd" id="13_qtrk6"]
 [ext_resource type="Script" path="res://scenes/wortliste.gd" id="14_66vb2"]
 
@@ -119,20 +121,55 @@ vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="ComputerdenktFortschrittanzeige" type="ColorRect" parent="UICanvasLayer/ZugBeenden"]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -215.0
+offset_left = -216.0
 offset_top = -37.5
-offset_right = 214.0
+offset_right = 213.0
 offset_bottom = 30.5
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0, 0.545098)
+
+[node name="PopUpMenu" type="Sprite2D" parent="UICanvasLayer"]
+visible = false
+position = Vector2(250, 439)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("11_ck8rb")
+script = ExtResource("10_5ke6a")
+
+[node name="Label" type="Label" parent="UICanvasLayer/PopUpMenu"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -420.0
+offset_top = -250.0
+offset_right = -180.0
+offset_bottom = -200.0
+grow_horizontal = 2
+text = "Bitte wählen ..."
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UICanvasLayer/PopUpMenu"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -538.0
+offset_top = -486.0
+offset_right = -62.0
+offset_bottom = -85.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContainerVertical" type="BoxContainer" parent="UICanvasLayer/PopUpMenu/ScrollContainer"]
+layout_mode = 2
+alignment = 1
+vertical = true
 
 [node name="Computerzug" type="Node" parent="."]
 script = ExtResource("9_avwwi")

@@ -1,5 +1,6 @@
 TODOS:
-- wahl der möglichen buchstaben für "?" -> Option Button instantiate - alle Optionen zur Wahl geben
+- computerzug: verwendung von "?"
+
 - Steine leicht durchsichtig, sodass man sieht, dass ein doppler/dreifacher darunter liegt - oder sonstwie sichtbar machen
 
 - animiert: buchstaben tauschen image

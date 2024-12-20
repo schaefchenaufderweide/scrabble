@@ -13,4 +13,7 @@ func _ready() -> void:
 	
 	## DEBUG
 	#internet.start_pruefe_wortliste()
-	
+	#global_concepts.show_popup(["Option 1", "Option 2", "Option 3"])
+	#var matches_txt = global_concepts.regex_operation("RU.N.{0,1}")
+	#for mat_txt in matches_txt:
+		#print(mat_txt)

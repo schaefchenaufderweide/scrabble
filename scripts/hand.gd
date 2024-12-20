@@ -26,7 +26,7 @@ func _ready() -> void:
 	else:
 		rel_punkte_label = global_concepts.computer_punkte_label
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if punkte < soll_punkte:
 		slow_count += 1
 		var slow_count_max

@@ -18,13 +18,15 @@ extends Node
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
-@onready var animation_player = $"/root/Main/AnimationPlayer"
+#@onready var animation_player = $"/root/Main/AnimationPlayer"
 #@onready var computerzug_sprite = $"/root/Main/UICanvasLayer/ComputerzugSprite"
 @onready var computerzug: Node = $"/root/Main/Computerzug"
 
 @onready var screen_size = get_viewport().size
 @onready var offset_screen_mitte = Vector2(screen_size.x/2, screen_size.y/2)
 @onready var ui_info_label: Node = $"/root/Main/UICanvasLayer/UIInfo"
+@onready var popup_menu: Node = $"/root/Main/UICanvasLayer/PopUpMenu"
+var button_scene = preload("res://scenes/MenuButton.tscn")
 
 
 var punkte_labels = {}
@@ -37,6 +39,7 @@ var snap_field = null
 var all_spielfelder = {}
 
 var spielfeld_is_locked = false
+#var waiting_for_option_pick = false
 
 var an_der_reihe 
 var wortliste_txt
@@ -72,8 +75,8 @@ func init_spielfeld():
 	var anzahl_felder = GlobalGameSettings.anzahl_felder
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
 	
-	var erste_x = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
-	var erste_y = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
+	var erste_x:int = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
+	var erste_y: int = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
 	for y in range(anzahl_felder):
 		for x in range(anzahl_felder):
 			
@@ -182,7 +185,7 @@ func get_allowed_spielfelder():
 	
 	var belegte_felder = get_belegte_felder(false)
 	var frisch_belegte_felder = get_belegte_felder(true)
-	change_zug_beenden_label(frisch_belegte_felder, [])
+	change_zug_beenden_label(frisch_belegte_felder)
 	if not is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
 		print("keine gültigen allowed felder!")
 		return []
@@ -375,7 +378,7 @@ func update_spielbrett(player_zug_erlaubt):
 	#print("nicht mehr frisch")
 	
 	
-func player_zug_beenden():
+func player_zug_beenden(spielsteine_to_reverse_to_fragezeichen_dict=null):
 	#print("player zug beenden")
 	var player_zug_erlaubt 
 	
@@ -392,11 +395,19 @@ func player_zug_beenden():
 		player_zug_erlaubt = true
 	else:
 		player_zug_erlaubt = is_zug_gueltig(allowed_felder, gelegte_woerter)
-
+	
+	if spielfeld_is_locked:# and waiting_for_option_pick:  # warten auf optionen wählen
+		return
+		
 	update_spielbrett(player_zug_erlaubt)
 	
+	
+	
 	if player_zug_erlaubt:
-		var ergebnis = get_punkte(gelegte_woerter, frisch_gelegt)
+		var reverse_zellen = []
+		if spielsteine_to_reverse_to_fragezeichen_dict:
+			reverse_zellen = spielsteine_to_reverse_to_fragezeichen_dict.values()
+		var ergebnis = get_punkte(gelegte_woerter, frisch_gelegt, reverse_zellen)
 		var new_punkte = ergebnis[0]
 		var new_labels = ergebnis[1]
 		player.add_punkte(new_punkte)#player.punkte += new_punkte
@@ -407,9 +418,11 @@ func player_zug_beenden():
 	else:
 		allowed_felder = get_allowed_spielfelder()
 		set_allowed_spielfelder(allowed_felder)
-		
+		if spielsteine_to_reverse_to_fragezeichen_dict:
+			for stein in spielsteine_to_reverse_to_fragezeichen_dict:
+				stein.label_buchstabe.text = "?"
 
-func get_punkte(gelegte_woerter, frisch_gelegte_felder):
+func get_punkte(gelegte_woerter, frisch_gelegte_felder, fragezeichen_zellen):
 	var neue_woerter = []
 	
 	for wort_lst in gelegte_woerter:
@@ -421,7 +434,7 @@ func get_punkte(gelegte_woerter, frisch_gelegte_felder):
 	if len(neue_woerter) > 1:
 		var punkte_woerter = []
 		for wort in neue_woerter:
-			var ergebnis = get_punkte_wort(wort, [], frisch_gelegte_felder)
+			var ergebnis = get_punkte_wort(wort, [], frisch_gelegte_felder, fragezeichen_zellen)
 			punkte_woerter.append([ergebnis[1], wort])
 		
 		punkte_woerter.sort_custom(func(a, b): return a[0] > b[0])
@@ -434,7 +447,7 @@ func get_punkte(gelegte_woerter, frisch_gelegte_felder):
 	var punkte_label_wort = {}
 	for wort in neue_woerter:
 		
-		var ergebnis = get_punkte_wort(wort, bereits_abgerechnet, frisch_gelegte_felder)
+		var ergebnis = get_punkte_wort(wort, bereits_abgerechnet, frisch_gelegte_felder, fragezeichen_zellen)
 		bereits_abgerechnet = ergebnis[0]
 		punkte += ergebnis[1]
 		punkte_label_wort = ergebnis[2]
@@ -442,7 +455,7 @@ func get_punkte(gelegte_woerter, frisch_gelegte_felder):
 	return [punkte, punkte_label_wort] 
 	
 	
-func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
+func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder, fragezeichen_zellen):
 	var wort_wert_bonus_faktor = 1
 	
 	var punkte_insgesamt = 0
@@ -471,6 +484,8 @@ func get_punkte_wort(wort_lst, bereits_abgerechnet, frisch_gelegte_felder):
 				buchstaben_wert_bonus_faktor = 2
 				#print(feld, " ist doppelter Buchstabenwert")
 			bereits_abgerechnet.append(feld)
+		if feld in fragezeichen_zellen:
+			buchstaben_wert_bonus_faktor = 0  # wurde ursprünglich als fragezeichen gelegt
 		var new_punkte = GlobalGameSettings.spielsteine_start[buchstabe]["Wert"] * buchstaben_wert_bonus_faktor
 		new_punkte_labels_fuer_feld.append(new_punkte * wort_wert_bonus_faktor)
 		if alle_buchstaben_bonus and not alle_buchstaben_bonus_gelegt:
@@ -543,7 +558,17 @@ func is_zug_gueltig(allowed_felder, gelegte_woerter):
 	for wort_lst in gelegte_woerter:
 		var wort = wort_lst[0]
 		if "?" in wort:
-			wort = change_fragezeichen_zu_buchstaben(wort)
+			var wort_dict = wort_lst[1]
+			var allright = false
+			for zelle in wort_dict:
+				if wort_dict[zelle] == "?":
+					allright = true
+					break
+			assert(allright) 
+			
+			create_wortvorschlaege_fragezeichen(wort, wort_dict)
+			
+			return false
 		
 		if wort.strip_edges() not in wortliste_dict:
 			#print(wort, " nicht in liste (weitere wurden nicht geprüft)")
@@ -552,12 +577,15 @@ func is_zug_gueltig(allowed_felder, gelegte_woerter):
 			#print(wort, " in liste")
 	return true
 	
-func change_fragezeichen_zu_buchstaben(wort_anfrage):
-	var pattern = "\\b" + wort_anfrage.replace("?", ".") + "\\b"  # nur ganzes solches wort
-	var matches_txt = regex_operation(pattern)
-	pass
-	# TODO HIER WEITER! 
-	# Option Button instantiate - alle Optionen zur Wahl geben
+func create_wortvorschlaege_fragezeichen(wort_txt, wort_dict):
+	var pattern = wort_txt.replace("?", "[A-Z]") # nur ganzes solches wort
+	#var pattern = ".{0,1}" + wort_anfrage.replace("?", ".") + ".{0,1}" # nur ganzes solches wort
+	var matches_txt_lst = regex_operation(pattern)
+	if not matches_txt_lst:
+		return
+	open_popup(matches_txt_lst, "Fragezeichen ersetzen", wort_dict)
+	
+	
 		
 func change_an_der_reihe():
 	spielfeld_is_locked = true
@@ -593,7 +621,7 @@ func change_an_der_reihe():
 		#computer_punkte_label.text = "Computer: " + str(computer.punkte)
 		spielfeld_is_locked = false
 		
-func change_zug_beenden_label(frisch_belegt, player_steine_dict):
+func change_zug_beenden_label(frisch_belegt):
 	if player.get_markierte_steine():
 	
 		zug_beenden_button_label.text = "Steine tauschen"
@@ -614,14 +642,90 @@ func spielfeld_pos_to_mouse_pos(spielfeld_pos):
 	
 	
 func regex_operation(pattern):
-	
+	#pattern = "\\n" + pattern + "\\n" # falsch! findet sonst viel zu wenig!!!
+	#print("starte regex mit ", pattern)
 	var regex = RegEx.new()
 	if regex.compile(pattern) == OK:
 		var matches_raw = regex.search_all(wortliste_txt)
-		var new_matches_txt = []
+		#print(len(matches_raw), " gefunden")
+		var new_matches_dict = {}
 		for single_match in matches_raw:
 			var single_match_txt = single_match.get_string()
 			single_match_txt = single_match_txt.strip_edges()
-			new_matches_txt.append(single_match_txt)
+			#print(single_match_txt)
+			#if not single_match_txt in new_matches_txt:
+			new_matches_dict[single_match_txt] = true
+				
+		#print("regex ende")
+		var filtered_woerter = filter_in_wortliste(new_matches_dict.keys())
+		return filtered_woerter
+	else:
+		print("regex fehler!!!")
+
+func open_popup(button_txt_lst, art, info):
+	button_txt_lst.sort()
+	popup_menu.visible = true
+	
+	spielfeld_is_locked = true
+	zug_beenden_button.disabled = true
+	zug_beenden_button.label.visible = false
 		
-		return new_matches_txt
+	for but_txt in button_txt_lst:
+		var new_button = button_scene.instantiate()
+		
+		popup_menu.container.add_child(new_button)
+		new_button.label.text = but_txt
+		new_button.art = art
+		var button_info = {}
+		if art == "Fragezeichen ersetzen":
+			var wort_dict = info
+			
+			#var first_zelle = info[0]
+			#var second_zelle = info[1]
+			#var richtung = Vector2(info[1]) - Vector2(info[0])
+			var stelle = 0
+			for zelle in wort_dict:
+				if wort_dict[zelle] == "?":
+					button_info[zelle] = but_txt[stelle]
+				stelle += 1
+		new_button.info = button_info
+		#print(new_button.size)
+
+func close_popup(button_txt, art, ersetzen_dict):
+	
+	var children = popup_menu.container.get_children()
+	for child in children:
+		child.queue_free()
+	
+	popup_menu.visible = false
+	
+	spielfeld_is_locked = false
+	zug_beenden_button.disabled = false
+	zug_beenden_button.label.visible = true
+	
+	
+	print(button_txt, " picked")
+	
+	if art == "Fragezeichen ersetzen":
+		assert (ersetzen_dict)
+		var spielsteine_to_reverse_dict = {}
+		for zelle in ersetzen_dict:
+			print(all_spielfelder[zelle])
+			print(all_spielfelder[zelle].spielstein_auf_feld)
+			all_spielfelder[zelle].spielstein_auf_feld.label_buchstabe.text = ersetzen_dict[zelle]
+			all_spielfelder[zelle].frisch_belegt = true
+			spielsteine_to_reverse_dict[all_spielfelder[zelle].spielstein_auf_feld] = zelle
+		player_zug_beenden(spielsteine_to_reverse_dict)   # info wenn wegen zweitwort nicht möglich ...!
+		spielfeld_is_locked = false
+	
+
+func filter_in_wortliste(matches_lst):
+	#print(len(matches_lst), " vorher")
+	var filtered_woerter = []
+	# debug
+	for new_match_txt in matches_lst:
+		if new_match_txt in wortliste_dict:
+			filtered_woerter.append(new_match_txt)
+	#print(len(filtered_woerter), " nachher")
+	return filtered_woerter
+		

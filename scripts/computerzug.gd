@@ -30,7 +30,7 @@ func _ready() -> void:
 	computerdenkt_fortschrittanzeige.visible = false
 	thread = Thread.new()
 	
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	
 	if aktiv:
 		
@@ -103,7 +103,7 @@ func restart():
 	word_array_waagrecht = word_array_lst[0]
 	word_array_senkrecht = word_array_lst[1]
 	
-	print("zu prüfende reihen: ", zu_pruefende_spalten, " zu prüfende spalten: ", zu_pruefende_spalten)
+	#print("zu prüfende reihen: ", zu_pruefende_spalten, " zu prüfende spalten: ", zu_pruefende_spalten)
 	
 func count_fake_durchgang_and_draw_bar():
 	if fake_durchgang < durchgang * faktor_fake_durchgang:
@@ -128,7 +128,7 @@ func count_fake_durchgang_and_draw_bar():
 		if randi_range(0, 100) < wahrscheinlichkeit:
 			fake_durchgang += add
 	var percent: float = fake_durchgang/(max_durchgaenge * faktor_fake_durchgang)
-	print(fake_durchgang, "/", max_durchgaenge * faktor_fake_durchgang, " ", percent)
+	#print(fake_durchgang, "/", max_durchgaenge * faktor_fake_durchgang, " ", percent)
 	
 	var new_breite = fortschrittanzeige_max_breite * percent
 	
@@ -170,7 +170,7 @@ func get_word_array(belegte_felder):
 	
 func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt, belegte_felder):
 	#print("start think durchgang ...")
-	var timer_start = Time.get_ticks_msec()
+	#var timer_start = Time.get_ticks_msec()
 	var zu_pruefende_reihe_oder_spalte_txt = ""
 	if info_reihe_oder_spalte_txt == "reihe":
 		zu_pruefende_reihe_oder_spalte_txt = word_array_waagrecht[zu_pruefende_reihe_oder_spalte_nr]
@@ -179,11 +179,11 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	
 	
 	
-	var all_lst = get_words_and_zellen_from_string_and_pattern(zu_pruefende_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_txt)
+	var all_lst = get_words_and_zellen_from_string_and_pattern(zu_pruefende_reihe_oder_spalte_txt)
 	var buchstaben_dict = all_lst[0]
 	var pattern = all_lst[1]
 	
-	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr, belegte_felder)
+	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr)
 	#print("Dauer eines kompletten Durchgangs: ", Time.get_ticks_msec() - timer_start)
 	#print("ende think durchgang")
 	#print("Vor thread_aktiv = false: thread_aktiv = ", thread_aktiv)
@@ -191,7 +191,7 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	#print("Nach thread_aktiv = false: thread_aktiv = ", thread_aktiv)
 	
 	
-func get_words_and_zellen_from_string_and_pattern(text, reihe_oder_spalte_nr, waag_oder_senkrecht):
+func get_words_and_zellen_from_string_and_pattern(text):
 	#var timer_start = Time.get_ticks_msec()
 	var buchstaben_dict = {}
 	var pattern = ""
@@ -240,8 +240,8 @@ func get_words_and_zellen_from_string_and_pattern(text, reihe_oder_spalte_nr, wa
 	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return [buchstaben_dict, pattern]
 
-func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waag_oder_senkrecht, reihe_oder_spalte_nr, belegte_felder):
-	
+func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waag_oder_senkrecht, reihe_oder_spalte_nr):
+	#print("start finde wörter")
 	#var timer_start = Time.get_ticks_msec()
 	#var woerter_in_reihe_oder_spalte = get_words_and_zellen_from_string(zu_pruefende_reihe_oder_spalte_txt)
 	
@@ -253,9 +253,10 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		matches_txt = known_matches[pattern]
 		print("knwon pattern") # todo ! prüfen: tatsächlich zeitersparnis?
 	else: 
+		#print("starte regex mit ", pattern)
 		matches_txt = global_concepts.regex_operation(pattern)
 		known_matches[pattern] = matches_txt
-		
+		#print("regex ende", matches_txt)
 			
 	if not matches_txt:
 		#print("Keine Matches gefunden!")
@@ -274,7 +275,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 			var fehlende_buchstaben = single_match_txt.split()
 			if not hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
 				continue
-			var lege_dict = get_lege_dict_for_new_game(single_match_txt, "reihe")
+			var lege_dict = get_lege_dict_for_new_game(single_match_txt)
 			var richtung = [1,0]
 			assert(single_match_txt in global_concepts.wortliste_dict)
 			moegliche_woerter.append([single_match_txt, lege_dict, richtung])
@@ -326,7 +327,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return moegliche_woerter
 
-func get_lege_dict_for_new_game(single_match_txt, info_waagrecht_oder_senkrecht):
+func get_lege_dict_for_new_game(single_match_txt):
 	
 	var richtung = 1
 	
@@ -376,8 +377,6 @@ func get_lege_dict_for_new_game(single_match_txt, info_waagrecht_oder_senkrecht)
 		zelle = [zelle[0] + richtung, zelle[1]]
 	return lege_dict
 	
-	for spezial in GlobalGameSettings.spezialfelder:
-		pass
 
 func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 	#print("checking ", single_match_txt, " länge: ", len(single_match_txt))
@@ -411,27 +410,27 @@ func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
 
-func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict, belegte_felder):
+func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict):
 	"""
 	hier wird geprüft, ob die wörter tatsächlich so gelegt werden können
 	außerdem werden die punkte ermittelt
 	"""
 	#var timer_start = Time.get_ticks_msec()
 	
-	var wort = wort_dict[0]
+	#var wort = wort_dict[0]
 	var zu_legende_buchstaben_dict = wort_dict[1]
 	
-	var alle_buchstaben_gelegt_bonus 
-	if len(zu_legende_buchstaben_dict) == GlobalGameSettings.anzahl_steine_pro_hand:
-		alle_buchstaben_gelegt_bonus = 50
-	else:
-		alle_buchstaben_gelegt_bonus = 0
-			
+	#var alle_buchstaben_gelegt_bonus 
+	#if len(zu_legende_buchstaben_dict) == GlobalGameSettings.anzahl_steine_pro_hand:
+		#alle_buchstaben_gelegt_bonus = 50
+	#else:
+		#alle_buchstaben_gelegt_bonus = 0
+			#
 	var alle_woerter = global_concepts.read_gelegte_woerter(zu_legende_buchstaben_dict)
 	if not global_concepts.is_zug_gueltig(true, alle_woerter):
 		return [false, 0, null]
-	
-	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys())
+	# todo: fragezeichen für computer!
+	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys(), [])
 	var punkte = ergebnis[0]
 	var new_punkte_labels = ergebnis[1]
 	#print(wort, " würde ", punkte, " bringen")
@@ -456,7 +455,7 @@ func thinking_ende():
 	for pruefwort_lst in moegliche_woerter:
 		assert(pruefwort_lst[0] in global_concepts.wortliste_dict)
 			
-		var ergebnis_test = test_moegliches_wort_und_get_punkte_und_get_punkte_labels(pruefwort_lst, belegte_felder)
+		var ergebnis_test = test_moegliches_wort_und_get_punkte_und_get_punkte_labels(pruefwort_lst)
 		var allowed = ergebnis_test[0]
 		
 		var punkte = ergebnis_test[1] 
