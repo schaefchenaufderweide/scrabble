@@ -179,23 +179,72 @@ func think_durchgang(zu_pruefende_reihe_oder_spalte_nr, info_reihe_oder_spalte_t
 	
 	
 	
-	var all_lst = get_words_and_zellen_from_string_and_pattern(zu_pruefende_reihe_oder_spalte_txt)
-	var buchstaben_dict = all_lst[0]
-	var pattern = all_lst[1]
+	var all_lst = get_words_and_zellen_from_string_and_patterns(zu_pruefende_reihe_oder_spalte_txt)
+	var alle_worter_all = all_lst[0]
+	var patterns = all_lst[1]
 	
-	moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, buchstaben_dict, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr)
+	# DEBUG
+	#var patterns = [".{0,5}A.{0,4}", ".{0,2}N.{0,1}"]
+	
+	for pattern in patterns:
+		moegliche_woerter += find_moegliche_woerter(pattern, computer_buchstaben, alle_worter_all, info_reihe_oder_spalte_txt, zu_pruefende_reihe_oder_spalte_nr)
 	#print("Dauer eines kompletten Durchgangs: ", Time.get_ticks_msec() - timer_start)
 	#print("ende think durchgang")
 	#print("Vor thread_aktiv = false: thread_aktiv = ", thread_aktiv)
 	thread_aktiv = false
 	#print("Nach thread_aktiv = false: thread_aktiv = ", thread_aktiv)
-	
-	
-func get_words_and_zellen_from_string_and_pattern(text):
+
+#
+#func get_words_and_zellen_from_string_and_patterns(text):
+	#var alle_woerter = text.split(" ", false)
+	#var wort_anfaenge_dict = {}
+	#var ab_wann_suchen = 0
+	#for wort in alle_woerter:
+		#var wortanfang = text.find(wort, ab_wann_suchen)
+		#
+		#wort_anfaenge_dict[wort] = wortanfang
+		#ab_wann_suchen = wortanfang + 1
+	#
+	#
+	#var big_pattern = ""
+	#ab_wann_suchen = 0
+	#for wort_nr in range(alle_woerter):
+		#var wort = alle_woerter[wort_nr]
+		#var single_pattern = ""
+		#var wortbeginn = wort_anfaenge_dict[wort]
+		#var wortbeginn_next
+		#var sub = text.substr(0, wortbeginn)
+		#var abstand_vorn = sub.count(" ")
+		#var abstand_hinten
+		#if wort_nr == 0:
+			#big_pattern += ".{0," + str(abstand) + "}" + wort
+			##abstand_vorn = wortbeginn
+		#elif wort_nr == len(alle_woerter) - 1:  # letztes wort
+			#wortbeginn_next = GlobalGameSettings.anzahl_felder 
+		#else:
+			#var next_wort = alle_woerter[wort_nr + 1]
+			#wortbeginn_next = wort_anfaenge_dict[next_wort] 
+		#
+		#
+		#if wort != alle_woerter[0] and wort != alle_woerter[-1]:
+			#abstand -= 1
+		#big_pattern += ".{0," + str(abstand) + "}" + wort
+		#
+		#if wort == alle_woerter[0]:
+			#single_pattern = ".{0," + str(abstand) + "}" + wort + 
+		#
+		#ab_wann_suchen = wortbeginn + len(wort)
+		#
+		
+		
+		
+func get_words_and_zellen_from_string_and_patterns(text):
 	#var timer_start = Time.get_ticks_msec()
-	var buchstaben_dict = {}
-	var pattern = ""
-	
+	#var wort_anfaenge_dict = {}
+	var alle_woerter = text.split(" ", false)
+	var alle_woerter_all = []
+	var big_pattern = ""
+	var patterns = []
 	var stelle = 0
 	var leerzeichen = 0
 	#var aufzeichnung = false
@@ -209,18 +258,18 @@ func get_words_and_zellen_from_string_and_pattern(text):
 		var buchstabe = text[stelle]
 		if buchstabe == " ":
 			if new_wort: # wort zu ende
-				
-				buchstaben_dict[new_wort] = wortbeginn_stelle
+				alle_woerter_all.append([new_wort, wortbeginn_stelle])
+				#wort_anfaenge_dict[new_wort] = wortbeginn_stelle
 				new_wort = ""
 				wortbeginn_stelle = null
 				#new_wort_dict = {}
 			leerzeichen += 1
 		else:
 			if not new_wort:  # aufzeichnung beginnt
-				pattern += ".{0," + str(leerzeichen) +  "}"
+				big_pattern += ".{0," + str(leerzeichen) +  "}"
 				leerzeichen = 0
 				wortbeginn_stelle = stelle
-			pattern += buchstabe
+			big_pattern += buchstabe
 			
 			#new_wort_dict[zelle] = buchstabe
 			new_wort += buchstabe
@@ -232,15 +281,50 @@ func get_words_and_zellen_from_string_and_pattern(text):
 			
 			break
 		
-	pattern += ".{0," + str(leerzeichen) +  "}"
+	big_pattern += ".{0," + str(leerzeichen) + "}"
 	
+	patterns.append(big_pattern)
+	
+	
+	if len(alle_woerter_all) > 1:
+		for wort_nr in range(len(alle_woerter_all)):
+			var wort = alle_woerter_all[wort_nr][0]
+			var wortbeginn = alle_woerter_all[wort_nr][1]
+			var wortende = wortbeginn + len(wort)
+			var wortende_prev
+			var wortbeginn_next 
+			
+			
+			var single_pattern = ""
+			
+			if wort_nr == 0:
+				wortende_prev = 0
+			if wort_nr == len(alle_woerter_all) - 1: # letztes
+				wortbeginn_next = GlobalGameSettings.anzahl_felder
+			
+			if wortbeginn_next == null:
+				var next_wort = alle_woerter_all[wort_nr + 1][0]
+				wortbeginn_next = alle_woerter_all[wort_nr + 1][1] - 1
+			if wortende_prev == null:
+				var last_wort = alle_woerter_all[wort_nr - 1][0]
+				wortende_prev = alle_woerter_all[wort_nr - 1][1] + len(last_wort) + 1
+			var abst_vorn = wortbeginn - wortende_prev
+			var abst_hinten = wortbeginn_next - wortende
+			if abst_vorn < 0 or abst_hinten < 0:
+				pass
+			
+			single_pattern = ".{0," + str(abst_vorn) + "}" + wort + ".{0," + str(abst_hinten) + "}"
+			if not single_pattern in patterns:
+				patterns.append(single_pattern)
+	# TODO patterns tw. falsch ( mit -2!!!!)
 	#print(waag_oder_senkrecht, " ", reihe_oder_spalte_nr)
 	#print(buchstaben_dict)
 	#print(pattern)
 	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
-	return [buchstaben_dict, pattern]
+	
+	return [alle_woerter_all, patterns]
 
-func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waag_oder_senkrecht, reihe_oder_spalte_nr):
+func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info_waag_oder_senkrecht, reihe_oder_spalte_nr):
 	#print("start finde wörter")
 	#var timer_start = Time.get_ticks_msec()
 	#var woerter_in_reihe_oder_spalte = get_words_and_zellen_from_string(zu_pruefende_reihe_oder_spalte_txt)
@@ -249,14 +333,15 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 	#print("buchstaben: ", computer_buchstaben)
 	#var timer_start = Time.get_ticks_msec()
 	var matches_txt
-	if pattern in known_matches:
-		matches_txt = known_matches[pattern]
-		#print("knwon pattern") 
+	
+	if pattern + str(computer_buchstaben.count("?")) in known_matches:
+		matches_txt = known_matches[pattern + str(computer_buchstaben.count("?"))]
+		print("known pattern ", pattern) 
 	else: 
 		#print("starte regex mit ", pattern)
 		matches_txt = global_concepts.regex_operation(pattern)
-		known_matches[pattern] = matches_txt
-		#print("regex ende", matches_txt)
+		known_matches[pattern + str(computer_buchstaben.count("?"))] = matches_txt
+		print("pattern saved: ", pattern)
 			
 	if not matches_txt:
 		#print("Keine Matches gefunden!")
@@ -270,8 +355,8 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 		var wortbeginn_wort
 		#var position = single_match.get_start()
 		#print("Gefunden: ", single_match_txt)
-		var wort_geht_sich_aus = false
-		if not woerter_dict: # neues spiel - leeres brett, computer legt nur waagrecht
+		
+		if not alle_woerter_all: # neues spiel - leeres brett, computer legt nur waagrecht
 			var fehlende_buchstaben = single_match_txt.split()
 			var ergebnis_hat_alle_buchstaben = hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben)
 			var erlaubt = ergebnis_hat_alle_buchstaben[0]
@@ -284,7 +369,13 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 			moegliche_woerter.append([single_match_txt, lege_dict, richtung, verwendet_fragezeichen])
 			continue
 		
-		for wort in woerter_dict:
+		# kein leeres brett
+		for wort_lst in alle_woerter_all:
+			
+			var wort = wort_lst[0]
+			if wort == single_match_txt:
+				continue
+			var teilwort_beginn = wort_lst[1]
 			var alle_stellen = []
 			var suche_stelle_beginn = 0
 			while true:  # so lange stellen suchen bis keine mehr zu finden
@@ -296,40 +387,43 @@ func find_moegliche_woerter(pattern, computer_buchstaben, woerter_dict, info_waa
 					suche_stelle_beginn = new_stelle + 1
 				
 				#var stelle_in_woerterbuch_wort = single_match_txt.find(wort)
-				
-			for stelle in alle_stellen:
-				wortbeginn_wort = woerter_dict[wort] - stelle
-				#wortbeginn_wort = woerter_dict[gelegtes_wort] - stelle_in_woerterbuch_wort
-				if wortbeginn_wort + len(single_match_txt) < GlobalGameSettings.anzahl_felder:
-					# wort geht sich aus
-					
-					wort_geht_sich_aus = true
-					break
-				
-			if not wort_geht_sich_aus:
-				continue
-			var zelle_beginn
-			var richtung 
-			if info_waag_oder_senkrecht == "reihe":
-				zelle_beginn = [wortbeginn_wort, reihe_oder_spalte_nr]
-				richtung = [1, 0]
-			else:
-				zelle_beginn = [reihe_oder_spalte_nr, wortbeginn_wort]
-				richtung = [0, 1]
-			#print(single_match_txt, " beginn: ", zelle_beginn)
-			var ergebnis_lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)
-			var lege_dict = ergebnis_lege_dict[0]
-			var verwendet_fragezeichen = ergebnis_lege_dict[1]
 			
-			if lege_dict:
-				#print("möglich: ", single_match_txt)
-				#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
-				assert(single_match_txt in global_concepts.wortliste_dict)
-				moegliche_woerter.append([single_match_txt, lege_dict, richtung, verwendet_fragezeichen])
-			#else:
-				#print(single_match_txt, " nicht möglich!")
+			for stelle in alle_stellen:
+				
+				wortbeginn_wort = teilwort_beginn - stelle
+				if wortbeginn_wort < 0:
+					
+					continue
+				
+				if wortbeginn_wort + len(single_match_txt) >= GlobalGameSettings.anzahl_felder:
+					
+					
+					
+					continue
+				
+				
+				var zelle_beginn
+				var richtung 
+				if info_waag_oder_senkrecht == "reihe":
+					zelle_beginn = [wortbeginn_wort, reihe_oder_spalte_nr]
+					richtung = [1, 0]
+				else:
+					zelle_beginn = [reihe_oder_spalte_nr, wortbeginn_wort]
+					richtung = [0, 1]
+				#print(single_match_txt, " beginn: ", zelle_beginn)
+				var ergebnis_lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)
+				var lege_dict = ergebnis_lege_dict[0]
+				var verwendet_fragezeichen = ergebnis_lege_dict[1]
+				
+				if lege_dict:
+					#print("möglich: ", single_match_txt)
+					#print("singlematch_txt stripped: ", single_match_txt, "singlematch_txt: ", single_match.get_string())
+					assert(single_match_txt in global_concepts.wortliste_dict)
+					moegliche_woerter.append([single_match_txt, lege_dict, richtung, verwendet_fragezeichen])
+				#else:
+					#print(single_match_txt, " nicht möglich!")
+			#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 		#print("Dauer: ", Time.get_ticks_msec() - timer_start)
-	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return moegliche_woerter
 
 func get_lege_dict_for_new_game(single_match_txt):
@@ -395,9 +489,8 @@ func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 		zelle = [zelle_beginn[0] + richtung[0] * abstand, zelle_beginn[1] + richtung[1] * abstand]
 		#buchstabe = single_match_txt[stelle]
 		if zelle not in belegte_felder:  # muss gelegt werden
-			#if zelle not in global_concepts.all_spielfelder:  # das sollte nicht mehr vorkommen!
-				#print("Zelle außerhalb des Spielfelds!")
-				#return false 
+			assert(zelle in global_concepts.all_spielfelder)  # das sollte nicht mehr vorkommen!
+				
 			lege_dict[zelle] = buchstabe
 			#if not buchstabe in computer_buchstaben:
 				#

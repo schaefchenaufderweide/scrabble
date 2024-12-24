@@ -1,0 +1,10 @@
+diff a/scripts/computerzug.gd b/scripts/computerzug.gd	(rejected hunks)
+@@ -263,7 +263,7 @@
+ 		return []
+ 		
+ 		
+-	for single_match_txt in matches_txt:
++	for single_match_txt in matches_txt:  # suche bei völlig neuem spielfeld
+ 		if not single_match_txt in global_concepts.wortliste_dict:
+ 			continue
+ 		
