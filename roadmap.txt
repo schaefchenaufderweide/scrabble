@@ -45,7 +45,7 @@
 0.953 menu für wortauswahl bei fragezeichen für spieler in Progress (20.12)
 1.0 computer kann fragezeichen verwenden, richtige punktezählung (20.12)
 1.05 computer kann zwischen buchstabenreihen legen (24.12)
-1.1 spielende begonnen ... IN PROGRESS (25.12)
+1.1 spielende: anzeige des gewinners, spiel wird neu begonnen (25.12)
 1.2 wortliste reinigen: doppelte, abkürzungen usw. 
 1.3 einstellungen direkt im spiel per zahnrad: leicht/mittel/schwer, namen direkt im spiel ändern
 1.4 im spiel wörter hinzufügen/löschen: per anfrage? sollen im internet sein

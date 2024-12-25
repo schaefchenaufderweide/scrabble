@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=20 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
@@ -12,8 +12,12 @@
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
 [ext_resource type="Script" path="res://scenes/pop_up_menu.gd" id="10_5ke6a"]
 [ext_resource type="Texture2D" uid="uid://d2f5nwnjobo33" path="res://graphics/background_HUD.png" id="11_ck8rb"]
+[ext_resource type="Script" path="res://scenes/menu_button.gd" id="12_0d1wb"]
 [ext_resource type="Script" path="res://scenes/internet.gd" id="13_qtrk6"]
 [ext_resource type="Script" path="res://scenes/wortliste.gd" id="14_66vb2"]
+[ext_resource type="Script" path="res://scenes/optionen_button.gd" id="15_vfl4s"]
+[ext_resource type="Texture2D" uid="uid://dqe4r6crx8jyt" path="res://graphics/button_round_zahnrad.png" id="16_siayd"]
+[ext_resource type="Texture2D" uid="uid://bo4bp8an8ns2k" path="res://graphics/button_round_zahnrad_pressed.png" id="17_rfnt2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o7rvn"]
 size = Vector2(1186, 1203)
@@ -137,8 +141,8 @@ color = Color(1, 1, 0, 0.545098)
 
 [node name="PopUpMenu" type="Sprite2D" parent="UICanvasLayer"]
 visible = false
-position = Vector2(250, 439)
-scale = Vector2(0.8, 0.8)
+position = Vector2(248, 438.5)
+scale = Vector2(0.806667, 0.8)
 texture = ExtResource("11_ck8rb")
 script = ExtResource("10_5ke6a")
 
@@ -159,17 +163,64 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -538.0
-offset_top = -486.0
-offset_right = -62.0
-offset_bottom = -85.0
+offset_left = -522.0
+offset_top = -500.0
+offset_right = -78.0
+offset_bottom = -100.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+horizontal_scroll_mode = 0
 
 [node name="ContainerVertical" type="BoxContainer" parent="UICanvasLayer/PopUpMenu/ScrollContainer"]
 layout_mode = 2
-alignment = 1
 vertical = true
+
+[node name="MainButton" type="TextureButton" parent="UICanvasLayer/PopUpMenu"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -537.0
+offset_top = -411.0
+offset_right = -63.0
+offset_bottom = -300.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("6_ky180")
+texture_normal = ExtResource("7_cm5u0")
+texture_pressed = ExtResource("8_j5j5i")
+script = ExtResource("12_0d1wb")
+
+[node name="Label" type="Label" parent="UICanvasLayer/PopUpMenu/MainButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -68.0
+offset_top = -25.0
+offset_right = 68.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Zurück
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OptionenButton" type="TextureButton" parent="UICanvasLayer"]
+offset_left = 15.0
+offset_top = 584.0
+offset_right = 126.0
+offset_bottom = 695.0
+theme = ExtResource("6_ky180")
+texture_normal = ExtResource("16_siayd")
+texture_pressed = ExtResource("17_rfnt2")
+script = ExtResource("15_vfl4s")
 
 [node name="Computerzug" type="Node" parent="."]
 script = ExtResource("9_avwwi")
@@ -182,4 +233,7 @@ script = ExtResource("14_66vb2")
 
 [connection signal="button_down" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_down"]
 [connection signal="button_up" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_up"]
+[connection signal="button_down" from="UICanvasLayer/PopUpMenu/MainButton" to="UICanvasLayer/PopUpMenu/MainButton" method="_on_button_down"]
+[connection signal="button_up" from="UICanvasLayer/PopUpMenu/MainButton" to="UICanvasLayer/PopUpMenu/MainButton" method="_on_button_up"]
+[connection signal="button_up" from="UICanvasLayer/OptionenButton" to="UICanvasLayer/OptionenButton" method="_on_button_up"]
 [connection signal="request_completed" from="Internet" to="Internet" method="_on_request_completed"]

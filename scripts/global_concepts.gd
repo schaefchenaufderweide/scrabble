@@ -13,6 +13,9 @@ extends Node
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 @onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
 @onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
+@onready var optionen_button = $"/root/Main/UICanvasLayer/OptionenButton"
+
+
 @onready var wortliste = $"/root/Main/Wortliste"
 
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
@@ -26,6 +29,7 @@ var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var offset_screen_mitte = Vector2(screen_size.x/2, screen_size.y/2)
 @onready var ui_info_label: Node = $"/root/Main/UICanvasLayer/UIInfo"
 @onready var popup_menu: Node = $"/root/Main/UICanvasLayer/PopUpMenu"
+
 var button_scene = preload("res://scenes/MenuButton.tscn")
 
 
@@ -396,9 +400,10 @@ func player_zug_beenden(spielsteine_to_reverse_to_fragezeichen_dict=null):
 		if not buchstaben_im_sackerl:
 			last_round = true
 	elif zug_beenden_button_label.text == "Spielende":
-		print("Spielende!")
-		pass
-		# TODO!!!!!
+		#print("Spielende!")
+		
+		open_popup([], "Spielende", null)
+		
 		
 	
 	else:
@@ -676,12 +681,34 @@ func regex_operation(pattern):
 		print("regex fehler!!!")
 
 func open_popup(button_txt_lst, art, info):
-	button_txt_lst.sort()
 	popup_menu.visible = true
 	
 	spielfeld_is_locked = true
 	zug_beenden_button.disabled = true
 	zug_beenden_button.label.visible = false
+	optionen_button.disabled = true
+	optionen_button.visible = false
+	popup_menu.main_button.visible = true
+	
+	if art == "Fragezeichen ersetzen":
+		popup_menu.label.text = "Bitte Wort wählen ..."
+		popup_menu.main_button_label.text = "Zurück"
+		popup_menu.main_button.art = "Zurück"
+		button_txt_lst.sort()
+	elif art == "Spielende":
+		var winner
+		if player.punkte > computer.punkte:
+			winner = "Player"
+		else:
+			winner = "Computer"
+		popup_menu.label.text = "Das Spiel ist zu Ende ...\n" + winner + " hat gewonnen!"
+		popup_menu.main_button_label.text = "Okay"
+		popup_menu.main_button.art = "Spielende"
+	elif art == "Optionen":
+		popup_menu.main_button.visible = false
+	
+	
+	
 		
 	for but_txt in button_txt_lst:
 		var new_button = button_scene.instantiate()
@@ -691,18 +718,22 @@ func open_popup(button_txt_lst, art, info):
 		new_button.art = art
 		var button_info = {}
 		if art == "Fragezeichen ersetzen":
+			
 			var wort_dict = info
 			
-			#var first_zelle = info[0]
-			#var second_zelle = info[1]
-			#var richtung = Vector2(info[1]) - Vector2(info[0])
 			var stelle = 0
 			for zelle in wort_dict:
 				if wort_dict[zelle] == "?":
 					button_info[zelle] = but_txt[stelle]
 				stelle += 1
+			
+			
+			
+		
 		new_button.info = button_info
-		#print(new_button.size)
+	
+	
+	
 
 func close_popup(button_txt, art, ersetzen_dict):
 	
@@ -715,7 +746,8 @@ func close_popup(button_txt, art, ersetzen_dict):
 	spielfeld_is_locked = false
 	zug_beenden_button.disabled = false
 	zug_beenden_button.label.visible = true
-	
+	optionen_button.disabled = false
+	optionen_button.visible = true
 	
 	#print(button_txt, " picked")
 	
@@ -730,8 +762,17 @@ func close_popup(button_txt, art, ersetzen_dict):
 			spielsteine_to_reverse_dict[all_spielfelder[zelle].spielstein_auf_feld] = zelle
 		player_zug_beenden(spielsteine_to_reverse_dict)   # info wenn wegen zweitwort nicht möglich ...!
 		spielfeld_is_locked = false
+	elif art == "Spielende":
+		restart_game()
+		# todo: check highscore
+		# todo: restart game
+	elif art == "Optionen":
+		if button_txt == "Neustart":
+			restart_game()
+		elif button_txt == "Schwierigkeitsgrad":
+			pass
+			# todo
 	
-
 func filter_in_wortliste(matches_lst):
 	#print(len(matches_lst), " vorher")
 	var filtered_woerter = []
@@ -742,3 +783,7 @@ func filter_in_wortliste(matches_lst):
 	#print(len(filtered_woerter), " nachher")
 	return filtered_woerter
 		
+
+func restart_game():
+	#print("restarting game ...")
+	get_tree().reload_current_scene()
