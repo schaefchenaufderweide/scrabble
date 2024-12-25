@@ -45,6 +45,9 @@ func _process(_delta: float) -> void:
 			
 func ziehe_steine():
 	
+	if not global_concepts.buchstaben_im_sackerl:
+		print("buchstaben sind aus!")
+		return
 	var anzahl_steine = GlobalGameSettings.anzahl_steine_pro_hand
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
 	
@@ -85,12 +88,15 @@ func ziehe_steine():
 func get_buchstaben():
 	var buchstaben = []
 	for stein_nr in steine_dict:
-		buchstaben.append(steine_dict[stein_nr].label_buchstabe.text)
+		if steine_dict[stein_nr]:  # nicht leer
+			buchstaben.append(steine_dict[stein_nr].label_buchstabe.text)
 	return buchstaben
 
 func get_markierte_steine():
 	var markierte_steine = []
 	for stein_nr in steine_dict:
+		if not steine_dict[stein_nr]:
+			continue
 		if steine_dict[stein_nr].eintauschen_sprite.visible:
 			markierte_steine.append(stein_nr)
 			
@@ -119,6 +125,8 @@ func _on_timer_timeout() -> void:
 	zum_tausch_markieren()
 	
 func check_markieren():
+	if not global_concepts.buchstaben_im_sackerl:
+		return
 	if not get_markierte_steine():
 		timer.start()
 		#print("Timer start")
@@ -132,7 +140,7 @@ func zum_tausch_markieren():
 		if not frisch_belegt:
 			global_concepts.dragged_stein.zum_tausch_markieren()
 		
-			global_concepts.change_zug_beenden_label(frisch_belegt, steine_dict)
+			global_concepts.change_zug_beenden_label(frisch_belegt)
 			
 func steine_tauschen():
 	var markierte_steine = get_markierte_steine()

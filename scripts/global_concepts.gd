@@ -40,7 +40,7 @@ var all_spielfelder = {}
 
 var spielfeld_is_locked = false
 #var waiting_for_option_pick = false
-
+var last_round = false
 var an_der_reihe 
 var wortliste_txt
 var wortliste_dict 
@@ -393,6 +393,14 @@ func player_zug_beenden(spielsteine_to_reverse_to_fragezeichen_dict=null):
 		player.steine_tauschen()
 	elif zug_beenden_button_label.text == "Passen":
 		player_zug_erlaubt = true
+		if not buchstaben_im_sackerl:
+			last_round = true
+	elif zug_beenden_button_label.text == "Spielende":
+		print("Spielende!")
+		pass
+		# TODO!!!!!
+		
+	
 	else:
 		player_zug_erlaubt = is_zug_gueltig(allowed_felder, gelegte_woerter)
 	
@@ -611,8 +619,10 @@ func change_an_der_reihe():
 		zug_beenden_button.disabled = false
 		#animation_player.stop("computer_denkt")
 		#animation_player.play("RESET")
-		zug_beenden_button_label.text = "Passen"
-		
+		if not last_round:
+			zug_beenden_button_label.text = "Passen"
+		else:
+			zug_beenden_button_label.text = "Spielende"
 		computerdenkt_fortschrittanzeige.visible = false
 		
 		computerzug.aktiv = false
@@ -626,7 +636,10 @@ func change_zug_beenden_label(frisch_belegt):
 	
 		zug_beenden_button_label.text = "Steine tauschen"
 	elif not frisch_belegt:
-		zug_beenden_button_label.text = "Passen"
+		if not last_round:
+			zug_beenden_button_label.text = "Passen"
+		else:
+			zug_beenden_button_label.text = "Spielende"
 	else:
 		zug_beenden_button_label.text = "Wort legen"
 	
@@ -704,7 +717,7 @@ func close_popup(button_txt, art, ersetzen_dict):
 	zug_beenden_button.label.visible = true
 	
 	
-	print(button_txt, " picked")
+	#print(button_txt, " picked")
 	
 	if art == "Fragezeichen ersetzen":
 		assert (ersetzen_dict)

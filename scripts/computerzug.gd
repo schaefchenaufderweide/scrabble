@@ -316,11 +316,6 @@ func get_words_and_zellen_from_string_and_patterns(text):
 			single_pattern = ".{0," + str(abst_vorn) + "}" + wort + ".{0," + str(abst_hinten) + "}"
 			if not single_pattern in patterns:
 				patterns.append(single_pattern)
-	# TODO patterns tw. falsch ( mit -2!!!!)
-	#print(waag_oder_senkrecht, " ", reihe_oder_spalte_nr)
-	#print(buchstaben_dict)
-	#print(pattern)
-	#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	
 	return [alle_woerter_all, patterns]
 
@@ -353,8 +348,7 @@ func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info
 			continue
 		
 		var wortbeginn_wort
-		#var position = single_match.get_start()
-		#print("Gefunden: ", single_match_txt)
+		
 		
 		if not alle_woerter_all: # neues spiel - leeres brett, computer legt nur waagrecht
 			var fehlende_buchstaben = single_match_txt.split()
@@ -375,6 +369,9 @@ func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info
 			var wort = wort_lst[0]
 			if wort == single_match_txt:
 				continue
+			
+			
+			
 			var teilwort_beginn = wort_lst[1]
 			var alle_stellen = []
 			var suche_stelle_beginn = 0
@@ -414,6 +411,8 @@ func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info
 				var ergebnis_lege_dict = get_lege_dict(single_match_txt, zelle_beginn, richtung)
 				var lege_dict = ergebnis_lege_dict[0]
 				var verwendet_fragezeichen = ergebnis_lege_dict[1]
+
+				
 				
 				if lege_dict:
 					#print("möglich: ", single_match_txt)
@@ -425,6 +424,9 @@ func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info
 			#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 		#print("Dauer: ", Time.get_ticks_msec() - timer_start)
 	return moegliche_woerter
+	
+		
+		
 
 func get_lege_dict_for_new_game(single_match_txt):
 	
@@ -507,6 +509,7 @@ func get_lege_dict(single_match_txt, zelle_beginn, richtung):
 
 	return [lege_dict, verwendet_fragezeichen]
 
+
 func sort_by_punkte(woerter):
 	woerter.sort_custom(func(a, b): return a[1] > b[1])
 	return woerter
@@ -536,7 +539,7 @@ func test_moegliches_wort_und_get_punkte_und_get_punkte_labels(wort_dict):
 		fragezeichen_zellen = find_fragezeichen_zellen(zu_legende_buchstaben_dict)
 	else:
 		fragezeichen_zellen = []
-	# todo: fragezeichen für computer!
+	
 	var ergebnis = global_concepts.get_punkte(alle_woerter, zu_legende_buchstaben_dict.keys(), fragezeichen_zellen)
 	var punkte = ergebnis[0]
 	var new_punkte_labels = ergebnis[1]
@@ -586,8 +589,27 @@ func find_fragezeichen_zellen(zu_legende_buchstaben_dict):
 			#computer_buchstaben_dict[buchst] += 1
 		#
 	#
-	#
 func hat_alle_buchstaben(fehlende_buchstaben, computer_buchstaben):
+	if len(fehlende_buchstaben) > len(computer_buchstaben):
+		return [false, false]
+	var uses_fragezeichen = false
+	var check_computer_buchstaben = computer_buchstaben.duplicate()
+	fehlende_buchstaben = Array(fehlende_buchstaben)
+	
+	for buch in fehlende_buchstaben:
+		#print("verbliebene: ", check_computer_buchstaben)
+		if buch in check_computer_buchstaben:
+			check_computer_buchstaben.erase(buch)
+		elif "?" in check_computer_buchstaben:
+			check_computer_buchstaben.erase("?")
+			uses_fragezeichen = true
+			
+		else:
+			#print("fehlendes ", buch)
+			return [false, false]
+	return [true, uses_fragezeichen]
+	
+func hat_alle_buchstaben_old(fehlende_buchstaben, computer_buchstaben):
 	var uses_fragezeichen = false
 	#var fragezeichen_zur_verfuegung = computer_buchstaben.count("?")
 	#var eingesetzte_fragezeichen = {}
@@ -643,10 +665,12 @@ func thinking_ende():
 		
 	elif not sort_erlaubte_woerter:
 		global_concepts.punkte_labels[[7,7]] = ["Computer passt ..."]
+		if not global_concepts.buchstaben_im_sackerl:
+			global_concepts.last_round = true
 		#print("Computer passt ... (Buchstaben: ", computer_buchstaben, ")")
 		
 	else:
-		#print("Computer passt nicht ... (Buchstaben: ", computer_buchstaben, ")")
+		global_concepts.last_round = false
 		lege_steine(sort_erlaubte_woerter[0])
 		var punkte = sort_erlaubte_woerter[0][1]
 		var new_punkte_labels = sort_erlaubte_woerter[0][2]
