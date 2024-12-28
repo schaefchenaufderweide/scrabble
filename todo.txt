@@ -9,11 +9,13 @@ TODOS:
 
 - liste mit gelegten wörtern und dazu erhaltenen punkten
 
+- popup fenster größer, sodass alle menu buttons reinkönnen!
+
 - computerzug dauert lange - kann man das optimieren? wo hängt es länger?
 
 2."computer tauscht 0 Buchstaben" - > "Computer passt ..."
 3. 	fragezeichen buchstaben - für computer und spieler ...
-4.	spielende - wer hat gewonnen?
+
 5. 	einstellungen/menü
 6.	im spiel wörter hinzufügen/löschen
 7.	wortliste reinigen

@@ -50,8 +50,12 @@ var wortliste_txt
 var wortliste_dict 
 
 func _ready() -> void:
-	wortliste_txt = wortliste.get_wortliste()
-	wortliste_dict = wortliste.get_wortliste_dict(wortliste_txt)
+	#wortliste_txt = wortliste.get_wortliste()
+	var ergebnis_load = wortliste.load_wortliste_dict_and_create_wortliste_suchtext()
+	wortliste_dict = ergebnis_load[0]
+	wortliste_txt = ergebnis_load[1]
+	#print(wortliste_txt)
+	
 	
 	#print("start global concepts")
 	an_der_reihe = player
@@ -771,7 +775,8 @@ func close_popup(button_txt, art, ersetzen_dict):
 			restart_game()
 		elif button_txt == "Schwierigkeitsgrad":
 			pass
-			# todo
+		elif button_txt == "Wortliste prüfen":
+			wortliste.start_pruefe_wortliste()
 	
 func filter_in_wortliste(matches_lst):
 	#print(len(matches_lst), " vorher")
