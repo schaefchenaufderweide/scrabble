@@ -11,6 +11,9 @@ TODOS:
 
 - popup fenster größer, sodass alle menu buttons reinkönnen!
 
+- wort legen unten neben buchstaben als einfachen button!
+
+- wortliste oben mit buttons, um erklärungen zu erhalten
 - computerzug dauert lange - kann man das optimieren? wo hängt es länger?
 
 2."computer tauscht 0 Buchstaben" - > "Computer passt ..."

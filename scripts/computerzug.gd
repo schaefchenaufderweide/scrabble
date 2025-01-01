@@ -8,7 +8,7 @@ var fake_durchgang:float = 0.0  # pseudozahl: durchgang * faktor_fake, um glatte
 
 
 
-@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
+@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ComputerdenktFortschrittanzeige"
 @onready var fortschrittanzeige_max_breite = computerdenkt_fortschrittanzeige.size.x
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
 

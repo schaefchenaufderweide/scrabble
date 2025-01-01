@@ -69,6 +69,7 @@ _data = {
 }
 
 [node name="Spielfeld" type="Area2D" groups=["Spielfelder"]]
+scale = Vector2(0.8, 0.8)
 script = ExtResource("1_w745b")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

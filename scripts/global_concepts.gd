@@ -11,8 +11,8 @@ extends Node
 @onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelPunkteComputer"
 
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
-@onready var zug_beenden_button_label = $"/root/Main/UICanvasLayer/ZugBeenden/Label"
-@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ZugBeenden/ComputerdenktFortschrittanzeige"
+#@onready var zug_beenden_button_symbol = $"/root/Main/UICanvasLayer/ZugBeenden/Symbol"
+@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ComputerdenktFortschrittanzeige"
 @onready var optionen_button = $"/root/Main/UICanvasLayer/OptionenButton"
 
 
@@ -51,9 +51,16 @@ var wortliste_dict
 
 func _ready() -> void:
 	#wortliste_txt = wortliste.get_wortliste()
-	var ergebnis_load = wortliste.load_wortliste_dict_and_create_wortliste_suchtext()
-	wortliste_dict = ergebnis_load[0]
-	wortliste_txt = ergebnis_load[1]
+	var ergebnis_load = wortliste.load_wortliste_suchtext_and_create_wortliste_dict()
+	#print(ergebnis_load[0])
+	#print(ergebnis_load[1])
+	if not ergebnis_load[0] and not ergebnis_load[1]:  # FEHLER BEIM LADEN!
+		ui_info_label.text = "Fehler beim Laden der Wortliste!"
+		wortliste_dict = {}
+		wortliste_txt = ""
+	else:
+		wortliste_dict = ergebnis_load[0]
+		wortliste_txt = ergebnis_load[1]
 	#print(wortliste_txt)
 	
 	
@@ -78,13 +85,15 @@ func init_spielfeld():
 	#var spielbrett_size = spielbrett.size
 	
 	var spielfeld_scene = preload("res://scenes/Spielfeld.tscn")
-	var spielfeld_size = preload("res://graphics/spielfeld.png").get_size()
-	
+	var spielfeld_size = preload("res://graphics/spielfeld.png").get_size() * spielbrett.scale
+	var spielbrett_size = preload("res://graphics/spielbrett.png").get_size() * spielbrett.scale
 	var anzahl_felder = GlobalGameSettings.anzahl_felder
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen
-	
-	var erste_x = spielbrett.position.x - anzahl_felder/2 * (spielfeld_size.x + abstand)
-	var erste_y = spielbrett.position.y - anzahl_felder/2 * (spielfeld_size.y + abstand)
+	var mitte = spielbrett.position * spielbrett.scale
+	var erste_x = mitte.x - (anzahl_felder/2) * (spielfeld_size.x + abstand)
+	var erste_y = mitte.y - (anzahl_felder/2) * (spielfeld_size.y + abstand)
+	#var erste_x = mitte.x
+	#var erste_y = mitte.y
 	for y in range(anzahl_felder):
 		for x in range(anzahl_felder):
 			
@@ -114,6 +123,7 @@ func init_spielfeld():
 			new_spielfeld.position.y = new_position_y
 			new_spielfeld.feld = [x, y]
 			all_spielfelder[[x,y]] = new_spielfeld
+			print(new_position_x, ", ", new_position_y)
 			
 func get_belegte_felder(check_is_frisch_belegt):
 	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
@@ -395,15 +405,15 @@ func player_zug_beenden(spielsteine_to_reverse_to_fragezeichen_dict=null):
 	var allowed_felder = get_allowed_spielfelder()
 	var gelegte_woerter = read_gelegte_woerter([])
 	
-	if zug_beenden_button_label.text == "Steine tauschen":
+	if zug_beenden_button.symbol_aktiv == "Steine tauschen":
 		assert(not frisch_gelegt)
 		player_zug_erlaubt = true
 		player.steine_tauschen()
-	elif zug_beenden_button_label.text == "Passen":
+	elif zug_beenden_button.symbol_aktiv == "Passen":
 		player_zug_erlaubt = true
 		if not buchstaben_im_sackerl:
 			last_round = true
-	elif zug_beenden_button_label.text == "Spielende":
+	elif zug_beenden_button.symbol_aktiv == "Spielende":
 		#print("Spielende!")
 		
 		open_popup([], "Spielende", null)
@@ -614,11 +624,12 @@ func change_an_der_reihe():
 		an_der_reihe = computer
 		computerzug.restart()
 		zug_beenden_button.disabled = true
-		zug_beenden_button_label.text = "Computer denkt ..."
+		
+		zug_beenden_button.change_symbol("Computerzug")
 		#animation_player.play("computer_denkt")
 		
 		#player_punkte_label.text = "Player: " + str(player.punkte)
-		print("Computer Buchstaben: ", computer.get_buchstaben())
+		#print("Computer Buchstaben: ", computer.get_buchstaben())
 		
 		
 	else: # computer WAR an der reihe, wechsel zu player
@@ -629,9 +640,9 @@ func change_an_der_reihe():
 		#animation_player.stop("computer_denkt")
 		#animation_player.play("RESET")
 		if not last_round:
-			zug_beenden_button_label.text = "Passen"
+			zug_beenden_button.change_symbol("Passen")
 		else:
-			zug_beenden_button_label.text = "Spielende"
+			zug_beenden_button.change_symbol("Spielende")
 		computerdenkt_fortschrittanzeige.visible = false
 		
 		computerzug.aktiv = false
@@ -643,24 +654,30 @@ func change_an_der_reihe():
 func change_zug_beenden_label(frisch_belegt):
 	if player.get_markierte_steine():
 	
-		zug_beenden_button_label.text = "Steine tauschen"
+		zug_beenden_button.change_symbol("Steine tauschen")
 	elif not frisch_belegt:
 		if not last_round:
-			zug_beenden_button_label.text = "Passen"
+			zug_beenden_button.change_symbol("Passen")
 		else:
-			zug_beenden_button_label.text = "Spielende"
+			zug_beenden_button.change_symbol("Spielende")
 	else:
-		zug_beenden_button_label.text = "Wort legen"
+		zug_beenden_button.change_symbol("Wort legen")
 	
 
 func mouse_pos_to_spielfeld_pos(mouse_pos):
 	
 	var relative_mouse_pos = (mouse_pos - offset_screen_mitte)  / camera.zoom
-	return relative_mouse_pos + camera.position 
+	
+	var spielfeld_pos = relative_mouse_pos + camera.position 
+	
+	
+	return spielfeld_pos
 
 func spielfeld_pos_to_mouse_pos(spielfeld_pos):
 	var relative_mouse_pos = spielfeld_pos - camera.position
-	return (relative_mouse_pos * camera.zoom) + offset_screen_mitte
+	var mouse_pos = (relative_mouse_pos * camera.zoom) + offset_screen_mitte
+	
+	return mouse_pos
 	
 	
 func regex_operation(pattern):
@@ -775,8 +792,8 @@ func close_popup(button_txt, art, ersetzen_dict):
 			restart_game()
 		elif button_txt == "Schwierigkeitsgrad":
 			pass
-		elif button_txt == "Wortliste prüfen":
-			wortliste.start_pruefe_wortliste()
+		#elif button_txt == "Wortliste prüfen":
+			#wortliste.start_pruefe_wortliste()
 	
 func filter_in_wortliste(matches_lst):
 	#print(len(matches_lst), " vorher")

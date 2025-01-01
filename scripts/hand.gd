@@ -46,7 +46,7 @@ func _process(_delta: float) -> void:
 func ziehe_steine():
 	
 	if not global_concepts.buchstaben_im_sackerl:
-		print("buchstaben sind aus!")
+		#print("buchstaben sind aus!")
 		return
 	var anzahl_steine = GlobalGameSettings.anzahl_steine_pro_hand
 	var abstand = GlobalGameSettings.abstand_zwischen_steinen

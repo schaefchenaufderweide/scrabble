@@ -15,6 +15,7 @@ font = ExtResource("4_pk7mf")
 font_size = 20
 
 [node name="Spielstein" type="Area2D"]
+scale = Vector2(0.8, 0.8)
 script = ExtResource("1_n7k4w")
 
 [node name="SpriteFrischGelegt" type="Sprite2D" parent="."]

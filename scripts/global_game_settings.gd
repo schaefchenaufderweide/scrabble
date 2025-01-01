@@ -1,7 +1,7 @@
 extends Node
 
 var anzahl_steine_pro_hand = 7
-var abstand_zwischen_steinen = 5
+var abstand_zwischen_steinen = 2
 var anzahl_felder = 15
 
 var spielsteine_start = {"E": {"Anzahl": 15, "Wert": 1}, 

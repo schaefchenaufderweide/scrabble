@@ -8,9 +8,6 @@ var max_zoom = 2
 var min_zoom = 0.4
 var zoom_step = 0.1
 
-func _ready() -> void:
-	var spielbrett_size = preload("res://graphics/spielbrett.png").get_size()
-	position = Vector2(spielbrett_size.x/2, spielbrett_size.y/2)
 
 func _unhandled_input(event: InputEvent) -> void:
 

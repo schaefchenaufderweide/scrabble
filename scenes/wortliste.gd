@@ -12,30 +12,41 @@ var neue_wortliste_dict = {}
 var wortliste_suchtext
 var wortliste_dict
 
+# todo: hat das einen sinn so? wieso nicht einfach danach suchen, wenn es gebraucht wird? internet hat man eh!
 
-func load_wortliste_dict_and_create_wortliste_suchtext():
-	var json_file = FileAccess.open("res://wortliste.json", FileAccess.READ)
+func load_wortliste_suchtext_and_create_wortliste_dict():
+	var json_file = FileAccess.open("res://wortliste.txt", FileAccess.READ)
 	
 	var data
-	
+	var liste_dict = {}
+	var suchtext = ""
 	if json_file:
-		var json_text = json_file.get_as_text()
-		var json = JSON.new()
-		var result = json.parse(json_text)
+		suchtext = json_file.get_as_text()
 		
-		if result == 0:
-			wortliste_dict = json.get_data()
+		
+		
+		var all_keys = suchtext.split("\n")
+		for key in all_keys:
+			var rein_key = key.strip_edges()
+			liste_dict[rein_key] = true
+		#var json = JSON.new()
+		#var result = json.parse(json_text)
+		
+		#if result == 0:
+			#wortliste_dict = json.get_data()
 			#print(data)
-		else:
-			global_concepts.ui_info_label.text = "Fehler beim JSON-Erstellen der Wortliste"
+		#else:
+			#return [false, false]
 		json_file.close()
 	else:
-		global_concepts.ui_info_label.text = "Fehler beim Laden der Wortliste"
+		return [{}, ""]
 	#print(", ".join(fruits)) 
-
-	var suchtext = "\n".join(wortliste_dict.keys())
+	
+	
+	#var suchtext = "\n".join(wortliste_dict.keys())
 	#print(suchtext)
-	return [wortliste_dict, suchtext]
+	
+	return [liste_dict, suchtext]
 	
 	
 	
@@ -80,10 +91,11 @@ func _process(_delta: float) -> void:
 			next_wort()
 			return
 		
-		if akt_erklaerung != "Keine Erklärung gefunden":
+		if akt_erklaerung != "keine Erklärung gefunden" and akt_erklaerung != "Keine Erklärung gefunden":
 			neue_wortliste_dict[akt_zu_pruefendes_wort] = akt_erklaerung
 			var message = '"' + akt_zu_pruefendes_wort + '": "' + akt_erklaerung + '",'
 			print(message)
+			#print("bekannt")
 			next_wort()
 			return
 			
@@ -97,7 +109,9 @@ func _process(_delta: float) -> void:
 func next_wort():
 	internet_anfrage_aktiv = false
 	pruefe_wortliste_nr += 1
-	
+	if pruefe_wortliste_nr % 1000 == 0:
+		# pause, um zwischenzuspeichern
+		pass
 func ist_erlaubt(wort):
 	# red flags: wortlänge < 2
 	# kein vokal
@@ -167,36 +181,65 @@ func get_new_erklaerung(html):
 		
 		
 			erklaerung = single_match.get_string()
-			erklaerung = erklaerung.substr(0, len(erklaerung) - 2)  # löscht letzte zwei zeichen
-			var length = pattern.find("<")
-			erklaerung = erklaerung.substr(length)  # löscht anfang
-			pattern = "<[^>]*>"# + r"|\[\d+\]" # Entfernt ALLE HTML-Tags
 			
-			if regex.compile(pattern) == OK:
-				while regex.search(erklaerung):
-					erklaerung = regex.sub(erklaerung, "")
-				erklaerung = erklaerung.replace("&#58;", ":")
-				erklaerung = erklaerung.replace("&#32;", " ")
-				erklaerung = erklaerung.replace("☆", "")
-				if "[1]" in erklaerung and not "[2]" in erklaerung:
-					erklaerung = erklaerung.replace("[1]", "")
-				erklaerung = erklaerung.strip_edges()
+			erklaerung = saeubere_string(erklaerung, pattern, 2)
 				
-				return erklaerung
-			else:
-				print("Regex konnte nicht kompiliert werden.")
+			return erklaerung
+			
 		else:
+			if "Grammatische Merkmale:</p" in html:
+				var grammatik_beginn = html.find("Grammatische Merkmale:</p>")
+				var pat = '<a href="/wiki/'
+				var wort_anfang = html.find(pat, grammatik_beginn) + len(pat)
+				var wort_ende = html.find('"', wort_anfang)
+				var sub_wort = html.substr(wort_anfang, wort_ende - wort_anfang)
+				sub_wort = sub_wort.to_upper()
+				if sub_wort in neue_wortliste_dict:
+					erklaerung = neue_wortliste_dict[sub_wort]
+					return erklaerung
+				##var grammatik_ende = html.find("</li></ul>", grammatik_beginn)
+				#
+				#var sub_grammar = html.substr(grammatik_beginn, grammatik_ende - grammatik_beginn)
+				#
+				#erklaerung = saeubere_string(sub_grammar, "Grammatische Merkmale:</p>", 0)
+				#return erklaerung
+				#
+				
+			
 			erklaerung = find_uebereinstimmung(neue_wortliste_dict)
 			return erklaerung
+
+func saeubere_string(erklaerung, pattern, remov_from_back):
+	if remov_from_back:
+		erklaerung = erklaerung.substr(0, len(erklaerung) - remov_from_back)  # löscht letzte zeichen
+	var length = pattern.find("<")
+	erklaerung = erklaerung.substr(length)  # löscht anfang
+	var sauber_pattern = "<[^>]*>"
+	var regex = RegEx.new()
+	if regex.compile(sauber_pattern) == OK:
+		while regex.search(erklaerung):
+			erklaerung = regex.sub(erklaerung, "")
+	
+	for rep in [ ["&#58;", ":"], ["&#32;", " "], ["&#32;", " "], ["&#91;", ""], ["1&#93;", ""], ["2&#93;", ""], ["3&#93;", ""], ["&#59;", ":"], ["☆", ""], ["&#160;", ""], ["&lt;", "<"] ]:
+		var what = rep[0]
+		var to = rep[1]
+		erklaerung = erklaerung.replace(what, to)
+	
+	
+	if "[1]" in erklaerung and not "[2]" in erklaerung:
+		erklaerung = erklaerung.replace("[1]", "")
+	erklaerung = erklaerung.strip_edges()
+	return erklaerung
 
 func find_uebereinstimmung(neue_wortliste_dict):
 	var alle_uebereinstimmungen = []
 	for check_wort in neue_wortliste_dict:
 		
 		var stelle = 0
+		var uebereinstimmungen = [0]
 		var uebereinstimmung: float = 0.0
-		var bonus_add = 0  # hintereinander übereinstimmend
-		var bonus = 0
+		#var bonus_add = 0  # hintereinander übereinstimmend
+		#var bonus = 0
 		for char in check_wort:
 			if neue_wortliste_dict[check_wort] == "Keine Erklärung gefunden":
 				continue
@@ -204,23 +247,28 @@ func find_uebereinstimmung(neue_wortliste_dict):
 				break
 			if akt_zu_pruefendes_wort[stelle] == char:
 				uebereinstimmung += 1
-				bonus_add += 1
+				#bonus_add += 1
 			else:
-				if bonus_add > 1:
-					bonus += bonus_add
-				bonus_add = 0
+				if uebereinstimmung:
+					uebereinstimmungen.append(uebereinstimmung)
+				uebereinstimmung = 0.0
+				
 				
 			stelle += 1
 		var vergleichslaenge = max(len(akt_zu_pruefendes_wort), len(check_wort))
-		var aehnlichkeit: float = ((uebereinstimmung + bonus)/(vergleichslaenge + bonus)) * 100
+		#var vergleichslaenge = len(check_wort)
+		var max_uebereinstimmung = uebereinstimmungen.max()
+		var aehnlichkeit: float = (max_uebereinstimmung/vergleichslaenge) * 100
 		alle_uebereinstimmungen.append([neue_wortliste_dict[check_wort], aehnlichkeit])
 			
 	alle_uebereinstimmungen.sort_custom(func(a, b): return a[1] > b[1])
+	if not alle_uebereinstimmungen:
+		return("keine Erklärung gefunden")
 	var best = alle_uebereinstimmungen[0]
-	if best[1] > 85:
+	if best[1] > 90:
 		return best[0]
 		
 	else:
-		return("Keine Erklärung gefunden")
+		return("keine Erklärung gefunden")
 
 		

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=22 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
@@ -7,11 +7,14 @@
 [ext_resource type="Theme" uid="uid://cftmp74rygmtr" path="res://themes/theme.tres" id="6_ky180"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_cm5u0"]
+[ext_resource type="Texture2D" uid="uid://dmnlit1u8gkbx" path="res://graphics/button_round_normal.png" id="7_hcqcc"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_j5j5i"]
+[ext_resource type="Texture2D" uid="uid://6x6wbbt6wnxn" path="res://graphics/button_round_pressed.png" id="8_q82k1"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
 [ext_resource type="Script" path="res://scenes/pop_up_menu.gd" id="10_5ke6a"]
-[ext_resource type="Texture2D" uid="uid://d2f5nwnjobo33" path="res://graphics/background_HUD.png" id="11_ck8rb"]
+[ext_resource type="Texture2D" uid="uid://mm1i222dsoru" path="res://graphics/symbol_passen.png" id="10_fenq5"]
+[ext_resource type="Texture2D" uid="uid://cp2773g57wehi" path="res://graphics/background_HUD.png" id="11_ck8rb"]
 [ext_resource type="Script" path="res://scenes/menu_button.gd" id="12_0d1wb"]
 [ext_resource type="Script" path="res://scenes/wortliste.gd" id="13_qtrk6"]
 [ext_resource type="Script" path="res://scenes/optionen_button.gd" id="15_vfl4s"]
@@ -28,11 +31,11 @@ script = ExtResource("1_6iaw0")
 script = ExtResource("2_vusr7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(249, 411)
 script = ExtResource("6_r55eh")
 
 [node name="Spielbrett" type="Area2D" parent="."]
-position = Vector2(600, 617)
+scale = Vector2(0.8, 0.8)
+metadata/_edit_group_ = true
 
 [node name="Spielfelder" type="Node" parent="Spielbrett"]
 
@@ -98,52 +101,44 @@ vertical_alignment = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -237.0
-offset_top = 40.0
-offset_right = 237.0
-offset_bottom = 151.0
+offset_left = 162.0
+offset_top = 708.0
+offset_right = 273.0
+offset_bottom = 819.0
 grow_horizontal = 2
+scale = Vector2(0.8, 0.8)
 size_flags_vertical = 4
-texture_normal = ExtResource("7_cm5u0")
-texture_pressed = ExtResource("8_j5j5i")
+texture_normal = ExtResource("7_hcqcc")
+texture_pressed = ExtResource("8_q82k1")
 script = ExtResource("8_dr8w6")
+metadata/_edit_group_ = true
 
-[node name="Label" type="Label" parent="UICanvasLayer/ZugBeenden"]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.0421941
-anchor_top = 0.171171
-anchor_right = 0.945148
-anchor_bottom = 0.774775
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("6_ky180")
-text = "Passen"
-horizontal_alignment = 1
-vertical_alignment = 1
+[node name="Symbol" type="Sprite2D" parent="UICanvasLayer/ZugBeenden"]
+position = Vector2(55, 53)
+texture = ExtResource("10_fenq5")
 metadata/_edit_use_anchors_ = true
 
-[node name="ComputerdenktFortschrittanzeige" type="ColorRect" parent="UICanvasLayer/ZugBeenden"]
-layout_mode = 1
-anchors_preset = 8
+[node name="ComputerdenktFortschrittanzeige" type="ColorRect" parent="UICanvasLayer"]
+anchors_preset = 7
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -216.0
-offset_top = -37.5
-offset_right = 213.0
-offset_bottom = 30.5
+anchor_bottom = 1.0
+offset_left = -214.0
+offset_top = -19.0
+offset_right = 215.0
+offset_bottom = -15.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 color = Color(1, 1, 0, 0.545098)
 
 [node name="PopUpMenu" type="Sprite2D" parent="UICanvasLayer"]
 visible = false
-position = Vector2(248, 438.5)
+position = Vector2(243, 370)
 scale = Vector2(0.806667, 0.8)
 texture = ExtResource("11_ck8rb")
 script = ExtResource("10_5ke6a")
+metadata/_edit_group_ = true
 
 [node name="Label" type="Label" parent="UICanvasLayer/PopUpMenu"]
 anchors_preset = 5
@@ -212,10 +207,10 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="OptionenButton" type="TextureButton" parent="UICanvasLayer"]
-offset_left = 15.0
-offset_top = 584.0
-offset_right = 126.0
-offset_bottom = 695.0
+offset_top = 706.0
+offset_right = 111.0
+offset_bottom = 817.0
+scale = Vector2(0.8, 0.8)
 theme = ExtResource("6_ky180")
 texture_normal = ExtResource("16_siayd")
 texture_pressed = ExtResource("17_rfnt2")
