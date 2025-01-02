@@ -48,8 +48,9 @@
 1.1 spielende: anzeige des gewinners, spiel wird neu begonnen (25.12)
 1.2 wortliste reinigen begonnen (25.12)
 1.21 wortliste reinigen: erklärungen werden aus dem internet ermittelt, in optionen wählbar (28.12)
-1.25 Wortliste wieder auf text, wäre zu groß, in Progress: nach legen Infos aus Internet holen, neue zuglegen-buttons mit Symbolen, neu angeordnet auch Spielfeld, alles auf scale 0.8 angepasst (1.1.25)
-1.3 einstellungen direkt im spiel per zahnrad: leicht/mittel/schwer, namen direkt im spiel ändern
+1.25 Wortliste wieder auf text, wäre zu groß, in Progress: nach legen Infos aus Internet holen, 
+neue zuglegen-buttons mit Symbolen, neu angeordnet auch Spielfeld, alles auf scale 0.8 angepasst (1.1.25)
+1.3 namen und schwierigkeitsstufe fertig (2.1.25)
 1.4 im spiel wörter hinzufügen/löschen: per anfrage? sollen im internet sein
 1.5 highscore und wortlisten online speichern
 1.6 liste der gelegten wörter direkt per button: Per antippen infos zu wörtern, können einfach bereits in Datenmaterial im dict vorhanden sein statt true

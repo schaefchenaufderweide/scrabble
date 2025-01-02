@@ -16,12 +16,12 @@ var abgelegtes_feld = false
 var is_pressed = false
 var wert
 var fixiert = false
-var pos_in_hand 
+var pos_in_hand
 
 #@onready var punkte_label = $PunkteLabel
 #@onready var punkte_label_timer = $PunkteLabel/Timer
 
-func _input(event: InputEvent) -> void:	
+func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and is_touched:
@@ -77,7 +77,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		if is_pressed:
 			
-			position = global_concepts.mouse_pos_to_spielfeld_pos(event.position) 
+			position = global_concepts.mouse_pos_to_spielfeld_pos(event.position)
 			#if global_concepts.snap_field:
 				#position = global_concepts.snap_field.position
 			#

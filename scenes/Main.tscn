@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://764kc4snul82"]
+[gd_scene load_steps=28 format=3 uid="uid://764kc4snul82"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_6iaw0"]
 [ext_resource type="Script" path="res://scripts/global_concepts.gd" id="2_vusr7"]
@@ -6,16 +6,22 @@
 [ext_resource type="PackedScene" uid="uid://c5wqgnu8r3eye" path="res://scenes/Hand.tscn" id="5_0h5wa"]
 [ext_resource type="Theme" uid="uid://cftmp74rygmtr" path="res://themes/theme.tres" id="6_ky180"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="6_r55eh"]
+[ext_resource type="Texture2D" uid="uid://dvs873jakfvnr" path="res://graphics/button_small_normal.png" id="7_421ko"]
 [ext_resource type="Texture2D" uid="uid://nf8vb73cw2qd" path="res://graphics/button_normal.png" id="7_cm5u0"]
 [ext_resource type="Texture2D" uid="uid://dmnlit1u8gkbx" path="res://graphics/button_round_normal.png" id="7_hcqcc"]
 [ext_resource type="Script" path="res://scenes/zug_beenden.gd" id="8_dr8w6"]
+[ext_resource type="Texture2D" uid="uid://c3twhmtx4xafr" path="res://graphics/button_small_pressed.png" id="8_hfdom"]
 [ext_resource type="Texture2D" uid="uid://bu7yqyscbpm6f" path="res://graphics/button_pressed.png" id="8_j5j5i"]
 [ext_resource type="Texture2D" uid="uid://6x6wbbt6wnxn" path="res://graphics/button_round_pressed.png" id="8_q82k1"]
 [ext_resource type="Script" path="res://scripts/computerzug.gd" id="9_avwwi"]
 [ext_resource type="Script" path="res://scenes/pop_up_menu.gd" id="10_5ke6a"]
+[ext_resource type="Script" path="res://scenes/line_edit.gd" id="10_bwcm0"]
 [ext_resource type="Texture2D" uid="uid://mm1i222dsoru" path="res://graphics/symbol_passen.png" id="10_fenq5"]
 [ext_resource type="Texture2D" uid="uid://cp2773g57wehi" path="res://graphics/background_HUD.png" id="11_ck8rb"]
+[ext_resource type="Script" path="res://scenes/difficulty_slider.gd" id="11_iry1u"]
+[ext_resource type="Texture2D" uid="uid://c0jf833jy01ek" path="res://graphics/computer_denkt_fortschritt_rahmen.png" id="11_yx2ml"]
 [ext_resource type="Script" path="res://scenes/menu_button.gd" id="12_0d1wb"]
+[ext_resource type="Script" path="res://scenes/computer_fortschritt.gd" id="12_f2jbp"]
 [ext_resource type="Script" path="res://scenes/wortliste.gd" id="13_qtrk6"]
 [ext_resource type="Script" path="res://scenes/optionen_button.gd" id="15_vfl4s"]
 [ext_resource type="Texture2D" uid="uid://dqe4r6crx8jyt" path="res://graphics/button_round_zahnrad.png" id="16_siayd"]
@@ -41,7 +47,7 @@ metadata/_edit_group_ = true
 
 [node name="AbgelegteSteine" type="Node" parent="Spielbrett"]
 
-[node name="Sprite2D" type="Sprite2D" parent="Spielbrett"]
+[node name="BackgroundSprite" type="Sprite2D" parent="Spielbrett"]
 texture = ExtResource("3_7hawp")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Spielbrett"]
@@ -55,29 +61,92 @@ transform = Transform2D(1, 0, 0, 1, 0, 500)
 
 [node name="UICanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="LabelPunktePlayer" type="Label" parent="UICanvasLayer"]
-offset_left = 20.0
-offset_right = 162.0
-offset_bottom = 50.0
+[node name="ButtonPlayer" type="TextureButton" parent="UICanvasLayer"]
+offset_right = 235.0
+offset_bottom = 109.0
+theme = ExtResource("6_ky180")
+texture_normal = ExtResource("7_421ko")
+texture_pressed = ExtResource("8_hfdom")
+script = ExtResource("12_0d1wb")
+
+[node name="Label" type="Label" parent="UICanvasLayer/ButtonPlayer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -108.5
+offset_top = -36.5
+offset_right = 106.5
+offset_bottom = 30.5
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("6_ky180")
 theme_override_colors/font_color = Color(0, 0.513726, 1, 1)
+theme_override_font_sizes/font_size = 25
 text = "Player: 0"
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="LabelPunkteComputer" type="Label" parent="UICanvasLayer"]
+[node name="LineEdit" type="LineEdit" parent="UICanvasLayer/ButtonPlayer"]
+visible = false
+layout_mode = 0
+offset_left = 8.0
+offset_top = 15.0
+offset_right = 223.0
+offset_bottom = 86.0
+placeholder_text = "New Name"
+max_length = 20
+select_all_on_focus = true
+caret_blink = true
+script = ExtResource("10_bwcm0")
+
+[node name="ButtonComputer" type="TextureButton" parent="UICanvasLayer"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -218.0
-offset_right = -20.0
-offset_bottom = 50.0
+offset_left = -235.0
+offset_bottom = 109.0
 grow_horizontal = 0
 theme = ExtResource("6_ky180")
+texture_normal = ExtResource("7_421ko")
+texture_pressed = ExtResource("8_hfdom")
+script = ExtResource("12_0d1wb")
+
+[node name="Label" type="Label" parent="UICanvasLayer/ButtonComputer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -108.5
+offset_top = -38.5
+offset_right = 103.5
+offset_bottom = 29.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("6_ky180")
 theme_override_colors/font_color = Color(1, 0, 0, 1)
-text = "Computer: 0"
+theme_override_font_sizes/font_size = 25
+text = "Computer (Novice): 0"
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="DifficultySlider" type="HSlider" parent="UICanvasLayer/ButtonComputer"]
+visible = false
+layout_mode = 0
+offset_left = -263.0
+offset_top = 101.0
+offset_right = 206.0
+offset_bottom = 139.0
+theme = ExtResource("6_ky180")
+max_value = 4.0
+value = 2.0
+script = ExtResource("11_iry1u")
 
 [node name="UIInfo" type="Label" parent="UICanvasLayer"]
 visible = false
@@ -118,24 +187,28 @@ position = Vector2(55, 53)
 texture = ExtResource("10_fenq5")
 metadata/_edit_use_anchors_ = true
 
-[node name="ComputerdenktFortschrittanzeige" type="ColorRect" parent="UICanvasLayer"]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
+[node name="ComputerFortschritt" type="Sprite2D" parent="UICanvasLayer"]
+position = Vector2(251, 788)
+texture = ExtResource("11_yx2ml")
+script = ExtResource("12_f2jbp")
+metadata/_edit_group_ = true
+
+[node name="ColorBar" type="ColorRect" parent="UICanvasLayer/ComputerFortschritt"]
+show_behind_parent = true
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -214.0
-offset_top = -19.0
-offset_right = 215.0
-offset_bottom = -15.0
+offset_left = -237.0
+offset_top = -4.0
+offset_right = -249.0
+offset_bottom = -16.0
 grow_horizontal = 2
-grow_vertical = 0
-color = Color(1, 1, 0, 0.545098)
+grow_vertical = 2
+color = Color(1, 1, 0, 1)
 
 [node name="PopUpMenu" type="Sprite2D" parent="UICanvasLayer"]
 visible = false
-position = Vector2(243, 370)
-scale = Vector2(0.806667, 0.8)
+position = Vector2(250, 380)
 texture = ExtResource("11_ck8rb")
 script = ExtResource("10_5ke6a")
 metadata/_edit_group_ = true
@@ -144,12 +217,14 @@ metadata/_edit_group_ = true
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -420.0
-offset_top = -250.0
-offset_right = -180.0
-offset_bottom = -200.0
+offset_left = -365.0
+offset_top = -300.0
+offset_right = -125.0
+offset_bottom = -250.0
 grow_horizontal = 2
 text = "Bitte wählen ..."
+autowrap_mode = 3
+justification_flags = 171
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UICanvasLayer/PopUpMenu"]
 anchors_preset = 8
@@ -157,14 +232,12 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -522.0
-offset_top = -500.0
-offset_right = -78.0
-offset_bottom = -100.0
+offset_left = -489.0
+offset_top = -570.0
+offset_right = 1.0
+offset_bottom = -101.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
 horizontal_scroll_mode = 0
 
 [node name="ContainerVertical" type="BoxContainer" parent="UICanvasLayer/PopUpMenu/ScrollContainer"]
@@ -177,10 +250,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -537.0
-offset_top = -411.0
-offset_right = -63.0
-offset_bottom = -300.0
+offset_left = -482.0
+offset_top = -439.0
+offset_right = -8.0
+offset_bottom = -328.0
 grow_horizontal = 2
 grow_vertical = 0
 theme = ExtResource("6_ky180")
@@ -222,6 +295,14 @@ script = ExtResource("9_avwwi")
 [node name="Wortliste" type="HTTPRequest" parent="."]
 script = ExtResource("13_qtrk6")
 
+[connection signal="button_down" from="UICanvasLayer/ButtonPlayer" to="UICanvasLayer/ButtonPlayer" method="_on_button_down"]
+[connection signal="button_up" from="UICanvasLayer/ButtonPlayer" to="UICanvasLayer/ButtonPlayer" method="_on_button_up"]
+[connection signal="focus_exited" from="UICanvasLayer/ButtonPlayer/LineEdit" to="UICanvasLayer/ButtonPlayer/LineEdit" method="_on_focus_exited"]
+[connection signal="text_submitted" from="UICanvasLayer/ButtonPlayer/LineEdit" to="UICanvasLayer/ButtonPlayer/LineEdit" method="_on_text_submitted"]
+[connection signal="button_down" from="UICanvasLayer/ButtonComputer" to="UICanvasLayer/ButtonComputer" method="_on_button_down"]
+[connection signal="button_up" from="UICanvasLayer/ButtonComputer" to="UICanvasLayer/ButtonComputer" method="_on_button_up"]
+[connection signal="drag_ended" from="UICanvasLayer/ButtonComputer/DifficultySlider" to="UICanvasLayer/ButtonComputer/DifficultySlider" method="_on_drag_ended"]
+[connection signal="value_changed" from="UICanvasLayer/ButtonComputer/DifficultySlider" to="UICanvasLayer/ButtonComputer/DifficultySlider" method="_on_value_changed"]
 [connection signal="button_down" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_down"]
 [connection signal="button_up" from="UICanvasLayer/ZugBeenden" to="UICanvasLayer/ZugBeenden" method="_on_button_up"]
 [connection signal="button_down" from="UICanvasLayer/PopUpMenu/MainButton" to="UICanvasLayer/PopUpMenu/MainButton" method="_on_button_down"]

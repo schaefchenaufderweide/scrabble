@@ -8,7 +8,8 @@ var symbols_dict = {"Passen": preload("res://graphics/symbol_passen.png"),
 "Wort legen": preload("res://graphics/symbol_okay.png"), 
 "Steine tauschen": preload("res://graphics/symbol_tauschen.png"), 
 "Spielende": preload("res://graphics/symbol_spielende.png"),
-"Computerzug": preload("res://graphics/symbol_wait.png")}
+"Computerzug": preload("res://graphics/symbol_wait.png"),
+"ungültig": preload("res://graphics/symbol_wrong.png")}
 
 
 func change_symbol(symbol_name):

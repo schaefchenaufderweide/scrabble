@@ -7,25 +7,37 @@ extends Node
 @onready var hand_area = $HandArea
 @onready var select_rect = $HandArea/SelectRect
 @onready var timer = $Timer
-
+@onready var name_edit_popup = $"/root/Main/UICanvasLayer/ButtonPlayer/LineEdit"
 
 var steine_dict = {}
 var stein_hand_positions = {}
 var is_touched = false
 var punkte = 0
 var soll_punkte = 0
+var rel_button
 var rel_punkte_label
 var slow_count = 0
-#var slow_count_max = 5
+var name_of_party
+
 
 func _ready() -> void:
 	
 	ziehe_steine()
 	if name == "Player":
-		rel_punkte_label = global_concepts.player_punkte_label
+		rel_punkte_label = $"/root/Main/UICanvasLayer/ButtonPlayer/Label"
+		rel_button = $"/root/Main/UICanvasLayer/ButtonPlayer"
+		rel_button.art = "Player Button"
+		name_of_party = "Player"
+		
 	else:
-		rel_punkte_label = global_concepts.computer_punkte_label
-
+		rel_punkte_label = $"/root/Main/UICanvasLayer/ButtonComputer/Label"
+		rel_button = $"/root/Main/UICanvasLayer/ButtonComputer"
+		rel_button.art = "Computer Button"
+		var difficulty = int(global_concepts.difficulty_slider.value)
+		name_of_party = global_concepts.difficulties_dict[difficulty]
+	update_text()
+	
+	
 func _process(_delta: float) -> void:
 	if punkte < soll_punkte:
 		slow_count += 1
@@ -40,9 +52,12 @@ func _process(_delta: float) -> void:
 		if slow_count == slow_count_max:
 			
 			punkte += 1
-			rel_punkte_label.text = name + ": " + str(punkte)
+			update_text()
 			slow_count = 0
-			
+
+func update_text():
+	rel_punkte_label.text = name_of_party + ": " + str(punkte)
+
 func ziehe_steine():
 	
 	if not global_concepts.buchstaben_im_sackerl:

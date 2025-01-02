@@ -8,8 +8,9 @@ var fake_durchgang:float = 0.0  # pseudozahl: durchgang * faktor_fake, um glatte
 
 
 
-@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ComputerdenktFortschrittanzeige"
-@onready var fortschrittanzeige_max_breite = computerdenkt_fortschrittanzeige.size.x
+
+@onready var computer_fortschritt: Sprite2D = $"/root/Main/UICanvasLayer/ComputerFortschritt"
+
 @onready var global_concepts: Node = $"/root/Main/GlobalConcepts"
 
 #var word_array
@@ -27,7 +28,7 @@ var thread: Thread
 var thread_aktiv = false
 
 func _ready() -> void:
-	computerdenkt_fortschrittanzeige.visible = false
+	computer_fortschritt.visible = false
 	thread = Thread.new()
 	
 func _process(_delta: float) -> void:
@@ -69,7 +70,7 @@ func _process(_delta: float) -> void:
 func restart():
 	#print("restart computerzug")
 	moegliche_woerter = []
-	computerdenkt_fortschrittanzeige.visible = true
+	computer_fortschritt.visible = true
 	aktiv = true
 	durchgang = 0
 	fake_durchgang = 0
@@ -112,29 +113,26 @@ func count_fake_durchgang_and_draw_bar():
 		var add 
 		if fehlen_auf_soll > faktor_fake_durchgang / 2:
 			wahrscheinlichkeit = 100
-			add = 5
-		elif fehlen_auf_soll > faktor_fake_durchgang / 3:
-			wahrscheinlichkeit = 100
 			add = 4
-		elif fehlen_auf_soll > faktor_fake_durchgang / 4:
-			wahrscheinlichkeit = 75
+		elif fehlen_auf_soll > faktor_fake_durchgang / 3:
+			wahrscheinlichkeit = 80
 			add = 3
-		elif fehlen_auf_soll > faktor_fake_durchgang / 5:
+		elif fehlen_auf_soll > faktor_fake_durchgang / 4:
 			wahrscheinlichkeit = 50
 			add = 2
+		elif fehlen_auf_soll > faktor_fake_durchgang / 5:
+			wahrscheinlichkeit = 40
+			add = 1
 		else:
-			wahrscheinlichkeit = 20
+			wahrscheinlichkeit = 40
 			add = 1
 		if randi_range(0, 100) < wahrscheinlichkeit:
 			fake_durchgang += add
 	var percent: float = fake_durchgang/(max_durchgaenge * faktor_fake_durchgang)
 	#print(fake_durchgang, "/", max_durchgaenge * faktor_fake_durchgang, " ", percent)
 	
-	var new_breite = fortschrittanzeige_max_breite * percent
+	computer_fortschritt.change_value(percent)
 	
-	computerdenkt_fortschrittanzeige.size.x = new_breite
-	computerdenkt_fortschrittanzeige.color.r = 1- percent
-	computerdenkt_fortschrittanzeige.color.g = percent
 
 func get_word_array(belegte_felder):
 	# waagrecht
@@ -331,12 +329,12 @@ func find_moegliche_woerter(pattern, computer_buchstaben, alle_woerter_all, info
 	
 	if pattern + str(computer_buchstaben.count("?")) in known_matches:
 		matches_txt = known_matches[pattern + str(computer_buchstaben.count("?"))]
-		print("known pattern ", pattern) 
+		#print("known pattern ", pattern) 
 	else: 
 		#print("starte regex mit ", pattern)
 		matches_txt = global_concepts.regex_operation(pattern)
 		known_matches[pattern + str(computer_buchstaben.count("?"))] = matches_txt
-		print("pattern saved: ", pattern)
+		#print("pattern saved: ", pattern)
 			
 	if not matches_txt:
 		#print("Keine Matches gefunden!")
@@ -671,8 +669,33 @@ func thinking_ende():
 		
 	else:
 		global_concepts.last_round = false
-		lege_steine(sort_erlaubte_woerter[0])
-		var punkte = sort_erlaubte_woerter[0][1]
+		var gewaehltes_wort_nr_max: int
+		var gewaehltes_wort_nr: int 
+		var difficulty_setting = global_concepts.difficulty_slider.value
+		if  difficulty_setting == 0:
+			gewaehltes_wort_nr_max = len(sort_erlaubte_woerter) - 1
+		elif difficulty_setting == 1:
+			gewaehltes_wort_nr_max = (len(sort_erlaubte_woerter) - 1) / 3
+		elif difficulty_setting == 2:
+			gewaehltes_wort_nr_max = (len(sort_erlaubte_woerter) - 1) / 5
+		elif difficulty_setting == 3:
+			gewaehltes_wort_nr_max = 2
+		elif difficulty_setting == 4:
+			gewaehltes_wort_nr_max = 0
+		
+		if gewaehltes_wort_nr_max == 0:
+			gewaehltes_wort_nr = 0
+		
+		elif gewaehltes_wort_nr_max > len(sort_erlaubte_woerter) - 1:
+			gewaehltes_wort_nr_max = len(sort_erlaubte_woerter) - 1
+		
+		gewaehltes_wort_nr = randi_range(0, gewaehltes_wort_nr_max)
+		var gewaehltes_wort = sort_erlaubte_woerter[gewaehltes_wort_nr]
+		#print("gewaehlt_nr:", gewaehltes_wort_nr)
+		#var gewaehltes_wort = sort_erlaubte_woerter[0]
+		var punkte = gewaehltes_wort[1]
+		lege_steine(gewaehltes_wort)
+		#var punkte = sort_erlaubte_woerter[0][1]
 		var new_punkte_labels = sort_erlaubte_woerter[0][2]
 		for lab in new_punkte_labels:
 			global_concepts.punkte_labels[lab] = new_punkte_labels[lab]

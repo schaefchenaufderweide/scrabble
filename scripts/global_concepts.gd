@@ -7,12 +7,12 @@ extends Node
 @onready var spielbereich_abgelegte_steine = $"/root/Main/Spielbrett/AbgelegteSteine"
 @onready var player = $"/root/Main/Player"
 @onready var computer = $"/root/Main/Computer"
-@onready var player_punkte_label = $"/root/Main/UICanvasLayer/LabelPunktePlayer"
-@onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelPunkteComputer"
-
+#@onready var player_punkte_label = $"/root/Main/UICanvasLayer/LabelPunktePlayer"
+#@onready var computer_punkte_label = $"/root/Main/UICanvasLayer/LabelPunkteComputer"
+@onready var difficulty_slider = $"/root/Main/UICanvasLayer/ButtonComputer/DifficultySlider"
 @onready var zug_beenden_button = $"/root/Main/UICanvasLayer/ZugBeenden"
 #@onready var zug_beenden_button_symbol = $"/root/Main/UICanvasLayer/ZugBeenden/Symbol"
-@onready var computerdenkt_fortschrittanzeige: ColorRect = $"/root/Main/UICanvasLayer/ComputerdenktFortschrittanzeige"
+@onready var computer_fortschritt: Sprite2D = $"/root/Main/UICanvasLayer/ComputerFortschritt"
 @onready var optionen_button = $"/root/Main/UICanvasLayer/OptionenButton"
 
 
@@ -21,7 +21,7 @@ extends Node
 var buchstaben_im_sackerl = create_buchstaben_im_sackerl()
 @onready var camera = $"/root/Main/Camera2D"
 @onready var main = $"/root/Main"
-@onready var animation_player = $"/root/Main/AnimationPlayer"
+#@onready var animation_player = $"/root/Main/AnimationPlayer"
 #@onready var computerzug_sprite = $"/root/Main/UICanvasLayer/ComputerzugSprite"
 @onready var computerzug: Node = $"/root/Main/Computerzug"
 
@@ -48,6 +48,13 @@ var last_round = false
 var an_der_reihe 
 var wortliste_txt
 var wortliste_dict 
+var difficulties_dict = {0: "Computer (HUND)", 
+						1: "Computer (KAUZ)", 2: "Computer (ERDKRÖTE)", 
+						3: "Computer (GRIZZLYBÄR)", 
+						4: "Computer (QUETZAL)"}
+
+
+
 
 func _ready() -> void:
 	#wortliste_txt = wortliste.get_wortliste()
@@ -123,7 +130,7 @@ func init_spielfeld():
 			new_spielfeld.position.y = new_position_y
 			new_spielfeld.feld = [x, y]
 			all_spielfelder[[x,y]] = new_spielfeld
-			print(new_position_x, ", ", new_position_y)
+			#print(new_position_x, ", ", new_position_y)
 			
 func get_belegte_felder(check_is_frisch_belegt):
 	var group_alle_felder = get_tree().get_nodes_in_group("Spielfelder")
@@ -205,7 +212,8 @@ func get_allowed_spielfelder():
 	var frisch_belegte_felder = get_belegte_felder(true)
 	change_zug_beenden_label(frisch_belegte_felder)
 	if not is_frisch_gelegt_valid(frisch_belegte_felder, belegte_felder):
-		print("keine gültigen allowed felder!")
+		zug_beenden_button.change_symbol("ungültig")
+		#print("keine gültigen allowed felder!")
 		return []
 	
 	var allowed_felder = []
@@ -576,6 +584,7 @@ func create_new_punkte_labels():
 func is_zug_gueltig(allowed_felder, gelegte_woerter):
 	
 	if not allowed_felder:  # zug ungültig!
+		
 		#print("zug ungültig! falsch gelegt")
 		return false
 	
@@ -643,7 +652,7 @@ func change_an_der_reihe():
 			zug_beenden_button.change_symbol("Passen")
 		else:
 			zug_beenden_button.change_symbol("Spielende")
-		computerdenkt_fortschrittanzeige.visible = false
+		computer_fortschritt.visible = false
 		
 		computerzug.aktiv = false
 		var allowed_felder = get_allowed_spielfelder()
@@ -701,12 +710,12 @@ func regex_operation(pattern):
 	else:
 		print("regex fehler!!!")
 
-func open_popup(button_txt_lst, art, info):
+func open_popup(button_txt_lst: Array, art: String, info):
 	popup_menu.visible = true
 	
 	spielfeld_is_locked = true
 	zug_beenden_button.disabled = true
-	zug_beenden_button.label.visible = false
+	zug_beenden_button.visible = false
 	optionen_button.disabled = true
 	optionen_button.visible = false
 	popup_menu.main_button.visible = true
@@ -727,9 +736,10 @@ func open_popup(button_txt_lst, art, info):
 		popup_menu.main_button.art = "Spielende"
 	elif art == "Optionen":
 		popup_menu.main_button.visible = false
+		popup_menu.label.text = ""
 	
-	
-	
+	elif art == "Schwierigkeitsgrad":
+		popup_menu.label.text = "Computer Schwierigkeitsgrad"
 		
 	for but_txt in button_txt_lst:
 		var new_button = button_scene.instantiate()
@@ -766,7 +776,7 @@ func close_popup(button_txt, art, ersetzen_dict):
 	
 	spielfeld_is_locked = false
 	zug_beenden_button.disabled = false
-	zug_beenden_button.label.visible = true
+	zug_beenden_button.visible = true
 	optionen_button.disabled = false
 	optionen_button.visible = true
 	
@@ -776,25 +786,43 @@ func close_popup(button_txt, art, ersetzen_dict):
 		assert (ersetzen_dict)
 		var spielsteine_to_reverse_dict = {}
 		for zelle in ersetzen_dict:
-			print(all_spielfelder[zelle])
-			print(all_spielfelder[zelle].spielstein_auf_feld)
+			#print(all_spielfelder[zelle])
+			#print(all_spielfelder[zelle].spielstein_auf_feld)
 			all_spielfelder[zelle].spielstein_auf_feld.label_buchstabe.text = ersetzen_dict[zelle]
 			all_spielfelder[zelle].frisch_belegt = true
 			spielsteine_to_reverse_dict[all_spielfelder[zelle].spielstein_auf_feld] = zelle
 		player_zug_beenden(spielsteine_to_reverse_dict)   # info wenn wegen zweitwort nicht möglich ...!
 		spielfeld_is_locked = false
+	
 	elif art == "Spielende":
 		restart_game()
 		# todo: check highscore
 		# todo: restart game
+	
 	elif art == "Optionen":
 		if button_txt == "Neustart":
 			restart_game()
-		elif button_txt == "Schwierigkeitsgrad":
-			pass
-		#elif button_txt == "Wortliste prüfen":
+		#elif button_txt == "Schwierigkeitsgrad":
+			#change_difficulty()
+		##elif button_txt == "Wortliste prüfen":
 			#wortliste.start_pruefe_wortliste()
 	
+	#elif art == "Schwierigkeitsgrad":
+		#computer.name_of_party = "CPU (" + button_txt + ")"
+		#computer.update_text()
+	#
+	elif art == "Zurück":
+		return
+	
+	elif art == "Player Button":
+		change_player_name()
+	
+	elif art == "Computer Button":
+		change_difficulty()
+		
+	else: 
+		print("Keine Art des Buttons definiert!")
+		
 func filter_in_wortliste(matches_lst):
 	#print(len(matches_lst), " vorher")
 	var filtered_woerter = []
@@ -809,3 +837,13 @@ func filter_in_wortliste(matches_lst):
 func restart_game():
 	#print("restarting game ...")
 	get_tree().reload_current_scene()
+
+func change_player_name():
+	player.rel_punkte_label.visible = false
+	player.name_edit_popup.visible = true
+	player.name_edit_popup.grab_focus()
+	
+func change_difficulty():
+	difficulty_slider.visible = true
+	
+	

@@ -4,5 +4,5 @@ extends TextureButton
 
 	
 func _on_button_up() -> void:
-	global_concepts.open_popup(["Neustart", "Schwierigkeitsgrad", "Zurück"], "Optionen", null)
+	global_concepts.open_popup(["Neustart", "Schwierigkeitsgrad", "Highscores", "Zurück"], "Optionen", null)
 	

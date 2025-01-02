@@ -4,6 +4,8 @@ var anzahl_steine_pro_hand = 7
 var abstand_zwischen_steinen = 2
 var anzahl_felder = 15
 
+
+
 var spielsteine_start = {"E": {"Anzahl": 15, "Wert": 1}, 
 						"N": {"Anzahl": 9, "Wert": 1}, 
 						"S": {"Anzahl": 7, "Wert": 1}, 
